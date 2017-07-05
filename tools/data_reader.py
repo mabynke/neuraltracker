@@ -10,8 +10,7 @@ def fetch_x_y(main_path, max_count=0, single_image=False):
     y hentes fra en fil ved navn "label" i sekvensmappen.
     :param main_path: Full bane til mappen som inneholder sekvensmappene (og bare det)
     :param max_count: Maksimalt antall sekvenser som skal lastes inn. 0 betyr ingen begrensning.
-    :param single_image: False: Laster inn hele sekvensen i en array av bilder. True: Laster inn bare det første bildet i sekvensen,
-    men fortsatt i en array av (1) bilder.
+    :param single_image: False: Laster inn hele sekvensen i en array av bilder. True: Laster inn bare det første bildet i sekvensen.
     :return: x, y
     """
 

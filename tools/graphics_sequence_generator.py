@@ -3,6 +3,7 @@ import random
 import scipy.misc
 import os
 
+
 def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, sizeX=32, sizeY=32, channels=3):
     square_size = 1
 
