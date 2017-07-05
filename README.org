@@ -1,0 +1,168 @@
+#+TITLE: Creating a generic object tracker
+#+OPTIONS: ^:{}
+
+* Introduction
+The goal of the summer of 2017 is to create a *generic object tracker*, in the
+sense that it should not be tied to a specific type of object. In fact we would
+like to make it so generic that it can track /any/ object. We can of course then
+not demand that the tracker will always know what /kind/ of object it is
+tracking.
+
+The inspiration for this project came from the article
+[[https://arxiv.org/abs/1406.6247][Recurrent Models of Visual Attention]] and its sequel [[https://arxiv.org/pdf/1412.7755.pdf][Multiple Object Recognition
+with Visual Attention]]. We will however not follow this architecture strictly. We
+will in fact try to use supervised learning as much as possible
+
+* Tracking
+   More specifically we would like to select an object in a frame with a
+   bounding box. The /tracker's/ view is then initialized to the center of this
+   object. In the next frame, where either the object and/or the camera might
+   have moved position, the tracker should then give us an updated bounding
+   box. The network should also output whether it believes the object to be
+   present or not (as the object may leave the field of view of the camera). The
+   view that is fed to the network may either be a function of the bounding box
+   or a separate coordinate decided by the network.
+   
+   As this may be done independently for several objects, we should be able to
+   track /arbitrarily/ many objects at the same time.
+
+** Base convolutional neural network
+   To extract features from the image we will use a convolutional neural
+   network. Experiments have shown that networks originally trained for
+   classification, with necessary changes to e.g. the output layer, are also
+   well suited for tasks like localization and detection. It thus seems like a
+   good approach to find a well-performing network from the literature, even
+   though it has not been tested for out exact purpose. [[https://arxiv.org/abs/1608.06993][DenseNet]] seems suitable
+   for our purpose, it has good performance while being computationally
+   resonable. The [[https://github.com/liuzhuang13/DenseNet][original implementation]] was in Torch, while we would like a
+   TensorFlow/Keras implementation. If we scroll down on their README file,
+   however, we can find a link to a Keras implementation:
+   - [[https://github.com/flyyufelix/DenseNet-Keras][DenseNet-Keras with ImageNet Pretrained Models]]
+     
+   which also contains a link to how you can do [[https://github.com/flyyufelix/cnn_finetune][finetuning on your own data]].
+
+   There are also many [[https://github.com/liuzhuang13/DenseNet#other-implementations][other implemenations]], both in pure TensorFlow as well as
+   Keras. They do not seem to contain any pretrained networks on ImageNet
+   though. We could still potentially use one of these and pretrain it ourselves
+   on a relevant dataset.
+** Initialization of hidden representation
+   How do we tell the network what it should be looking for? Say that we draw a
+   bounding box around an object, how do we convey this information to the
+   network? If there are no other objects close by we might just give a window
+   around the object as $x_{0}$, and then it should be clear for the network which
+   object to track. If we try to mark a person in the middle of a crowd this
+   approach seems to be less reliable. We could possibly create a separate input
+   channel with either a bounding box or a point on the object as additional input.
+  
+** Initialization of weights
+   The amount of annotated video data for tracking may prove not to be
+   sufficiently large or diversified. A possible solution to this may be to
+   start with a network that already knows how to recognize objects or pretrain
+   our network ourselves on another data source and task. A good idea might be
+   too initialize the network by training it on /object localization/. This
+   should be similar to the first step of our tracking, but it will of course
+   not learn how to combine the information over multiple views.
+
+* User interface
+  We would like to create a web-interface to our tracker application.    
+** Tracking interface
+  We should be able to upload a video file into our web-page, mark an object in
+  one of the frames, and then get the tracking data for following frames
+  overlayed in the video. The tracker algorithm may be running on a remote
+  server. In this way we could have a tracker server running, and then anyone
+  could use it on their own video data, from their own computers, without having
+  to install anything.
+*** Data flow
+
+  The idea is that we alternate sending information back and forth, between the
+  client and the server. We start of by sending subimage containing the object
+  we are interested in tracking. The server then responds with information
+  about:
+  1. Where it believes the object is in the image
+  2. Where it wants to look next
+
+  We use the first piece of information to display the track, and the second to
+  send back the appropriate part of the image that the server requested.
+
+*** Communication between client and server
+    It seems like an intersting option is to use [[https://tensorflow.github.io/serving/][TensorFlow Serving]]. After we
+    have set up a server and a client, see [[https://tensorflow.github.io/serving/serving_basic][tutorial]], we communicate by making
+    remote procedure calls (with [[http://www.grpc.io/][gRPC]]) from the client to the server.
+    
+    It does not seem like we can do this directly from JavaScript however, so
+    how do we circumvent this? It seems like we may have to go through
+
+** Annotation tool
+   We would like this to be an efficient tool for labeling data as well. This
+   means that after our tracker has run on (parts of) a video, we should be able
+   to
+   - Make edits to the track
+   - Label the track with a specified object 
+   - Possibly label the track with other information, like if the object is
+     absent or partially occluded for part of the track
+
+** Resources
+   JavaScript, HTML and CSS are the cornerstone technologies for web-pages
+  - [[https://www.w3schools.com/js/]] 
+  - [[https://www.w3schools.com/html/default.asp]]
+  - [[https://www.w3schools.com/css/default.asp]]
+    
+  TensorFlow serving:
+  - [[https://tensorflow.github.io/serving/]]
+  - [[https://www.youtube.com/watch?v=T_afaArR0E8][YouTube: How To Deploy a Model to Production]]
+  - [[https://github.com/llSourcell/How-to-Deploy-a-Tensorflow-Model-in-Production][GitHub: How to Deploy a Model to Production]] 
+* Bonus and extensions
+** Object rediscovery
+   The most straightforward thing to do when the object disappears from the
+   field of view is to mark the object as absent and stop tracking.
+   Something that would be really cool was if we where able to rediscover a
+   object that disappears for a few frames. There seems to be two be at least
+   two approaches to follow.
+   - Go into "search mode" with a predefined mechanism to try to detect the
+     object in subsequent frames.
+   - Use reinforcement learning to learn a search policy. This approach could be
+     integrated more elegantly and we may not even need a separate mode.
+ 
+** Combine with detection 
+   One could imagine combining this with object detection, e.g. one constantly
+   tries to detect new objects appearing and then set track on them.
+   
+** Combine with UAV flight control
+   One could imagine using the information to make the UAV automatically track
+   e.g. a car.
+
+* Data
+** Tracking data
+   We would like to have video data annotated with tracking information of
+   different kinds of objects.
+  - [[https://www.jpjodoin.com/urbantracker/index.htm]] has annotated video data
+    with tracking of pedestrians, bicycles and vehicles, and seems like a good
+    starting point.
+  - [[http://clementcreusot.com/pedestrian/]] contains data for pedestrian tracking.
+  - [[https://motchallenge.net/][The Multiple Object Tracking Benchmark]] contains tracking data and also a
+    challenge. We may find some of the data and/or submissions helpful?
+
+ Other sources of data should also be sought. This may be both data from the
+ internet,
+
+** Other sources 
+  - [[https://gitlabu.ffi.no/ili/UAV-2016-data][UAV 2016 Data]]
+  - [[http://image-net.org/][ImageNet]]
+  - [[http://host.robots.ox.ac.uk/pascal/VOC/index.html][PASCAL VOC]]
+  - [[http://mscoco.org/][Common Objects in Context (COCO)]]
+
+* Documentation 
+
+Documentation should be written in *Emacs Org Mode*.
+See [[https://www.youtube.com/watch?v=SzA2YODtgK4][Getting Started With Org Mode]] for an introduction to Org Mode.
+
+* FAQ
+** How is tracking different from detection?
+** Why do we need to maintain /a state/?
+
+* Resources
+  - [[https://arxiv.org/abs/1406.6247][Recurrent Models of Visual Attention]]
+  - [[https://arxiv.org/pdf/1412.7755.pdf][Multiple Object Recognition with Visual Attention]]
+  - [[http://www.deeplearningbook.org/][Deep Learning]] book, see specifically Chapter 10.
+  - [[https://arxiv.org/abs/1502.03044][Show, Attend and Tell: Neural Image Caption Generation with Visual Attention]]
+  - [[https://arxiv.org/pdf/1506.02025.pdf][Spatial Transformer Networks]]
