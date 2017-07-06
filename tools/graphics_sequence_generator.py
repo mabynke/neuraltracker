@@ -38,9 +38,7 @@ def generate_movement_binarylabel(category, binary_type="horizontal-vertical", f
     return sequence
 
 
-def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32, channels=3):
-
-    sequence = np.zeros((frames, sizeX, sizeY, channels), dtype=np.int)
+def generate_movement_positionlabel(sequence, type="random", frames=12, sizeX=32, sizeY=32, channels=3):
     labels = []
 
     # Initialisere
@@ -72,7 +70,7 @@ def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32
             speedX = 0
         elif posX >= sizeX:
             posX = sizeX - 1
-            speedX  = 0
+            speedX = 0
         if posY < 0:
             posY = 0
             speedY = 0
@@ -80,7 +78,7 @@ def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32
             posY = sizeY - 1
             speedY = 0
 
-    return sequence, labels
+    return labels
 
 
 def draw_rectangle(sequence, frame, posX, posY, square_size=4, channels=3, color=(255, 255, 255)):
@@ -165,6 +163,7 @@ def save_sequence_labelfile(sequence, labels, parent_path):
 def create_train_test_examples(path, counts):
     frames = 12
     image_size = 32
+    channels = 3
 
     # type = bool(random.getrandbits(1))
     # sequence = generate_movement_binarylabel(type, binary_type="fast-slow_right", frames=frames, sizeX=image_size, sizeY=image_size)
@@ -180,10 +179,15 @@ def create_train_test_examples(path, counts):
 
         count = counts[folder_names.index(name)]
         for _ in range(count):
-            sequence, labels = generate_movement_positionlabel(type="random",
-                                                       frames=frames,
-                                                       sizeX=image_size,
-                                                       sizeY=image_size)
+            sequence = np.zeros((frames, image_size, image_size, channels), dtype=np.int)
+            for figure in range(2):
+                # Kun den siste versjonen av labels blir beholdt og skrevet til fil
+                labels = generate_movement_positionlabel(sequence,
+                                                         type="random",
+                                                         frames=frames,
+                                                         sizeX=image_size,
+                                                         sizeY=image_size,
+                                                         channels=channels)
             save_sequence_labelfile(sequence, labels, os.path.join(path, name))
 
 
