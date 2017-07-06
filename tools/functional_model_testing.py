@@ -32,10 +32,6 @@ def create_model(sequence_length, image_size, output_values):
     else:
         inputs = Input(shape=(sequence_length, image_size, image_size, 3))
 
-
-    # Ser på bare det første bildet
-    # image = Reshape(target_shape=(image_size, image_size, 3))(inputs)
-
     # x = Conv2D(filters = 20,
     #            kernel_size = (3,3),
     #            data_format = "channels_last")(inputs)
@@ -50,7 +46,7 @@ def create_model(sequence_length, image_size, output_values):
 def main():
     sequence_length = 1
     image_size = 32     # Antar kvadrat og 3 kanaler
-    output_values = 2
+    output_values = 4
     training_epochs = 10
 
     training_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/train"

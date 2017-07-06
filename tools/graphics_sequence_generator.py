@@ -54,9 +54,11 @@ def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
     for frame in range(frames):                     # For hvert bilde i sekvensen
-        draw_rectangle(sequence, frame, posX, posY, square_size, channels)
+        draw_rectangle(sequence, frame, posX, posY, square_size, channels, color=(255, 255, 255))      # Tegne inn firkant i bildet
+
         # Lagre label for dette bildet
-        labels.append((posX, posY))
+        radius = square_size / 2
+        labels.append((posX - radius, posY - radius, posX + radius, posY + radius))
 
         # Oppdatere posisjon og fart til neste tidssteg
         posX += speedX
@@ -77,7 +79,6 @@ def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32
         elif posY >= sizeY:
             posY = sizeY - 1
             speedY = 0
-
 
     return sequence, labels
 
