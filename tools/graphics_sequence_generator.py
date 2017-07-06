@@ -4,21 +4,21 @@ import scipy.misc
 import os
 
 
-def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, sizeX=32, sizeY=32, channels=3):
+def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, size_x=32, size_y=32, channels=3):
     square_size = 1
 
-    sequence = np.zeros((frames, sizeX, sizeY, channels), dtype=np.int)
+    sequence = np.zeros((frames, size_x, size_y, channels), dtype=np.int)
 
     if binary_type == "horizontal-vertical":
-        speedX = (category - 1) * random.random() * sizeX / 2 / frames
-        speedY = category       * random.random() * sizeY / 2 / frames
-        posX = sizeX / 2
-        posY = sizeY / 2
+        speedX = (category - 1) * random.random() * size_x / 2 / frames
+        speedY = category       * random.random() * size_y / 2 / frames
+        posX = size_x / 2
+        posY = size_y / 2
     elif binary_type == "fast-slow_right":
-        speedX = (sizeX / frames) * (1 + random.random() + category)
+        speedX = (size_x / frames) * (1 + random.random() + category)
         speedY = 0
-        posX = random.randint(0, sizeX-1)
-        posY = sizeY / 2
+        posX = random.randint(0, size_x - 1)
+        posY = size_y / 2
 
     else:
         print("FEIL i sekvensgenerator.generate_binary_linear_movement: Ukjent binary_type: ", binary_type)
@@ -29,8 +29,8 @@ def generate_movement_binarylabel(category, binary_type="horizontal-vertical", f
             for heightIndex in range(square_size):
                 for channel in range(channels):
                     sequence[frame,
-                             round(posY + heightIndex - square_size / 2) % sizeY,
-                             round(posX  + widthIndex - square_size / 2) % sizeX,
+                             round(posY + heightIndex - square_size / 2) % size_y,
+                             round(posX  + widthIndex - square_size / 2) % size_x,
                              channel] = 255
         posX += speedX
         posY += speedY
@@ -38,57 +38,57 @@ def generate_movement_binarylabel(category, binary_type="horizontal-vertical", f
     return sequence
 
 
-def generate_movement_positionlabel(sequence, type="random", frames=12, sizeX=32, sizeY=32, channels=3):
+def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=32, size_y=32, channels=3):
     labels = []
 
     # Initialisere
     if type == "random":
-        posX = random.randint(0, sizeX-1)
-        posY = random.randint(0, sizeY-1)
-        speedX = random.gauss(0, 0.02*sizeX)
-        speedY = random.gauss(0, 0.02*sizeY)
+        pos_x = random.randint(0, size_x - 1)
+        pos_y = random.randint(0, size_y - 1)
+        speed_x = random.gauss(0, 0.02 * size_x)
+        speed_y = random.gauss(0, 0.02 * size_y)
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
-    square_size = random.randint(3, int(sizeX / 3))
+    square_size = random.randint(3, int(size_x / 3))
     for frame in range(frames):                                                                     # For hvert bilde i sekvensen
-        draw_rectangle(sequence, frame, posX, posY, square_size, channels, color=(255, 255, 255))   # Tegne inn firkant i bildet
+        draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=(255, 255, 255))   # Tegne inn firkant i bildet
 
         # Lagre merkelapp for dette bildet
         radius = square_size / 2
-        labels.append((max(0, posX - radius), max(0, posY - radius), min(sizeX, posX + radius), min(sizeY, posY + radius)))
+        labels.append((max(0, pos_x - radius), max(0, pos_y - radius), min(size_x, pos_x + radius), min(size_y, pos_y + radius)))
 
         # Oppdatere posisjon og fart til neste bilde/tidssteg
-        posX += speedX
-        posY += speedY
-        speedX += random.gauss(0, 0.03*sizeX)
-        speedY += random.gauss(0, 0.03*sizeY)
+        pos_x += speed_x
+        pos_y += speed_y
+        speed_x += random.gauss(0, 0.03 * size_x)
+        speed_y += random.gauss(0, 0.03 * size_y)
 
         # Sørge for at firkanten holder seg innenfor bildet
-        if posX < 0:
-            posX = 0
-            speedX = 0
-        elif posX >= sizeX:
-            posX = sizeX - 1
-            speedX = 0
-        if posY < 0:
-            posY = 0
-            speedY = 0
-        elif posY >= sizeY:
-            posY = sizeY - 1
-            speedY = 0
+        if pos_x < 0:
+            pos_x = 0
+            speed_x = 0
+        elif pos_x >= size_x:
+            pos_x = size_x - 1
+            speed_x = 0
+        if pos_y < 0:
+            pos_y = 0
+            speed_y = 0
+        elif pos_y >= size_y:
+            pos_y = size_y - 1
+            speed_y = 0
 
     return labels
 
 
-def draw_rectangle(sequence, frame, posX, posY, square_size=4, channels=3, color=(255, 255, 255)):
+def draw_rectangle(sequence, frame, pos_x, pos_y, square_size=4, channels=3, color=(255, 255, 255)):
     """
     Tegner et kvadrat i en numpy-array sequence på den gitte posisjonen.
 
     :param sequence: Sekvens av bilder (numpy-array)
     :param frame: Indeksen til bildet i sekvensen som skal endres
-    :param posX: x-koordinaten til midten av rektangelet
-    :param posY: y-koordinaten til midten av rektangelet
+    :param pos_x: x-koordinaten til midten av rektangelet
+    :param pos_y: y-koordinaten til midten av rektangelet
     :param square_size: sidelengden til kvadratet
     :param channels: antallet fargekanaler
     :param color: fargen til rektangelet, som tuppel med oppføring for hver fargekanal
@@ -97,8 +97,8 @@ def draw_rectangle(sequence, frame, posX, posY, square_size=4, channels=3, color
 
     assert len(color) == channels
 
-    orig_x = round(posX - square_size / 2)      # Venstre kant av rektangelet
-    orig_y = round(posY - square_size / 2)      # Øvre kant av rektangelet
+    orig_x = round(pos_x - square_size / 2)      # Venstre kant av rektangelet
+    orig_y = round(pos_y - square_size / 2)      # Øvre kant av rektangelet
     for widthIndex in range(square_size):           # Iterere over bredden til firkanten
         current_pos_x = orig_x + widthIndex
         if current_pos_x < 0 or current_pos_x > len(sequence[0][0]):    # Utenfor bildet
@@ -160,7 +160,7 @@ def save_sequence_labelfile(sequence, labels, parent_path):
     label_file.close()
 
 
-def create_train_test_examples(path, counts):
+def create_train_test_examples(path, counts, figures=1):
     frames = 12
     image_size = 32
     channels = 3
@@ -180,20 +180,21 @@ def create_train_test_examples(path, counts):
         count = counts[folder_names.index(name)]
         for _ in range(count):
             sequence = np.zeros((frames, image_size, image_size, channels), dtype=np.int)
-            for figure in range(2):
+            for figure in range(figures):
                 # Kun den siste versjonen av labels blir beholdt og skrevet til fil
                 labels = generate_movement_positionlabel(sequence,
                                                          type="random",
                                                          frames=frames,
-                                                         sizeX=image_size,
-                                                         sizeY=image_size,
+                                                         size_x=image_size,
+                                                         size_y=image_size,
                                                          channels=channels)
             save_sequence_labelfile(sequence, labels, os.path.join(path, name))
 
 
 def main():
     create_train_test_examples("/home/mathias/inndata/generert/tilfeldig bevegelse/",
-                              [10, 10])
+                              [10, 10],
+                               figures=2)
 
 
 if __name__ == "__main__":
