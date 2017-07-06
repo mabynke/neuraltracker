@@ -54,17 +54,7 @@ def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
     for frame in range(frames):                     # For hvert bilde i sekvensen
-        for widthIndex in range(square_size):       # Iterere over bredden til firkanten
-            for heightIndex in range(square_size):  # Iterere over høyden til firkanten
-                for channel in range(channels):     # Iterere over fargekanalene
-                    try:
-                        sequence[frame,
-                                 round(posY + heightIndex - square_size / 2),
-                                 round(posX + widthIndex - square_size / 2),
-                                 channel] = 255
-                    except IndexError:
-                        pass
-
+        draw_rectangle(sequence, frame, posX, posY, square_size, channels)
         # Lagre label for dette bildet
         labels.append((posX, posY))
 
@@ -90,6 +80,35 @@ def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32
 
 
     return sequence, labels
+
+
+def draw_rectangle(sequence, frame, posX, posY, square_size=4, channels=3, color=(255, 255, 255)):
+    """
+    Tegner et kvadrat i en numpy-array sequence på den gitte posisjonen.
+
+    :param sequence: Sekvens av bilder (numpy-array)
+    :param frame: Indeksen til bildet i sekvensen som skal endres
+    :param posX: x-koordinaten til midten av rektangelet
+    :param posY: y-koordinaten til midten av rektangelet
+    :param square_size: sidelengden til kvadratet
+    :param channels: antallet fargekanaler
+    :param color: fargen til rektangelet, som tuppel med oppføring for hver fargekanal
+    :return:
+    """
+
+    assert len(color) == channels
+
+    orig_x = round(posX - square_size / 2)      # Venstre kant av rektangelet
+    orig_y = round(posY - square_size / 2)      # Øvre kant av rektangelet
+    for widthIndex in range(square_size):           # Iterere over bredden til firkanten
+        current_pos_x = orig_x + widthIndex
+        for heightIndex in range(square_size):      # Iterere over høyden til firkanten
+            current_pos_y = orig_y + heightIndex
+            for channel in range(channels):         # Iterere over fargekanalene
+                try:
+                    sequence[frame, current_pos_y, current_pos_x, channel] = color[channel]
+                except IndexError:
+                    pass
 
 
 def save_sequence_binarylabel(sequence, parent_path, type):
