@@ -39,7 +39,6 @@ def generate_movement_binarylabel(category, binary_type="horizontal-vertical", f
 
 
 def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32, channels=3):
-    square_size = 1
 
     sequence = np.zeros((frames, sizeX, sizeY, channels), dtype=np.int)
     labels = []
@@ -53,14 +52,15 @@ def generate_movement_positionlabel(type="random", frames=12, sizeX=32, sizeY=32
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
-    for frame in range(frames):                     # For hvert bilde i sekvensen
-        draw_rectangle(sequence, frame, posX, posY, square_size, channels, color=(255, 255, 255))      # Tegne inn firkant i bildet
+    square_size = random.randint(3, int(sizeX / 3))
+    for frame in range(frames):                                                                     # For hvert bilde i sekvensen
+        draw_rectangle(sequence, frame, posX, posY, square_size, channels, color=(255, 255, 255))   # Tegne inn firkant i bildet
 
-        # Lagre label for dette bildet
+        # Lagre merkelapp for dette bildet
         radius = square_size / 2
-        labels.append((posX - radius, posY - radius, posX + radius, posY + radius))
+        labels.append((max(0, posX - radius), max(0, posY - radius), min(sizeX, posX + radius), min(sizeY, posY + radius)))
 
-        # Oppdatere posisjon og fart til neste tidssteg
+        # Oppdatere posisjon og fart til neste bilde/tidssteg
         posX += speedX
         posY += speedY
         speedX += random.gauss(0, 0.03*sizeX)
@@ -103,8 +103,12 @@ def draw_rectangle(sequence, frame, posX, posY, square_size=4, channels=3, color
     orig_y = round(posY - square_size / 2)      # Øvre kant av rektangelet
     for widthIndex in range(square_size):           # Iterere over bredden til firkanten
         current_pos_x = orig_x + widthIndex
+        if current_pos_x < 0 or current_pos_x > len(sequence[0][0]):    # Utenfor bildet
+            continue
         for heightIndex in range(square_size):      # Iterere over høyden til firkanten
             current_pos_y = orig_y + heightIndex
+            if current_pos_y < 0 or current_pos_y > len(sequence[0]):  # Utenfor bildet
+                continue
             for channel in range(channels):         # Iterere over fargekanalene
                 try:
                     sequence[frame, current_pos_y, current_pos_x, channel] = color[channel]
@@ -152,7 +156,7 @@ def save_sequence_labelfile(sequence, labels, parent_path):
         scipy.misc.imsave(os.path.join(path, file_name), image_array)
 
         # Skrive label til fil
-        label_file.write(file_name + "," + ",".join(["{0:01f}".format(i) for i in labels[frame]]) + "\n")
+        label_file.write(file_name + "," + ",".join(["{0:.1f}".format(i) for i in labels[frame]]) + "\n")
 
     # Lukke label-fil
     label_file.close()
@@ -166,7 +170,7 @@ def create_train_test_examples(path, counts):
     # sequence = generate_movement_binarylabel(type, binary_type="fast-slow_right", frames=frames, sizeX=image_size, sizeY=image_size)
     # save_sequence(sequence, "/home/mathias/inndata/generert/fast-slow_right/eksempel", "1" if type else "0")
 
-    folder_names = ["train", "test", "examples"]
+    folder_names = ["train", "test"]
 
     for name in folder_names:
         try:
@@ -183,10 +187,9 @@ def create_train_test_examples(path, counts):
             save_sequence_labelfile(sequence, labels, os.path.join(path, name))
 
 
-
 def main():
     create_train_test_examples("/home/mathias/inndata/generert/tilfeldig bevegelse/",
-                              [1000, 1000, 24])
+                              [10, 10])
 
 
 if __name__ == "__main__":

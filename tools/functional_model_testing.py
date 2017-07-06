@@ -55,7 +55,7 @@ def main():
 
     training_examples = 0
     testing_examples = 0
-    example_examples = 24
+    example_examples = 6
 
 
     # Bygge modellen
