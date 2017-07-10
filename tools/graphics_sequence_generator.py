@@ -2,6 +2,7 @@ import numpy as np
 import random
 import scipy.misc
 import os
+import json
 
 
 def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, size_x=32, size_y=32, channels=3):
@@ -25,6 +26,7 @@ def generate_movement_binarylabel(category, binary_type="horizontal-vertical", f
         return None
 
     for frame in range(frames):
+        # TODO: Bruke draw_rectangle her dersom vi beholder denne funksjonen
         for widthIndex in range(square_size):
             for heightIndex in range(square_size):
                 for channel in range(channels):
@@ -47,10 +49,10 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         pos_y = random.randint(0, size_y - 1)
         speed_x = random.gauss(0, 0.02 * size_x)
         speed_y = random.gauss(0, 0.02 * size_y)
+        square_size = random.randint(3, int(size_x / 3))
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
-    square_size = random.randint(3, int(size_x / 3))
     for frame in range(frames):                                                                     # For hvert bilde i sekvensen
         draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=(255, 255, 255))   # Tegne inn firkant i bildet
 
@@ -144,20 +146,19 @@ def save_sequence_labelfile(sequence, labels, parent_path):
         break
     os.mkdir(path)
 
-    # Lage label-fil
-    label_file = open(os.path.join(path, "labels"), "w")
-
     # Iterere gjennom bildene i sekvensen
+    file_names = []
     for frame in range(len(sequence)):
-        image_array = sequence[frame]
         file_name = "frame{0:05d}.jpg".format(frame)
+        file_names.append(file_name)
+        image_array = sequence[frame]
         scipy.misc.imsave(os.path.join(path, file_name), image_array)
 
-        # Skrive label til fil
-        label_file.write(file_name + "," + ",".join(["{0:.1f}".format(i) for i in labels[frame]]) + "\n")
-
-    # Lukke label-fil
-    label_file.close()
+    # Skrive merkelapper til fil
+    formatted_labels = [{"filename": file_names[i], "x1":labels[i][0], "y1":labels[i][1], "x2":labels[i][2], "y2":labels[i][3]} for i in range(len(labels))]
+    with open(os.path.join(path, "labels.json"), "w") as label_file:
+        json.dump(formatted_labels, label_file)
+    #label_file.write(file_name + "," + ",".join(["{0:.1f}".format(i) for i in labels[frame]]) + "\n")
 
 
 def create_train_test_examples(path, counts, figures=1):

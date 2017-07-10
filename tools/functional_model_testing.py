@@ -1,5 +1,9 @@
-from keras.layers import Input, Dense, Conv2D, Dropout, Flatten, Reshape
-from keras.models import Model, Sequential
+from keras.layers.core import Dense, Dropout, Flatten, Reshape
+from keras.layers.recurrent import LSTM
+from keras.layers.convolutional import Conv2D
+from keras.layers.wrappers import TimeDistributed
+from keras.layers import Input
+from keras.models import Model
 
 import random
 import numpy as np
@@ -26,7 +30,7 @@ def generate_example_io(count):
     return np.array(xes), np.array(ys)
 
 
-def create_model(sequence_length, image_size, output_values):
+def create_model(sequence_length, image_size, interface_vector_length, hidden_vector_length):
     if sequence_length == 1:
         inputs = Input(shape=(image_size, image_size, 3))
     else:
@@ -38,15 +42,25 @@ def create_model(sequence_length, image_size, output_values):
     x = Flatten()(inputs)
     # x = Dropout(0.2)(x)
     x = Dense(units=512, activation="relu")(x)
-    predictions = Dense(output_values, activation="linear")(x)
+    frame_summary = Dense(hidden_vector_length, activation="linear")(x)
+
+    sequence_after_frame_net = TimeDistributed(x)(input_sequence)
+    position_sequence = LSTM(units=hidden_vector_length, dropout=0.0, recurrent_dropout=0.0)(sequence_after_frame_net)
+    return Model(inputs=input_sequence, outputs=position_sequence)
+
+
+def create_conv_net(image_size, output_values, sequence_length):
+    """Enn så lenge ikke egentlig konvolusjonal"""
+
 
     return Model(inputs=inputs, outputs=predictions)
 
 
 def main():
-    sequence_length = 1
+    sequence_length = 12
     image_size = 32     # Antar kvadrat og 3 kanaler
-    output_values = 4
+    interface_vector_length = 128
+    hidden_vector_length = 256
     training_epochs = 10
 
     training_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/train"
@@ -59,12 +73,14 @@ def main():
 
 
     # Bygge modellen
-    model = create_model(sequence_length, image_size, output_values)
+    model = create_model(sequence_length, image_size, interface_vector_length, hidden_vector_length)
     model.compile(optimizer="rmsprop",
                   loss="mean_squared_error")
 
+    print("Oppsummering av det ferdige nettet:")
     model.summary()     # Skrive ut en oversikt over modellen
     print()
+    exit()
 
     # Trene modellen
     x_train, y_train = data_reader.fetch_x_y(training_path, training_examples, single_image=sequence_length == 1)
