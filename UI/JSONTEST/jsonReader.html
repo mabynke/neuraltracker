@@ -1,0 +1,22 @@
+<!-- 1. import string from txt file -->
+<!-- 2. cut file up into a list -->
+<!-- 3. create a button, when pressed you see where the computer "guessed" the object was, given as an alert --> 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset = "UTF-8">
+	<title> Testing Json </title>
+	<script src="jquery-3.2.1.js"></script>
+</head>
+<body>
+
+<script>
+	$.getJSON("test.json", function(data) {
+    document.write(data[1].x2);
+});
+
+</script>
+
+</body>
+</html>
