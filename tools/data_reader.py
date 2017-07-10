@@ -1,5 +1,6 @@
 import os
 import numpy
+import json
 
 from PIL import Image
 
@@ -50,12 +51,11 @@ def fetch_x_y(main_path, max_count=0, single_image=False):
         x.append(sequence)
 
         # Hente labels
-        label_file = open(os.path.join(seq_path, "labels"))         # Åpne filen
-        labels = label_file.readlines()                             # Lese linjer fra filen
-        label_file.close()
+        with open(os.path.join(seq_path, "labels.json")) as label_file:         # Åpne filen
+            label_raw = json.load(label_file)                      # Lese linjer fra filen
 
-        labels = [line.split(",") for line in labels]               # Dele opp hver linje etter komma
-        labels = [[float(i) for i in line[1:]] for line in labels]  # Ignorere filnavnet i hver linje og konvertere hvert tall til flyttall
+        labels = [(i["x1"], i["y1"], i["x2"], i["y2"]) for i in label_raw]
+        # labels = [[float(i) for i in line] for line in labels]  # Konvertere hvert tall til flyttall
         if single_image:
             labels = labels[0]                                      # Evt. beholde data fra bare det første bildet
         y.append(labels)

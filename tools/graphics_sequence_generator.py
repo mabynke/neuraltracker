@@ -193,8 +193,11 @@ def create_train_test_examples(path, counts, figures=1):
 
 
 def main():
+    test_examples = 1000
+    train_examples = 1000
+
     create_train_test_examples("/home/mathias/inndata/generert/tilfeldig bevegelse",
-                              [10, 10],
+                              [train_examples, test_examples],
                                figures=2)
 
 
