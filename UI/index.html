@@ -3,23 +3,30 @@
 <head>
 	<meta charset = "UTF-8">
 	<title> Canvas on image </title>
+	<style>
+	body {
+  		margin: 0px;
+		}
+	</style>
 </head>
 <body>
-	<canvas id="myCanvas" height = "" width="" style="border:1px solid #000000";> </canvas>
+	<canvas id="myCanvas" height = "" width=""> </canvas>
+	<!--  style="border:1px solid #000000"; -->
 	<script>
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");// used for drawing
     	var coordlst = [];
 
 	    var img = new Image();
-  		img.src = "frog.jpg";
+  		img.src = "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00000/frame00000.jpg";
+  		//img.src = "frog.jpg";
   		
   		function getCoordinates(){ //pushes coordinates to 'coordlst' and return a list with current coordinates
 			canvas_x = event.pageX;
 			canvas_y = event.pageY;
 			coordlst.push(canvas_x);
 			coordlst.push(canvas_y);
-			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + coordinates);
+			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + coordlst);
 		}
 
 		function clickEvent() { // happens when click is detected
@@ -54,8 +61,8 @@
 			ctx.lineTo(x_C,y_C);
 			ctx.lineTo(x_A,y_C);
 			ctx.lineTo(x_A,y_A);
-			ctx.lineWidth = 10;
-			ctx.strokeStyle = "#fa34a3";
+			//ctx.lineWidth = 10;
+			ctx.strokeStyle = "#00ff00"; // pink : #fa34a3
 			ctx.stroke(); // nothing happens before the stroke method is called. 
 		}
 
