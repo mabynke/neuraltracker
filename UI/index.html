@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset = "UTF-8">
+	<title> Canvas on image </title>
+</head>
+<body>
+	<canvas id="myCanvas" height = "" width="" style="border:1px solid #000000";> </canvas>
+	<script>
+	    var c = document.getElementById("myCanvas");
+    	var ctx = c.getContext("2d");// used for drawing
+    	var coordlst = [];
+
+	    var img = new Image();
+  		img.src = "frog.jpg";
+  		
+  		function getCoordinates(){ //pushes coordinates to 'coordlst' and return a list with current coordinates
+			canvas_x = event.pageX;
+			canvas_y = event.pageY;
+			coordlst.push(canvas_x);
+			coordlst.push(canvas_y);
+			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + coordinates);
+		}
+
+		function clickEvent() { // happens when click is detected
+			getCoordinates()
+
+			if (coordlst.length == 4) { // We have a box!
+
+				//'refreshes then draws square'
+				ctx.clearRect(0, 0, c.width, c.height);
+  				ctx.drawImage(img,0,0);
+				drawSquare(coordlst[0],coordlst[1],coordlst[2],coordlst[3]);
+				//coordlst = [];
+			}
+			if (coordlst.length == 6) { // a box has been created, and one 'mousedown' has been registrered
+				var x_within = coordlst[4] < coordlst[2] && coordlst[4] > coordlst[0]
+
+				var y_within = coordlst[5] < coordlst[3] && coordlst[5] > coordlst[1]
+
+				if (x_within && y_within){
+					alert('within box!') // if mouse is down move object
+					}
+				else {
+					alert('outside of box!')
+					}
+			}
+		}
+
+		function drawSquare(x_A,y_A,x_C,y_C){
+			ctx.beginPath(); //create multiplie 'beginPath's if you want to track multiple objects
+			ctx.moveTo(x_A, y_A);
+			ctx.lineTo(x_C, y_A);
+			ctx.lineTo(x_C,y_C);
+			ctx.lineTo(x_A,y_C);
+			ctx.lineTo(x_A,y_A);
+			ctx.lineWidth = 10;
+			ctx.strokeStyle = "#fa34a3";
+			ctx.stroke(); // nothing happens before the stroke method is called. 
+		}
+
+		window.onload = function() { // changes myCanvas to make it have a size, also draws the image onto the canvas. 
+    		c.height = img.height;
+    		c.width = img.width;
+    		ctx.drawImage(img, 0, 0);
+    	}
+
+		document.addEventListener("mousedown", clickEvent);
+
+	</script>
+</body>
+</html>
