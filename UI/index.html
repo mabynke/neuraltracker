@@ -3,6 +3,7 @@
 <head>
 	<meta charset = "UTF-8">
 	<title> Canvas on image </title>
+	<script src="jquery-3.2.1.js"></script>
 	<style>
 	body {
   		margin: 0px;
@@ -18,9 +19,10 @@
     	var coordlst = [];
 
 	    var img = new Image();
-  		img.src = "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00000/frame00000.jpg";
+  		img.src = "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001/frame00000.jpg";
   		//img.src = "frog.jpg";
-  		
+
+
   		function getCoordinates(){ //pushes coordinates to 'coordlst' and return a list with current coordinates
 			canvas_x = event.pageX;
 			canvas_y = event.pageY;
@@ -28,6 +30,18 @@
 			coordlst.push(canvas_y);
 			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + coordlst);
 		}
+
+		
+		/*
+		function getJsonData() { // BREAKS CODE!!
+
+			$.getJSON("labels.json", function(data) {
+    		x1 = data[0].x1
+    		y1 = data[0].y1
+    		alert(x1)
+    		alert(y1)
+		}
+		*/
 
 		function clickEvent() { // happens when click is detected
 			getCoordinates()
