@@ -33,20 +33,43 @@ def generate_example_io(count):
 
 
 def create_model(sequence_length, image_size, interface_vector_length, hidden_vector_length):
+    # Ta innputt
     input_sequence = Input(shape=(sequence_length, image_size, image_size, 3), name="Innsekvens")
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
+    # Behandle bildesekvensen
     x = TimeDistributed(Flatten(), name="Bildeutflating")(input_sequence)
     x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu", name="Grensesnittvektorer"))(x)
 
+    # Kode og sette inn informasjon om startkoordinater
     k = Dense(units=interface_vector_length, activation="relu", name="Kodede koordinater")
     k = Reshape(target_shape=(1, interface_vector_length), name="Omforming til todimensjonal tensor")(k)
     x = Concatenate([k, x], name="Sammensetting")
 
+    # Behandle sekvens av grensesnittvektorer
     x = LSTM(units=hidden_vector_length, dropout=0.0, recurrent_dropout=0.0, return_sequences=True, name="LSTM-lag")(x)
     answers = TimeDistributed(Dense(units=4, activation="linear", name="Koordinater ut"))(x)
-    return Model(inputs=input_sequence, outputs=answers)
+
+    return Model(inputs=[input_sequence, input_coordinates], outputs=answers)
+
+
+def build_and_train_model(hidden_vector_length, image_size, interface_vector_length, sequence_length,
+                          tensorboard_log_dir, training_epochs, training_examples, training_path):
+    # Bygge modellen
+    model = create_model(sequence_length, image_size, interface_vector_length, hidden_vector_length)
+    model.compile(optimizer="rmsprop",
+                  loss="mean_squared_error")
+    print("Oppsummering av det ferdige nettet:")
+    model.summary()  # Skrive ut en oversikt over modellen
+    print()
+    # Trene modellen
+    x_train, y_train = data_reader.fetch_x_y(training_path, training_examples, single_image=sequence_length == 1)
+    model.fit(x_train, y_train, epochs=training_epochs,
+              callbacks=[TerminateOnNaN(),
+                         EarlyStopping(monitor="loss", patience=2),
+                         TensorBoard(log_dir=tensorboard_log_dir)])
+    return model
 
 
 def main():
@@ -66,28 +89,15 @@ def main():
     testing_examples = 1000
     example_examples = 2
 
-
-    # Bygge modellen
-    model = create_model(sequence_length, image_size, interface_vector_length, hidden_vector_length)
-    model.compile(optimizer="rmsprop",
-                  loss="mean_squared_error")
-
-    print("Oppsummering av det ferdige nettet:")
-    model.summary()     # Skrive ut en oversikt over modellen
-    print()
-
-    # Trene modellen
-    x_train, y_train = data_reader.fetch_x_y(training_path, training_examples, single_image=sequence_length == 1)
-    model.fit(x_train, y_train, epochs=training_epochs,
-              callbacks=[TerminateOnNaN(), EarlyStopping(monitor="loss", patience=2), TensorBoard(log_dir=tensorboard_log_dir)])
+    model = build_and_train_model(hidden_vector_length, image_size, interface_vector_length, sequence_length,
+                                  tensorboard_log_dir, training_epochs, training_examples, training_path)
 
     x_test, y_test = data_reader.fetch_x_y(testing_path, testing_examples, single_image=sequence_length == 1)
     evaluation = model.evaluate(x_test, y_test)
     print("Evaluering: ", evaluation)
     print()
 
-
-    # Lage eksempler
+    # Lage og vise eksempler
     x_example, y_example = data_reader.fetch_x_y(example_path, example_examples, single_image=sequence_length == 1)
 
     prediction = model.predict(x_example)
