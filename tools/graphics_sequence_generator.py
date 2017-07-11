@@ -1,8 +1,10 @@
-import numpy as np
-import random
-import scipy.misc
 import os
-import json
+import random
+
+import numpy as np
+import scipy.misc
+
+from tools.data_io import write_labels
 
 
 def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, size_x=32, size_y=32, channels=3):
@@ -154,11 +156,7 @@ def save_sequence_labelfile(sequence, labels, parent_path):
         image_array = sequence[frame]
         scipy.misc.imsave(os.path.join(path, file_name), image_array)
 
-    # Skrive merkelapper til fil
-    formatted_labels = [{"filename": file_names[i], "x1":labels[i][0], "y1":labels[i][1], "x2":labels[i][2], "y2":labels[i][3]} for i in range(len(labels))]
-    with open(os.path.join(path, "labels.json"), "w") as label_file:
-        json.dump(formatted_labels, label_file)
-    #label_file.write(file_name + "," + ",".join(["{0:.1f}".format(i) for i in labels[frame]]) + "\n")
+    write_labels(file_names, labels, path, "labels.json")
 
 
 def create_train_test_examples(path, counts, figures=1):
