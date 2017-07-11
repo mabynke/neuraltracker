@@ -1,0 +1,49 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset = "UTF-8">
+    <title> Json push test </title>
+    <script src="jquery-3.2.1.js"></script>
+    <style>
+    body {
+        margin: 0px;
+        }
+    </style>
+</head>
+<body>
+    <!-- <button onclick= alert('ay') >Click me </button> -->
+    <canvas id="myCanvas" height = "" width=""> </canvas>
+    <!--  style="border:1px solid #000000"; -->
+    <script>
+        
+        var pictureData = [];
+
+        function getJsonData() { //returns tuple
+
+            alert('in getJsonData')
+
+            $.ajax({url: "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001/labels.json", async: false, dataType: "json", success: function(data) {
+                x1 = data[0].x1;
+                y1 = data[0].y1;
+                x2 = data[0].x2;
+                y2 = data[0].y2;
+                filename = data[0].filename;
+
+                alert (' will do pushing now... ')
+                pictureData.push(x1);
+                pictureData.push(y1);
+                pictureData.push(x2);
+                pictureData.push(y2);
+                pictureData.push(filename);
+
+                alert("Done pushing!");
+            }})
+        }
+        
+        getJsonData();
+        alert("This is the picture data!: " + pictureData);
+
+    </script>
+</body>
+</html>

@@ -1,8 +1,10 @@
+<!-- mousedown event is commented out in this version -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset = "UTF-8">
-	<title> Canvas on image </title>
+	<title> Tracking UI </title>
 	<script src="jquery-3.2.1.js"></script>
 	<style>
 	body {
@@ -11,82 +13,113 @@
 	</style>
 </head>
 <body>
+	<!-- <button onclick= alert('ay') >Click me </button> -->
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<!--  style="border:1px solid #000000"; -->
 	<script>
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");// used for drawing
+
     	var coordlst = [];
+    	var pictureData = [];
 
-	    var img = new Image();
-  		img.src = "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001/frame00000.jpg";
-  		//img.src = "frog.jpg";
+    	var inputLocation = "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001" //prompt("Please enter the image location");
+    	var picNum = 3  // prompt("Please enter picture number"), broken
 
 
-  		function getCoordinates(){ //pushes coordinates to 'coordlst' and return a list with current coordinates
+  		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
+  		
+
+		function getJsonData() { //returns tuple
+            //alert('in getJsonData')
+
+            $.ajax({url: "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001/labels.json", async: false, dataType: "json", success: function(data) {
+                x1 = data[picNum].x1;
+                y1 = data[picNum].y1;
+                x2 = data[picNum].x2;
+                y2 = data[picNum].y2;
+                filename = data[picNum].filename;
+
+                pictureData.push(x1);
+                pictureData.push(y1);
+                pictureData.push(x2);
+                pictureData.push(y2);
+                pictureData.push(filename);
+
+                //alert("Done inner anonomyous funct!");
+            }})
+        }
+		
+
+		function getCoordinates(event){ //pushes coordinates to 'coordlst'
 			canvas_x = event.pageX;
 			canvas_y = event.pageY;
 			coordlst.push(canvas_x);
 			coordlst.push(canvas_y);
 			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + coordlst);
+			//alert(userInput)
 		}
 
-		
-		/*
-		function getJsonData() { // BREAKS CODE!!
-
-			$.getJSON("labels.json", function(data) {
-    		x1 = data[0].x1
-    		y1 = data[0].y1
-    		alert(x1)
-    		alert(y1)
-		}
-		*/
-
-		function clickEvent() { // happens when click is detected
-			getCoordinates()
+		function clickEvent(event) { // happens when click is detected
+			getCoordinates(event);
 
 			if (coordlst.length == 4) { // We have a box!
 
 				//'refreshes then draws square'
-				ctx.clearRect(0, 0, c.width, c.height);
+				//ctx.clearRect(0, 0, c.width, c.height);
   				ctx.drawImage(img,0,0);
 				drawSquare(coordlst[0],coordlst[1],coordlst[2],coordlst[3]);
 				//coordlst = [];
 			}
 			if (coordlst.length == 6) { // a box has been created, and one 'mousedown' has been registrered
-				var x_within = coordlst[4] < coordlst[2] && coordlst[4] > coordlst[0]
+				var x_within = coordlst[4] < coordlst[2] && coordlst[4] > coordlst[0];
 
-				var y_within = coordlst[5] < coordlst[3] && coordlst[5] > coordlst[1]
+				var y_within = coordlst[5] < coordlst[3] && coordlst[5] > coordlst[1];
 
 				if (x_within && y_within){
-					alert('within box!') // if mouse is down move object
+					alert('within box!');
 					}
 				else {
-					alert('outside of box!')
+					alert('outside of box!');
 					}
 			}
 		}
 
 		function drawSquare(x_A,y_A,x_C,y_C){
-			ctx.beginPath(); //create multiplie 'beginPath's if you want to track multiple objects
+			// alert('drawing square');
+			ctx.beginPath();
 			ctx.moveTo(x_A, y_A);
 			ctx.lineTo(x_C, y_A);
 			ctx.lineTo(x_C,y_C);
 			ctx.lineTo(x_A,y_C);
-			ctx.lineTo(x_A,y_A);
-			//ctx.lineWidth = 10;
-			ctx.strokeStyle = "#00ff00"; // pink : #fa34a3
-			ctx.stroke(); // nothing happens before the stroke method is called. 
+			ctx.lineTo(x_A,y_A);	//ctx.lineWidth = 10;
+			ctx.strokeStyle = "#00ff00";
+			ctx.stroke();
 		}
 
-		window.onload = function() { // changes myCanvas to make it have a size, also draws the image onto the canvas. 
-    		c.height = img.height;
+		//main??
+
+    	getJsonData();
+
+		window.onload = function() {
+
+    		var img = new Image();
+  			img.src = inputLocation + "/" + pictureData[4]  // "/frame00000.jpg";
+
+
+    		c.height = img.height; // gives canvas a size
     		c.width = img.width;
-    		ctx.drawImage(img, 0, 0);
+
+    		ctx.drawImage(img, 0, 0); // draws image onto canvas
+
+    		//alert('will draw square now.')
+    		drawSquare(pictureData[0], pictureData[1], pictureData[2], pictureData[3])
+
     	}
 
-		document.addEventListener("mousedown", clickEvent);
+		//document.addEventListener("mousedown", clickEvent);
+
+		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
 
 	</script>
 </body>
