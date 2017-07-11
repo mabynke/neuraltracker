@@ -2,7 +2,9 @@ from keras.layers.core import Dense, Dropout, Flatten, Reshape
 from keras.layers.recurrent import LSTM
 from keras.layers.convolutional import Conv2D
 from keras.layers.wrappers import TimeDistributed
+from keras.layers.merge import Concatenate
 from keras.layers import Input
+from keras.callbacks import TerminateOnNaN, EarlyStopping, TensorBoard
 from keras.models import Model
 
 import random
@@ -31,25 +33,20 @@ def generate_example_io(count):
 
 
 def create_model(sequence_length, image_size, interface_vector_length, hidden_vector_length):
-    if sequence_length == 1:
-        inputs = Input(shape=(image_size, image_size, 3))
-    else:
-        inputs = Input(shape=(sequence_length, image_size, image_size, 3))
+    input_sequence = Input(shape=(sequence_length, image_size, image_size, 3), name="Innsekvens")
+    input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
-    # x = Conv2D(filters = 20,
-    #            kernel_size = (3,3),
-    #            data_format = "channels_last")(inputs)
-    # x = Flatten()(inputs)
-    x = TimeDistributed(Flatten())(inputs)
-    # x = Dropout(0.2)(x)
-    # x = Dense(units=512, activation="relu")(x)
-    x = TimeDistributed(Dense(units=512, activation="relu"))(x)
-    # frame_summary = Dense(hidden_vector_length, activation="linear")(x)
-    x = TimeDistributed(Dense(interface_vector_length, activation="relu"))(x)
+    x = TimeDistributed(Flatten(), name="Bildeutflating")(input_sequence)
+    x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
+    x = TimeDistributed(Dense(interface_vector_length, activation="relu", name="Grensesnittvektorer"))(x)
 
-    x = LSTM(units=hidden_vector_length, dropout=0.0, recurrent_dropout=0.0, return_sequences=True)(x)
-    answers = TimeDistributed(Dense(units=4, activation="linear"))(x)
-    return Model(inputs=inputs, outputs=answers)
+    k = Dense(units=interface_vector_length, activation="relu", name="Kodede koordinater")
+    k = Reshape(target_shape=(1, interface_vector_length), name="Omforming til todimensjonal tensor")(k)
+    x = Concatenate([k, x], name="Sammensetting")
+
+    x = LSTM(units=hidden_vector_length, dropout=0.0, recurrent_dropout=0.0, return_sequences=True, name="LSTM-lag")(x)
+    answers = TimeDistributed(Dense(units=4, activation="linear", name="Koordinater ut"))(x)
+    return Model(inputs=input_sequence, outputs=answers)
 
 
 def main():
@@ -57,15 +54,17 @@ def main():
     image_size = 32     # Antar kvadrat og 3 kanaler
     interface_vector_length = 128
     hidden_vector_length = 256
-    training_epochs = 10
+    training_epochs = 100
+
+    tensorboard_log_dir = "/tmp/logg/logg3"
 
     training_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/train"
     testing_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/test"
     example_path = testing_path
 
-    training_examples = 1000
+    training_examples = 100
     testing_examples = 1000
-    example_examples = 1
+    example_examples = 2
 
 
     # Bygge modellen
@@ -79,7 +78,8 @@ def main():
 
     # Trene modellen
     x_train, y_train = data_reader.fetch_x_y(training_path, training_examples, single_image=sequence_length == 1)
-    model.fit(x_train, y_train, epochs=training_epochs)
+    model.fit(x_train, y_train, epochs=training_epochs,
+              callbacks=[TerminateOnNaN(), EarlyStopping(monitor="loss", patience=2), TensorBoard(log_dir=tensorboard_log_dir)])
 
     x_test, y_test = data_reader.fetch_x_y(testing_path, testing_examples, single_image=sequence_length == 1)
     evaluation = model.evaluate(x_test, y_test)
