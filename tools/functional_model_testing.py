@@ -47,7 +47,7 @@ def create_model(sequence_length, image_size, interface_vector_length, hidden_ve
     k = Reshape(target_shape=(1, interface_vector_length), name="Omforming til todimensjonal tensor")(k)
     x = Concatenate([k, x], name="Sammensetting")
 
-    # Behandle sekvens av grensesnittvektorer
+    # Behandle sekvens av grensesnittvektorer med LSTM
     x = LSTM(units=hidden_vector_length, dropout=0.0, recurrent_dropout=0.0, return_sequences=True, name="LSTM-lag")(x)
     answers = TimeDistributed(Dense(units=4, activation="linear", name="Koordinater ut"))(x)
 
@@ -58,11 +58,12 @@ def build_and_train_model(hidden_vector_length, image_size, interface_vector_len
                           tensorboard_log_dir, training_epochs, training_examples, training_path):
     # Bygge modellen
     model = create_model(sequence_length, image_size, interface_vector_length, hidden_vector_length)
-    model.compile(optimizer="rmsprop",
-                  loss="mean_squared_error")
-    print("Oppsummering av det ferdige nettet:")
+    model.compile(optimizer="rmsprop", loss="mean_squared_error")
+
+    print("Oppsummering av nettet:")
     model.summary()  # Skrive ut en oversikt over modellen
     print()
+
     # Trene modellen
     x_train, y_train = data_reader.fetch_x_y(training_path, training_examples, single_image=sequence_length == 1)
     model.fit(x_train, y_train, epochs=training_epochs,
