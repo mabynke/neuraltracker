@@ -23,8 +23,8 @@
     	var clickCoords = [];
     	var jsonCoords = [];
 
-    	var inputLocation = "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001" //prompt("Please enter the image location");
-    	var picNum = 6;
+    	var inputLocation = prompt("Please enter the image location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001");
+    	var picNum = 0;
 
   		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
   		
@@ -32,7 +32,7 @@
 		function getJsonData() {
             jsonCoords = [];
 
-            $.ajax({url: "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001/labels.json", async: false, dataType: "json", success: function(data) {
+            $.ajax({url: inputLocation + "/labels.json", async: false, dataType: "json", success: function(data) {
                 x1 = data[picNum].x1;
                 y1 = data[picNum].y1;
                 x2 = data[picNum].x2;
@@ -101,7 +101,9 @@
 
   			//alert('waiting...'); // neccesary so far...
 
-    		c.height = img.height; // gives canvas a size
+  			setTimeout(function(){
+
+			c.height = img.height; // gives canvas a size
     		c.width = img.width;
   			
 
@@ -109,8 +111,9 @@
 
     		drawSquare(jsonCoords[0], jsonCoords[1], jsonCoords[2], jsonCoords[3]);
 
-    		document.getElementById("imageTitle").innerHTML = jsonCoords[4]
+    		document.getElementById("imageTitle").innerHTML = jsonCoords[4];
 
+			}, 25); // can be increased if neccesary. 
 
     	}
 
@@ -125,6 +128,7 @@
     	getJsonData();
 
 		window.onload = onLoad();
+
 
 
 		//document.addEventListener("mousedown", clickEvent);
