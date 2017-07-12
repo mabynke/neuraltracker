@@ -21,29 +21,47 @@
     	var ctx = c.getContext("2d");// used for drawing
 
     	var clickCoords = [];
-    	var jsonCoords = [];
+    	var jsonPredictCoords = [];
 
-    	var inputLocation = prompt("Please enter the image location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001");
+    	var inputLocation = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
+
     	var picNum = 0;
+    	var folderNum = 456;
+
+    	var folderName = getFolderName();
+  		alert(folderName);
 
   		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
   		
+  		function getFolderName() {
+       		if (folderNum < 10) {
+       			var folderName = "/seq0000" + folderNum
+       		}
+       		else if (folderNum < 100) {
+       			var folderName = "/seq000" + folderNum;
+       		}
+       		else if (folderNum < 1000) {
+       			var folderName = "/seq00" + folderNum;
+       		}
+       	return folderName
+  		}
+
 
 		function getJsonData() {
-            jsonCoords = [];
+            jsonPredictCoords = [];
 
-            $.ajax({url: inputLocation + "/labels.json", async: false, dataType: "json", success: function(data) {
+            $.ajax({url: inputLocation + folderName + "/labels.json", async: false, dataType: "json", success: function(data) {
                 x1 = data[picNum].x1;
                 y1 = data[picNum].y1;
                 x2 = data[picNum].x2;
                 y2 = data[picNum].y2;
                 filename = data[picNum].filename;
 
-                jsonCoords.push(x1);
-                jsonCoords.push(y1);
-                jsonCoords.push(x2);
-                jsonCoords.push(y2);
-                jsonCoords.push(filename);
+                jsonPredictCoords.push(x1);
+                jsonPredictCoords.push(y1);
+                jsonPredictCoords.push(x2);
+                jsonPredictCoords.push(y2);
+                jsonPredictCoords.push(filename);
             }})
         }
 		
@@ -97,7 +115,7 @@
     	function onLoad() {
 			
     		var img = new Image();
-  			img.src = inputLocation + "/" + jsonCoords[4];  // "/frame00000.jpg";
+  			img.src = inputLocation + folderName + "/" + jsonPredictCoords[4];  // "/frame00000.jpg";
 
   			//alert('waiting...'); // neccesary so far...
 
@@ -109,19 +127,28 @@
 
     		ctx.drawImage(img, 0, 0); // draws image onto canvas
 
-    		drawSquare(jsonCoords[0], jsonCoords[1], jsonCoords[2], jsonCoords[3]);
+    		drawSquare(jsonPredictCoords[0], jsonPredictCoords[1], jsonPredictCoords[2], jsonPredictCoords[3]);
 
-    		document.getElementById("imageTitle").innerHTML = jsonCoords[4];
+    		document.getElementById("imageTitle").innerHTML = jsonPredictCoords[4];
+
+    		document.getElementById("folderTitle").innerHTML = folderName;
 
 			}, 25); // can be increased if neccesary. 
 
     	}
 
 
-    	function changePict(i) {
+    	function changePic(i) {
 			picNum = (picNum + i + 12) % 12;
-			console.log(picNum);
 			getJsonData();
+			onLoad();
+    	}
+
+    	function changeFolder(i) {
+    		folderNum = folderNum + i;
+    		folderName = getFolderName();
+
+    		getJsonData();
 			onLoad();
     	}
 
@@ -130,6 +157,14 @@
 		window.onload = onLoad();
 
 
+	/* BLA IGJENOM MAPPER MED ARROWKEY!
+	document.addEventListener('keydown', function(event) {
+  	if (event.code == 'ArrowDown' && (event.ctrlKey || event.metaKey)) {
+  		  alert('calling function')
+  		  changeFolder(-1);
+ 		 }
+		});
+	*/ // UTVID MED FLERE IFS OG ULIKE KEYS!
 
 		//document.addEventListener("mousedown", clickEvent);
 
@@ -137,9 +172,17 @@
 
 	</script>
 	<br style = "line-height: 5px">
+	<i id = "folderTitle" style = "font-size: 5px;"></i>
 	<i id = "imageTitle" style = "font-size: 5px;"></i>
 	<br style = "line-height: 5px">
-	<button style = "font-size: 5px; height: 10px; width:10px" onclick= "changePict(-1)" > < </button>
-	<button style = "font-size: 5px; height: 10px; width:10px" onclick= "changePict(+1)" > > </button>
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(-1)" > < </button>
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(+1)" > > </button>
+
+	<br style = "line-height: 5px">
+	<i style = "font-size: 5px;"> Folder buttons: </i>
+
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(-1)" > < </button>
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(+1)" > > </button>
+
 </body>
 </html>
