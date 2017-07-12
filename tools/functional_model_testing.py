@@ -57,7 +57,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     # Trene modellen
     train_seq, train_startcoords, train_labels = data_io.fetch_seq_startcoords_labels(training_path, training_examples)
     model.fit(x=[train_seq, train_startcoords], y=train_labels, epochs=training_epochs,
-              callbacks=[TerminateOnNaN(), EarlyStopping(monitor="loss", patience=2),
+              callbacks=[TerminateOnNaN(), EarlyStopping(monitor="loss", patience=5),
                          TensorBoard(log_dir=tensorboard_log_dir)])
     return model
 
@@ -87,17 +87,17 @@ def main():
     image_size = 32  # Antar kvadrat og 3 kanaler
     interface_vector_length = 128
     state_vector_length = 256
-    training_epochs = 1
+    training_epochs = 1000
 
     tensorboard_log_dir = "/tmp/logg/logg3"
 
     train_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/train"
     test_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/test"
-    example_path = test_path
+    example_path = train_path
 
-    training_examples = 100
-    testing_examples = 100
-    example_examples = 2
+    training_examples = 10
+    testing_examples = 1000
+    example_examples = 10
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
                                   tensorboard_log_dir, training_epochs, training_examples, train_path)
