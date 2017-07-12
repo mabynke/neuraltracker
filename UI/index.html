@@ -20,18 +20,17 @@
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");// used for drawing
 
-    	var coordlst = [];
-    	var pictureData = [];
+    	var clickCoords = [];
+    	var jsonCoords = [];
 
     	var inputLocation = "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001" //prompt("Please enter the image location");
-    	var picNum = 3  // prompt("Please enter picture number"), broken
-
+    	var picNum = 6;
 
   		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
   		
 
-		function getJsonData() { //returns tuple
-            //alert('in getJsonData')
+		function getJsonData() {
+            jsonCoords = [];
 
             $.ajax({url: "/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001/labels.json", async: false, dataType: "json", success: function(data) {
                 x1 = data[picNum].x1;
@@ -40,41 +39,39 @@
                 y2 = data[picNum].y2;
                 filename = data[picNum].filename;
 
-                pictureData.push(x1);
-                pictureData.push(y1);
-                pictureData.push(x2);
-                pictureData.push(y2);
-                pictureData.push(filename);
-
-                //alert("Done inner anonomyous funct!");
+                jsonCoords.push(x1);
+                jsonCoords.push(y1);
+                jsonCoords.push(x2);
+                jsonCoords.push(y2);
+                jsonCoords.push(filename);
             }})
         }
 		
 
-		function getCoordinates(event){ //pushes coordinates to 'coordlst'
-			canvas_x = event.pageX;
+		function getCoordinates(event){ //pushes coordinates to 'clickCoords'
+			canvas_x = event.pageX; // finnes annen metode i gamle backups
 			canvas_y = event.pageY;
-			coordlst.push(canvas_x);
-			coordlst.push(canvas_y);
-			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + coordlst);
+			clickCoords.push(canvas_x);
+			clickCoords.push(canvas_y);
+			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + clickCoords);
 			//alert(userInput)
 		}
 
 		function clickEvent(event) { // happens when click is detected
 			getCoordinates(event);
 
-			if (coordlst.length == 4) { // We have a box!
+			if (clickCoords.length == 4) { // We have a box!
 
 				//'refreshes then draws square'
 				//ctx.clearRect(0, 0, c.width, c.height);
   				ctx.drawImage(img,0,0);
-				drawSquare(coordlst[0],coordlst[1],coordlst[2],coordlst[3]);
-				//coordlst = [];
+				drawSquare(clickCoords[0],clickCoords[1],clickCoords[2],clickCoords[3]);
+				//clickCoords = [];
 			}
-			if (coordlst.length == 6) { // a box has been created, and one 'mousedown' has been registrered
-				var x_within = coordlst[4] < coordlst[2] && coordlst[4] > coordlst[0];
+			if (clickCoords.length == 6) { // a box has been created, and one 'mousedown' has been registrered
+				var x_within = clickCoords[4] < clickCoords[2] && clickCoords[4] > clickCoords[0];
 
-				var y_within = coordlst[5] < coordlst[3] && coordlst[5] > coordlst[1];
+				var y_within = clickCoords[5] < clickCoords[3] && clickCoords[5] > clickCoords[1];
 
 				if (x_within && y_within){
 					alert('within box!');
@@ -86,7 +83,6 @@
 		}
 
 		function drawSquare(x_A,y_A,x_C,y_C){
-			// alert('drawing square');
 			ctx.beginPath();
 			ctx.moveTo(x_A, y_A);
 			ctx.lineTo(x_C, y_A);
@@ -97,30 +93,49 @@
 			ctx.stroke();
 		}
 
-		//main??
 
-    	getJsonData();
-
-		window.onload = function() {
-
+    	function onLoad() {
+			
     		var img = new Image();
-  			img.src = inputLocation + "/" + pictureData[4]  // "/frame00000.jpg";
+  			img.src = inputLocation + "/" + jsonCoords[4];  // "/frame00000.jpg";
 
+  			//alert('waiting...'); // neccesary so far...
 
     		c.height = img.height; // gives canvas a size
     		c.width = img.width;
+  			
 
     		ctx.drawImage(img, 0, 0); // draws image onto canvas
 
-    		//alert('will draw square now.')
-    		drawSquare(pictureData[0], pictureData[1], pictureData[2], pictureData[3])
+    		drawSquare(jsonCoords[0], jsonCoords[1], jsonCoords[2], jsonCoords[3]);
+
+    		document.getElementById("imageTitle").innerHTML = jsonCoords[4]
+
 
     	}
+
+
+    	function changePict(i) {
+			picNum = (picNum + i + 12) % 12;
+			console.log(picNum);
+			getJsonData();
+			onLoad();
+    	}
+
+    	getJsonData();
+
+		window.onload = onLoad();
+
 
 		//document.addEventListener("mousedown", clickEvent);
 
 		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
 
 	</script>
+	<br style = "line-height: 5px">
+	<i id = "imageTitle" style = "font-size: 5px;"></i>
+	<br style = "line-height: 5px">
+	<button style = "font-size: 5px; height: 10px; width:10px" onclick= "changePict(-1)" > < </button>
+	<button style = "font-size: 5px; height: 10px; width:10px" onclick= "changePict(+1)" > > </button>
 </body>
 </html>
