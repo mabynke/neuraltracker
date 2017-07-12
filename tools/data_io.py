@@ -31,6 +31,7 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
         seq_path = os.path.join(main_path, seq_name)
         sequence = []
         for image_name in os.listdir(seq_path):  # Iterere gjennom bildene i sekvensen
+            # TODO: bruke get_image_file_names_in_dir
             image_path = os.path.join(seq_path, image_name)
             try:
                 im = Image.open(image_path)
@@ -64,7 +65,8 @@ if __name__ == "__main__":
 def write_labels(file_names, labels, path, json_file_name):
     # Skrive merkelapper til fil
     formatted_labels = [
-        {"filename": file_names[i], "x1": labels[i][0], "y1": labels[i][1], "x2": labels[i][2], "y2": labels[i][3]} for
+        {"filename": file_names[i], "x1": float(labels[i][0]), "y1": float(labels[i][1]),
+         "x2": float(labels[i][2]), "y2": float(labels[i][3])} for
         i in range(len(labels))]
     with open(os.path.join(path, json_file_name), "w") as label_file:
         json.dump(formatted_labels, label_file)
@@ -73,5 +75,5 @@ def write_labels(file_names, labels, path, json_file_name):
 def get_image_file_names_in_dir(dir_path, suffix=".jpg"):
     files = os.listdir(dir_path)
     files = [i for i in files if i.endswith(suffix)]
-    files = files.sort()
+    files.sort()
     return files

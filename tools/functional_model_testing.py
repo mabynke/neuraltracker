@@ -12,7 +12,7 @@ from keras.models import Model
 import os
 
 # import random
-# import numpy as np
+import numpy as np
 
 from tools import data_io
 
@@ -110,6 +110,7 @@ def main():
     example_sequences, example_startcoords, example_labels = data_io.fetch_seq_startcoords_labels(example_path,
                                                                                                   example_examples)
     predictions = model.predict([example_sequences, example_startcoords])
+    predictions = np.delete(predictions, 0, 1)  # Fjerne det første ("falske") tidssteget
     for sequence in range(len(predictions)):
         path = os.path.join(example_path, "seq{0:05d}".format(sequence))
         data_io.write_labels(file_names=data_io.get_image_file_names_in_dir(path), labels=predictions[sequence], path=path, json_file_name="predictions.json")
