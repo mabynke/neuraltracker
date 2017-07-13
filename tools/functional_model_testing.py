@@ -92,10 +92,8 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
 
 
 def get_paths_from_user(default_train_path, default_test_path):
-    train_path = None
-    test_path = None
-    train_path = data_io.get_path_from_user(default_train_path, train_path)
-    test_path = data_io.get_path_from_user(default_test_path, test_path)
+    train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
+    test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
 
     return train_path, test_path
 

@@ -75,9 +75,10 @@ def get_image_file_names_in_dir(dir_path, suffix=".jpg"):
     return files
 
 
-def get_path_from_user(default_path, path):
+def get_path_from_user(default_path, description):
+    path = None
     while path is None:
-        path = input("Mappe med treningssekvenser (trykk enter for \"{0}\"): >".format(default_path))
+        path = input("Skriv inn banen til {1} (trykk enter for \"{0}\"): >".format(default_path, description))
         if path == "":
             path = default_path
         if not os.access(path, os.F_OK):
