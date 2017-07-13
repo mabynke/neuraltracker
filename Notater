@@ -1,0 +1,19 @@
+2017-07-12 - Forsøk:
+Beskrivelse: Forsøk med data (1000 trening, 1000 test) med 1 4*4-kvadrat i tilfeldig bevegelse med tilfeldig startpunkt (32*32 piksler, hvit figur på svart bakgrunn). Grensesnittvektorstørrelse 512. Tilstandsvektorstørrelse 256. Ingen konvolusjonale lag.
+Resultat: Rundt 9 i loss (mean squared error) på testsettet, akseptabel følging av målet.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Data med 2 like store hvite kvadrater som beveger seg uavhengig av hverandre.
+Resultat: Dårlig. Mulig med overfitting ved lite treningssett, men testsettet mister fort målet og blir stående på samme sted.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Endringer siden sist: Konvolusjonale lag: 3 konv-lag med max-pooling mellom.
+Resultat: 0.64 loss for treningsdata, 37 for testdata. Overfitting, dårlige resultater for testsettet.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Økt til 10000 treningssekvenser.
+Resultat: Ikke overfitting, men 42 loss for testdata (39 for treningsdata). Ikke fungerende.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Økt tilstandsvektorens lengde fra 256 til 512.
+Resultat: Treningsloss: 3.7, testloss: 18.0. Ganske fungerende, men mister av og til målet og begynner å spore feil firkant eller virrer i et svart område. Blir spesielt forvirret når de to firkantene er nær hverandre.
