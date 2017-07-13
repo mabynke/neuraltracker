@@ -9,7 +9,6 @@
 	<style>
 	body {
   		margin: 0px;
-  		padding: 0px;
 		}
 	</style>
 </head>
@@ -22,34 +21,32 @@
 
     	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
 
-    	var click_coords = [];
+    	var clickCoords = [];
     	var json_predict_coords = [];
     	var json_labels_coords = [];
 
     	var pic_num = 0;
-    	var folder_num = 0;
+    	var folderNum = 0;
 
     	var json_labels = prompt("Please enter the labels (correct answer) jsonfile name","labels.json"); // TODO: turn into userinput!
     	var json_predict = prompt("Please enter the AI prediction jsonfile name", "predictions.json");
 
     	var foldername = getFolderName();
-    	var scale_factor = 8; // scalefactor = 1 er original.
 
   		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
   		
   		function getFolderName() {
-  			if (folder_num <= 0) {
-  				folder_num = 0;
+  			if (folderNum <= 0) {
        			var foldername = "/seq00000";
        		}
-       		else if (folder_num < 10) {
-       			var foldername = "/seq0000" + folder_num;
+       		else if (folderNum < 10) {
+       			var foldername = "/seq0000" + folderNum;
        		}
-       		else if (folder_num < 100) {
-       			var foldername = "/seq000" + folder_num;
+       		else if (folderNum < 100) {
+       			var foldername = "/seq000" + folderNum;
        		}
-       		else if (folder_num < 1000) {
-       			var foldername = "/seq00" + folder_num;
+       		else if (folderNum < 1000) {
+       			var foldername = "/seq00" + folderNum;
        		}
        	return foldername
   		}
@@ -77,57 +74,51 @@
         }
 		
 
-		function getCoordinates(event){ //pushes coordinates to 'click_coords'
+		function getCoordinates(event){ //pushes coordinates to 'clickCoords'
 			canvas_x = event.pageX; // finnes annen metode i gamle backups
 			canvas_y = event.pageY;
-			click_coords.push(canvas_x);
-			click_coords.push(canvas_y);
-			//alert("X=" + canvas_x + " Y=" + canvas_y + "all coordinates:" + click_coords);
+			clickCoords.push(canvas_x);
+			clickCoords.push(canvas_y);
+			alert(clickCoords);
+			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + clickCoords);
+			//alert(userInput)
 		}
 
-		function clickEvent(event) {
+		function clickEvent(event) { // happens when click is detected
 			getCoordinates(event);
 
-			if (click_coords.length == 4) {
+			if (clickCoords.length == 4) { // We have a box!
 
-				var img = new Image();  // denne er nå to steder z
-  				img.src = input_location + foldername + "/" + json_labels_coords[4];
-
+				alert('registrered a lenght of 4')
 				//'refreshes then draws square'
 				//ctx.clearRect(0, 0, c.width, c.height);
   				ctx.drawImage(img,0,0); // img not defines
-				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3]);
-				//click_coords = [];
+				drawSquare(clickCoords[0],clickCoords[1],clickCoords[2],clickCoords[3]);
+				alert('tried to draw a square..')
+				//clickCoords = [];
 			}
-			if (click_coords.length == 6) { // box has been created, and one 'mousedown' has been registrered
-				var x_within = click_coords[4] < click_coords[2] && click_coords[4] > click_coords[0];
+			if (clickCoords.length == 6) { // a box has been created, and one 'mousedown' has been registrered
+				var x_within = clickCoords[4] < clickCoords[2] && clickCoords[4] > clickCoords[0];
 
-				var y_within = click_coords[5] < click_coords[3] && click_coords[5] > click_coords[1];
+				var y_within = clickCoords[5] < clickCoords[3] && clickCoords[5] > clickCoords[1];
 
 				if (x_within && y_within){
 					alert('within box!');
-					click_coords = [];
 					}
 				else {
 					alert('outside of box!');
-					click_coords = [];
 					}
 			}
 		}
 
 		function drawSquare(x_A,y_A,x_C,y_C, colour = "#0066ff"){
-			ctx.globalAlpha = 0.6; // opacity
-			ctx.lineWidth = 6; // potentially 1*scale_factor
-			ctx.strokeStyle = colour;
-
 			ctx.beginPath();
-			ctx.moveTo(x_A*scale_factor, y_A*scale_factor);
-			ctx.lineTo(x_C*scale_factor, y_A*scale_factor);
-			ctx.lineTo(x_C*scale_factor,y_C*scale_factor);
-			ctx.lineTo(x_A*scale_factor,y_C*scale_factor);
-			ctx.lineTo(x_A*scale_factor,y_A*scale_factor);
-			ctx.lineTo(x_C*scale_factor, y_A*scale_factor); // for å få vekk venstre hjørne hull
-
+			ctx.moveTo(x_A, y_A);
+			ctx.lineTo(x_C, y_A);
+			ctx.lineTo(x_C,y_C);
+			ctx.lineTo(x_A,y_C);
+			ctx.lineTo(x_A,y_A);	//ctx.lineWidth = 10;
+			ctx.strokeStyle = colour;
 			ctx.stroke();
 		}
 
@@ -156,9 +147,8 @@
     	}
 
     	function changeFolder(i) {
-    		folder_num = folder_num + i;
+    		folderNum = folderNum + i;
     		foldername = getFolderName();
-    		pic_num = 0;
 
     		getJsonData(json_labels,json_labels_coords);
     		getJsonData(json_predict, json_predict_coords);
@@ -167,7 +157,7 @@
     	}
 
     	function onLoad() { // initializing process. 
-    		var img = new Image(32*scale_factor,32*scale_factor);
+    		var img = new Image();
   			img.src = input_location + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
 
   			//alert('waiting...'); // neccesary so far...
@@ -177,7 +167,7 @@
 			c.height = img.height; // gives canvas a size
     		c.width = img.width;
   			
-    		ctx.drawImage(img, 0, 0, 32*scale_factor, 32*scale_factor); // drawImage(img, 0, 0, width, height) draws image onto canvas
+    		ctx.drawImage(img, 0, 0); // draws image onto canvas
 
     		drawSquare(json_labels_coords[0], json_labels_coords[1], json_labels_coords[2], json_labels_coords[3]);
 
@@ -187,7 +177,7 @@
 
     		document.getElementById("folderTitle").innerHTML = foldername;
 
-			}, 0); // can be increased if neccesary
+			}, 25); // can be increased if neccesary. 
     	}
 
     	getJsonData(json_labels, json_labels_coords);
@@ -200,12 +190,11 @@
 		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
 
 	</script>
-	<br style = "line-height: 15px">
-	<i id = "folderTitle" style = "font-size: 15px;"></i>
-	<i id = "imageTitle" style = "font-size: 15px;"></i>
-	<br style = "line-height: 15px">
-	<p> </p>
-	<i id = "imageTitle" style = "font-size: 15px;"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i>
+	<br style = "line-height: 5px">
+	<i id = "folderTitle" style = "font-size: 5px;"></i>
+	<i id = "imageTitle" style = "font-size: 5px;"></i>
+	<br style = "line-height: 5px">
+	<i id = "imageTitle" style = "font-size: 5px;"> Use arrow keys to change folder and pictures</i>
 
 	<!--
 	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(-1)" > < </button>
