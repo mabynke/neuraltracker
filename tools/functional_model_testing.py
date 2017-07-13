@@ -26,9 +26,10 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
     # Behandle bildesekvensen
     # x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
     x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv1")(input_sequence)
+    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)  # 16*16
     x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv2")(x)
-    x = TimeDistributed(MaxPooling2D((2,2)))
-    # x = TimeDistributed(MaxPooling2D())
+    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)  # 8*8
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv3")(x)
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu", name="Grensesnittvektorer"))(x)
@@ -91,33 +92,32 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
             print("\tLoss: {0:5.2f}".format(mean_squared_error))
 
 
-def get_paths_from_user(default_train_path, default_test_path):
-    train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
-    test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
-
-    return train_path, test_path
-
-
 def main():
     training_epochs = 1000  # Stoppes når loss ikke lenger forbedres, av EarlyStopping
-    training_examples = 1000
-    testing_examples = 1000
+    training_examples = 0
+    testing_examples = 0
     example_examples = 100
 
     sequence_length = 12
     image_size = 32  # Antar kvadrat og 3 kanaler
     interface_vector_length = 512
-    state_vector_length = 256
+    state_vector_length = 512
 
     tensorboard_log_dir = "/tmp/logg/logg01"
 
-    default_train_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/train"
-    default_test_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/test"
-    train_path, test_path = get_paths_from_user(default_train_path, default_test_path)
+    default_train_path = "/home/mby/Grafikk/Tilfeldig bevegelse/train"
+    default_test_path = "/home/mby/Grafikk/Tilfeldig bevegelse/test"
+    default_save_weight_path = "/home/mby/neuraltracker/tools/saved_weights/last_run.h5"
+    train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
+    test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
+    save_weights_path = data_io.get_path_from_user(default_save_weight_path,
+                                                   "filen som vektene skal lagres til (overskriver)")
     example_path = test_path
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
                                   tensorboard_log_dir, training_epochs, training_examples, train_path)
+
+    model.save_weights(save_weights_path, overwrite=True)
 
     test_sequences, test_startcoords, test_labels = data_io.fetch_seq_startcoords_labels(test_path, testing_examples)
     evaluation = model.evaluate([test_sequences, test_startcoords], test_labels)

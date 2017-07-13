@@ -196,8 +196,8 @@ def create_train_test_examples(path, counts, figures=1):
 
 def main():
     test_examples = 1000
-    train_examples = 1000
-    default_path = "/home/mathias/inndata/generert/tilfeldig bevegelse"
+    train_examples = 10000
+    default_path = "/home/mby/Grafikk/Tilfeldig bevegelse"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":
