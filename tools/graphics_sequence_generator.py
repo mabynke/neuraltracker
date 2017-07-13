@@ -49,9 +49,12 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
     if type == "random":
         pos_x = random.randint(0, size_x - 1)
         pos_y = random.randint(0, size_y - 1)
-        speed_x = random.gauss(0, 0.02 * size_x)
-        speed_y = random.gauss(0, 0.02 * size_y)
-        square_size = random.randint(3, int(size_x / 3))
+        # pos_x = round(size_x / 2)
+        # pos_y = round(size_y / 2)
+        speed_x = random.gauss(0, 0.05 * size_x)
+        speed_y = random.gauss(0, 0.05 * size_y)
+        # square_size = random.randint(3, int(size_x / 3))
+        square_size = 4
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
@@ -193,8 +196,14 @@ def create_train_test_examples(path, counts, figures=1):
 def main():
     test_examples = 1000
     train_examples = 1000
+    default_path = "/home/mathias/inndata/generert/tilfeldig bevegelse"
 
-    create_train_test_examples("/home/mathias/inndata/generert/tilfeldig bevegelse",
+    path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
+    if path == "":
+        path = default_path
+    if not os.access(path, os.F_OK):
+        raise IOError("%s er ikke en mappe." % path)
+    create_train_test_examples(path,
                               [train_examples, test_examples],
                                figures=2)
 

@@ -77,3 +77,13 @@ def get_image_file_names_in_dir(dir_path, suffix=".jpg"):
     files = [i for i in files if i.endswith(suffix)]
     files.sort()
     return files
+
+
+def get_path_from_user(default_path, path):
+    while path is None:
+        path = input("Mappe med treningssekvenser (trykk enter for \"{0}\"): >".format(default_path))
+        if path == "":
+            path = default_path
+        if not os.access(path, os.F_OK):
+            print("%s er ikke en mappe." % path)
+    return path
