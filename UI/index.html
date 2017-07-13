@@ -13,109 +13,155 @@
 	</style>
 </head>
 <body>
-	<!-- <button onclick= alert('ay') >Click me </button> -->
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<!--  style="border:1px solid #000000"; -->
 	<script>
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");// used for drawing
 
-    	var clickCoords = [];
-    	var jsonPredictCoords = [];
+    	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
 
-    	var inputLocation = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
+    	var click_coords = [];
+    	var json_predict_coords = [];
+    	var json_labels_coords = [];
 
-    	var picNum = 0;
-    	var folderNum = 456;
+    	var pic_num = 0;
+    	var folder_num = 0;
 
-    	var folderName = getFolderName();
-  		alert(folderName);
+    	var json_labels = prompt("Please enter the labels (correct answer) jsonfile name","labels.json"); // TODO: turn into userinput!
+    	var json_predict = prompt("Please enter the AI prediction jsonfile name", "predictions.json");
+
+    	var foldername = getFolderName();
 
   		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
   		
   		function getFolderName() {
-       		if (folderNum < 10) {
-       			var folderName = "/seq0000" + folderNum
+  			if (folder_num <= 0) {
+  				folder_num = 0;
+       			var foldername = "/seq00000";
        		}
-       		else if (folderNum < 100) {
-       			var folderName = "/seq000" + folderNum;
+       		else if (folder_num < 10) {
+       			var foldername = "/seq0000" + folder_num;
        		}
-       		else if (folderNum < 1000) {
-       			var folderName = "/seq00" + folderNum;
+       		else if (folder_num < 100) {
+       			var foldername = "/seq000" + folder_num;
        		}
-       	return folderName
+       		else if (folder_num < 1000) {
+       			var foldername = "/seq00" + folder_num;
+       		}
+       	return foldername
   		}
 
 
-		function getJsonData() {
-            jsonPredictCoords = [];
+		function getJsonData(jsonfile, datalist) {
+            
+            while(datalist.length > 0) { // emptys both arrays, which datalist = [] doesn't do. 
+    			datalist.pop();
+			}
 
-            $.ajax({url: inputLocation + folderName + "/labels.json", async: false, dataType: "json", success: function(data) {
-                x1 = data[picNum].x1;
-                y1 = data[picNum].y1;
-                x2 = data[picNum].x2;
-                y2 = data[picNum].y2;
-                filename = data[picNum].filename;
+            $.ajax({url: input_location + foldername + "/" + jsonfile, async: false, dataType: "json", success: function(data) {
+                x1 = data[pic_num].x1;
+                y1 = data[pic_num].y1;
+                x2 = data[pic_num].x2;
+                y2 = data[pic_num].y2;
+                filename = data[pic_num].filename;
 
-                jsonPredictCoords.push(x1);
-                jsonPredictCoords.push(y1);
-                jsonPredictCoords.push(x2);
-                jsonPredictCoords.push(y2);
-                jsonPredictCoords.push(filename);
+                datalist.push(x1);
+                datalist.push(y1);
+                datalist.push(x2);
+                datalist.push(y2);
+                datalist.push(filename);
             }})
         }
 		
 
-		function getCoordinates(event){ //pushes coordinates to 'clickCoords'
+		function getCoordinates(event){ //pushes coordinates to 'click_coords'
 			canvas_x = event.pageX; // finnes annen metode i gamle backups
 			canvas_y = event.pageY;
-			clickCoords.push(canvas_x);
-			clickCoords.push(canvas_y);
-			//alert("X=" + canvas_x + " Y=" + canvas_y + "coordinates:" + clickCoords);
-			//alert(userInput)
+			click_coords.push(canvas_x);
+			click_coords.push(canvas_y);
+			//alert("X=" + canvas_x + " Y=" + canvas_y + "all coordinates:" + click_coords);
 		}
 
-		function clickEvent(event) { // happens when click is detected
+		function clickEvent(event) {
 			getCoordinates(event);
 
-			if (clickCoords.length == 4) { // We have a box!
+			if (click_coords.length == 4) {
+
+				var img = new Image();  // denne er nå to steder z
+  				img.src = input_location + foldername + "/" + json_labels_coords[4];
 
 				//'refreshes then draws square'
 				//ctx.clearRect(0, 0, c.width, c.height);
-  				ctx.drawImage(img,0,0);
-				drawSquare(clickCoords[0],clickCoords[1],clickCoords[2],clickCoords[3]);
-				//clickCoords = [];
+  				ctx.drawImage(img,0,0); // img not defines
+				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3]);
+				//click_coords = [];
 			}
-			if (clickCoords.length == 6) { // a box has been created, and one 'mousedown' has been registrered
-				var x_within = clickCoords[4] < clickCoords[2] && clickCoords[4] > clickCoords[0];
+			if (click_coords.length == 6) { // box has been created, and one 'mousedown' has been registrered
+				var x_within = click_coords[4] < click_coords[2] && click_coords[4] > click_coords[0];
 
-				var y_within = clickCoords[5] < clickCoords[3] && clickCoords[5] > clickCoords[1];
+				var y_within = click_coords[5] < click_coords[3] && click_coords[5] > click_coords[1];
 
 				if (x_within && y_within){
 					alert('within box!');
+					click_coords = [];
 					}
 				else {
 					alert('outside of box!');
+					click_coords = [];
 					}
 			}
 		}
 
-		function drawSquare(x_A,y_A,x_C,y_C){
+		function drawSquare(x_A,y_A,x_C,y_C, colour = "#0066ff"){
 			ctx.beginPath();
 			ctx.moveTo(x_A, y_A);
 			ctx.lineTo(x_C, y_A);
 			ctx.lineTo(x_C,y_C);
 			ctx.lineTo(x_A,y_C);
 			ctx.lineTo(x_A,y_A);	//ctx.lineWidth = 10;
-			ctx.strokeStyle = "#00ff00";
+			ctx.strokeStyle = colour;
 			ctx.stroke();
 		}
 
+		$(document).keydown(function(e){
+		if (e.keyCode==40) { // down
+		    changeFolder(-1);
+		}
+		else if (e.keyCode == 39) { // right
+			changePic(+1);
+		}
+		else if (e.keyCode == 38) { // up
+			changeFolder(+1);
+		}
+		else if (e.keyCode == 37) { // left
+			changePic(-1);
+		}
+		});
 
-    	function onLoad() {
-			
+
+    	function changePic(i) {
+			pic_num = (pic_num + i + 12) % 12;
+			getJsonData(json_labels, json_labels_coords);
+			getJsonData(json_predict, json_predict_coords);
+
+			onLoad();
+    	}
+
+    	function changeFolder(i) {
+    		folder_num = folder_num + i;
+    		foldername = getFolderName();
+    		pic_num = 0;
+
+    		getJsonData(json_labels,json_labels_coords);
+    		getJsonData(json_predict, json_predict_coords);
+
+			onLoad();
+    	}
+
+    	function onLoad() { // initializing process. 
     		var img = new Image();
-  			img.src = inputLocation + folderName + "/" + jsonPredictCoords[4];  // "/frame00000.jpg";
+  			img.src = input_location + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
 
   			//alert('waiting...'); // neccesary so far...
 
@@ -124,47 +170,23 @@
 			c.height = img.height; // gives canvas a size
     		c.width = img.width;
   			
-
     		ctx.drawImage(img, 0, 0); // draws image onto canvas
 
-    		drawSquare(jsonPredictCoords[0], jsonPredictCoords[1], jsonPredictCoords[2], jsonPredictCoords[3]);
+    		drawSquare(json_labels_coords[0], json_labels_coords[1], json_labels_coords[2], json_labels_coords[3]);
 
-    		document.getElementById("imageTitle").innerHTML = jsonPredictCoords[4];
+    		drawSquare(json_predict_coords[0], json_predict_coords[1], json_predict_coords[2], json_predict_coords[3], "#ff3300");
 
-    		document.getElementById("folderTitle").innerHTML = folderName;
+    		document.getElementById("imageTitle").innerHTML = json_labels_coords[4];
 
-			}, 25); // can be increased if neccesary. 
+    		document.getElementById("folderTitle").innerHTML = foldername;
 
+			}, 50); // can be increased if neccesary
     	}
 
-
-    	function changePic(i) {
-			picNum = (picNum + i + 12) % 12;
-			getJsonData();
-			onLoad();
-    	}
-
-    	function changeFolder(i) {
-    		folderNum = folderNum + i;
-    		folderName = getFolderName();
-
-    		getJsonData();
-			onLoad();
-    	}
-
-    	getJsonData();
+    	getJsonData(json_labels, json_labels_coords);
+    	getJsonData(json_predict, json_predict_coords);
 
 		window.onload = onLoad();
-
-
-	/* BLA IGJENOM MAPPER MED ARROWKEY!
-	document.addEventListener('keydown', function(event) {
-  	if (event.code == 'ArrowDown' && (event.ctrlKey || event.metaKey)) {
-  		  alert('calling function')
-  		  changeFolder(-1);
- 		 }
-		});
-	*/ // UTVID MED FLERE IFS OG ULIKE KEYS!
 
 		//document.addEventListener("mousedown", clickEvent);
 
@@ -175,14 +197,20 @@
 	<i id = "folderTitle" style = "font-size: 5px;"></i>
 	<i id = "imageTitle" style = "font-size: 5px;"></i>
 	<br style = "line-height: 5px">
+	<i id = "imageTitle" style = "font-size: 5px;"> Use up/down arrow keys to change folder, left/right arrow keys to change picture</i>
+
+	<!--
 	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(-1)" > < </button>
 	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(+1)" > > </button>
 
 	<br style = "line-height: 5px">
 	<i style = "font-size: 5px;"> Folder buttons: </i>
+	<br style = "line-height: 5px">
+
 
 	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(-1)" > < </button>
 	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(+1)" > > </button>
+	-->
 
 </body>
 </html>
