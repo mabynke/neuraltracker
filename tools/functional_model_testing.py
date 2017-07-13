@@ -1,20 +1,20 @@
-from keras.layers.core import Dense, Dropout, Flatten, Reshape, Masking
-from keras.layers.recurrent import LSTM
-# from keras.layers.convolutional import Conv2D
-from keras.layers.wrappers import TimeDistributed
-from keras.layers.merge import Concatenate
-from keras.layers import Input
-from keras.callbacks import TerminateOnNaN, EarlyStopping, TensorBoard
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import Model
-# from keras import backend as K
-
 import os
 
 # import random
 import numpy as np
+from keras.callbacks import TerminateOnNaN, EarlyStopping, TensorBoard
+from keras.layers import Input
+from keras.layers.convolutional import Conv2D
+from keras.layers.core import Dense, Flatten, Reshape
+from keras.layers.merge import Concatenate
+from keras.layers.recurrent import LSTM
+from keras.layers.wrappers import TimeDistributed
+from keras.models import Model
 
 from tools import data_io
+
+
+# from keras import backend as K
 
 
 def create_model(sequence_length, image_size, interface_vector_length, state_vector_length):
@@ -23,8 +23,12 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
-    x = TimeDistributed(Flatten(), name="Bildeutflating")(input_sequence)
-    x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
+    # x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv1")(input_sequence)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv2")(x)
+    # x = TimeDistributed(MaxPooling2D())
+
+    x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu", name="Grensesnittvektorer"))(x)
 
     # Kode og sette inn informasjon om startkoordinater
@@ -62,8 +66,11 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     return model
 
 
-def print_results(example_labels, example_sequences, prediction, sequence_length):
+def print_results(example_labels, example_sequences, prediction, sequence_length, max_count):
     for i in range(len(example_sequences)):
+        if i >= max_count:
+            break
+
         print("Eksempelsekvens:")
         for frame in range(sequence_length):
             print("Bilde:")
@@ -82,22 +89,32 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
             print("\tLoss: {0:5.2f}".format(mean_squared_error))
 
 
+def get_paths_from_user(default_train_path, default_test_path):
+    train_path = None
+    test_path = None
+    train_path = data_io.get_path_from_user(default_train_path, train_path)
+    test_path = data_io.get_path_from_user(default_test_path, test_path)
+
+    return train_path, test_path
+
+
 def main():
+    training_epochs = 1000  # Stoppes når loss ikke lenger forbedres, av EarlyStopping
+    training_examples = 1000
+    testing_examples = 1000
+    example_examples = 100
+
     sequence_length = 12
     image_size = 32  # Antar kvadrat og 3 kanaler
-    interface_vector_length = 128
+    interface_vector_length = 512
     state_vector_length = 256
-    training_epochs = 1000
 
-    tensorboard_log_dir = "/tmp/logg/logg3"
+    tensorboard_log_dir = "/tmp/logg/logg01"
 
-    train_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/train"
-    test_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/test"
-    example_path = train_path
-
-    training_examples = 10
-    testing_examples = 1000
-    example_examples = 10
+    default_train_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/train"
+    default_test_path = "/home/mathias/inndata/generert/tilfeldig bevegelse/test"
+    train_path, test_path = get_paths_from_user(default_train_path, default_test_path)
+    example_path = test_path
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
                                   tensorboard_log_dir, training_epochs, training_examples, train_path)
@@ -114,7 +131,7 @@ def main():
     for sequence in range(len(predictions)):
         path = os.path.join(example_path, "seq{0:05d}".format(sequence))
         data_io.write_labels(file_names=data_io.get_image_file_names_in_dir(path), labels=predictions[sequence], path=path, json_file_name="predictions.json")
-    print_results(example_labels, example_sequences, predictions, sequence_length)
+    print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
 
 main()
