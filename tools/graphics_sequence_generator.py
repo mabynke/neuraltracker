@@ -4,7 +4,8 @@ import random
 import numpy as np
 import scipy.misc
 
-from tools.data_io import write_labels
+# from tools.data_io import write_labels
+from data_io import write_labels
 
 
 def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, size_x=32, size_y=32, channels=3):

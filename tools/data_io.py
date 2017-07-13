@@ -58,10 +58,6 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
     return sequences, startcoords, labels
 
 
-if __name__ == "__main__":
-    fetch_seq_startcoords_labels("/home/mathias/inndata/generert/tilfeldig bevegelse/examples/", 0)
-
-
 def write_labels(file_names, labels, path, json_file_name):
     # Skrive merkelapper til fil
     formatted_labels = [

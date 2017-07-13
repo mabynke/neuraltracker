@@ -4,14 +4,15 @@ import os
 import numpy as np
 from keras.callbacks import TerminateOnNaN, EarlyStopping, TensorBoard
 from keras.layers import Input
-from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers.core import Dense, Flatten, Reshape
 from keras.layers.merge import Concatenate
 from keras.layers.recurrent import LSTM
 from keras.layers.wrappers import TimeDistributed
 from keras.models import Model
 
-from tools import data_io
+# from tools import data_io  # For kjøring fra PyCharm
+import data_io  # For kjøring fra terminal
 
 
 # from keras import backend as K
@@ -26,6 +27,7 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
     # x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
     x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv1")(input_sequence)
     x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv2")(x)
+    x = TimeDistributed(MaxPooling2D((2,2)))
     # x = TimeDistributed(MaxPooling2D())
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
