@@ -116,7 +116,9 @@ def main():
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
                                   tensorboard_log_dir, training_epochs, training_examples, train_path)
-
+    # TODO: Lagre modellens konfigurasjon som json
+    # model_string = model.to_json()
+    # with
     model.save_weights(save_weights_path, overwrite=True)
 
     test_sequences, test_startcoords, test_labels = data_io.fetch_seq_startcoords_labels(test_path, testing_examples)
