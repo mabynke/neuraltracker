@@ -1,0 +1,48 @@
+De følgende forsøkene er kjørt med trening som automatisk slutter å trene når 5 epoker har gått uten forbedring i loss.
+
+2017-07-12 - Forsøk:
+Beskrivelse: Forsøk med data (1000 trening, 1000 test) med 1 4*4-kvadrat i tilfeldig bevegelse med tilfeldig startpunkt (32*32 piksler, hvit figur på svart bakgrunn). Grensesnittvektorstørrelse 512. Tilstandsvektorstørrelse 256. Ingen konvolusjonale lag. Optimiseringsalgoritme: rmsprop
+Resultat: Rundt 9 i loss (mean squared error) på testsettet, akseptabel følging av målet.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Data med 2 like store hvite kvadrater som beveger seg uavhengig av hverandre.
+Resultat: Dårlig. Mulig å få til overfitting ved lite treningssett, men testsettet mister fort målet og blir stående på samme sted.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Endringer siden sist: Konvolusjonale lag: 3 konv-lag (32 filtre) med max-pooling (skaleringsfaktor 2) mellom.
+Resultat: 0.64 loss for treningsdata, 37 for testdata. Overfitting, dårlige resultater for testsettet.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Økt til 10000 treningssekvenser.
+Resultat: Ikke overfitting, men 42 loss for testdata (39 for treningsdata). Ikke fungerende.
+
+2017-07-13 - Forsøk:
+Beskrivelse: Økt tilstandsvektorens lengde fra 256 til 512.
+Resultat: Treningsloss: 3.7, testloss: 18.0. Overtilpasset, men ganske fungerende, men mister av og til målet og begynner å spore feil firkant eller virrer i et svart område. Blir spesielt forvirret når de to firkantene er nær hverandre.
+
+2017-07-14 - Forsøk:
+Beskrivelse: Firkantene bytter til en tilfeldig farge for hvert bilde.
+Resultat: Treningsloss: 3.5, testloss: 24. Overtilpasset. Gjør det ikke veldig merkbart dårligere enn forrige forsøk selv om nettverket nå ikke kan se etter en bestemt farge (hvit). Ser fortsatt ofte på feil firkant.
+
+2017-07-14 - Forsøk:
+Beskrivelse: Firkantene har tilfeldig størrelse (men er alltid kvadratiske) mellom 3*3 og 10*10 (32//3). Bytter ikke lenger farge for hvert bilde, men hver firkant får en tilfeldig farge som den beholder gjennom sekvensen. De har også samme størrelse gjennom hele sekvensen.
+Resultat: Treningsloss: 37, testloss: 36. Lite fungerende, men kan til en viss grad følge firkantene. Mister dem fort. Forventningen var at dette skulle være lettere å lære enn forrige forsøk. Gjentok forsøket med treningsloss 41, testloss 40.
+
+2017-07-14 - Forsøk:
+Beskrivelse: Økte antall filtre på det andre konvolusjonale laget fra 32 til 64 og på det tredje fra 32 til 128.
+Resultat: Treningsloss: 50, testloss: 47. Treffer (fortsatt) ganske bra på første bilde, men sklir så mer eller mindre fort ut og mister firkanten viss den beveger seg raskt.
+
+Forsøk:
+Beskrivelse: Endret antall filtre i de tre konvolusjonale lagene fra 32, 64 og 128 til henholdsvis 128, 64 og 32.
+Resultat: Treningsloss: 48, testloss: 47.
+
+Forsøk:
+Beskrivelse: Endret antall filtre tilbake til 32 i alle tre konvolusjonale lag. Endret lengden av grensesnittvektoren fra 512 til 1024.
+Resultat: Trening: 45, test: 44.
+
+Forsøk:
+Beskrivelse: Deaktiverte den konvolusjonale delen og bruker kun et tett lag fra innbilder til grensesnittvektoren. Endret grensesnittvektoren tilbake fra 1024 til 512.
+Resultat: Trening: 37, test: 39. Veldig lik oppførsel som tidligere.
+
+Forsøk:
+Beskrivelse: Økte lengen på tilstandrvektoren fra 512 til 1024. 7.9 mill parametre å trene (ca. dobbelt så mange som før)
