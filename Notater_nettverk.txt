@@ -1,7 +1,7 @@
 De følgende forsøkene er kjørt med trening som automatisk slutter å trene når 5 epoker har gått uten forbedring i loss.
 
 2017-07-12 - Forsøk:
-Beskrivelse: Forsøk med data (1000 trening, 1000 test) med 1 4*4-kvadrat i tilfeldig bevegelse med tilfeldig startpunkt (32*32 piksler, hvit figur på svart bakgrunn). Grensesnittvektorstørrelse 512. Tilstandsvektorstørrelse 256. Ingen konvolusjonale lag. Optimiseringsalgoritme: rmsprop
+Beskrivelse: Forsøk med data (1000 trening, 1000 test) med 1 4*4-kvadrat i tilfeldig bevegelse med tilfeldig startpunkt (32*32 piksler, hvit figur på svart bakgrunn). Grensesnittvektorstørrelse 512. Tilstandsvektorstørrelse 256. Ingen konvolusjonale lag. Optimeringsalgoritme: rmsprop
 Resultat: Rundt 9 i loss (mean squared error) på testsettet, akseptabel følging av målet.
 
 2017-07-13 - Forsøk:
@@ -45,4 +45,13 @@ Beskrivelse: Deaktiverte den konvolusjonale delen og bruker kun et tett lag fra 
 Resultat: Trening: 37, test: 39. Veldig lik oppførsel som tidligere.
 
 Forsøk:
-Beskrivelse: Økte lengen på tilstandrvektoren fra 512 til 1024. 7.9 mill parametre å trene (ca. dobbelt så mange som før)
+Beskrivelse: Økte lengen på tilstandrvektoren fra 512 til 1024. 7.9 mill parametre å trene (ca. dobbelt så mange som før).
+Resultat: Trening: 34, test: 36. Ingen stor forbedring.
+
+Forsøk01:
+Beskrivelse: Endret tilstandsvektoren tilbake fra 1024 til 512. Bruker adagrad istedenfor rmsprop som optimeringsalgoritme.
+Resultat: Treningen varte MYE lenger. Treningsloss: 9.9, test: 30.
+
+Forsøk02:
+Beskrivelse: Brukt et litt annen treningsmetode og "adagrad". Evaluerte med testsettet for hver 10. epoke.
+Resultat: Nådde treningsloss 7.4, testloss 30.9. Testloss var underveis nede på 28,4, så overtilpassing ødela ikke veldig mye for testsettet. Klarer å følge den omtrentlige posisjonen til firkanten, men faller fort ut og er ikke særlig nøyaktig i posisjoneringen.
