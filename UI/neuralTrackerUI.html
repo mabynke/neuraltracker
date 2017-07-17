@@ -122,8 +122,6 @@
 
 				var y_within = click_coords[5] < click_coords[3] && click_coords[5] > click_coords[1];
 
-				var in_canvas = click_coords[4] < c.width && click_coords[5] < c.height
-
 				if (x_within && y_within){
 					alert('within box!');
 
@@ -132,7 +130,6 @@
 					//click_coords = [];
 					}
 				else{
-				// will likely do nothing, insert turn this into 'else if (in_canvas) if this codeblack will do SOMETHING that break button functionality. 
 					click_coords.splice(4,2);
 
 					alert('outside of box!');
