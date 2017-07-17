@@ -52,10 +52,15 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
 
 
 def build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
-                          tensorboard_log_dir, training_epochs, training_examples, training_path):
+                          tensorboard_log_dir, training_epochs, training_examples, training_path,
+                          test_path, testing_examples, round_patience=2):
     # Bygge modellen
     model = create_model(sequence_length, image_size, interface_vector_length, state_vector_length)
+<<<<<<< HEAD
     model.compile(optimizer="adagrad", loss="mean_squared_error")
+=======
+    model.compile(optimizer="adam", loss="mean_squared_error")
+>>>>>>> d49501671a1bc84275ee8cdd5129141415874fcc
 
     print("Oppsummering av nettet:")
     model.summary()  # Skrive ut en oversikt over modellen
@@ -63,9 +68,31 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
 
     # Trene modellen
     train_seq, train_startcoords, train_labels = data_io.fetch_seq_startcoords_labels(training_path, training_examples)
-    model.fit(x=[train_seq, train_startcoords], y=train_labels, epochs=training_epochs,
-              callbacks=[TerminateOnNaN(), EarlyStopping(monitor="loss", patience=5),
+
+    epoches_per_test = 9
+    best_loss = 10000
+    num_of_rounds_without_improvement = 0
+    max_num_of_rounds = int(1032 / epoches_per_test)
+    time_at_start = os.times().elapsed
+    for i in range(max_num_of_rounds):
+        model.fit(x=[train_seq, train_startcoords], y=train_labels, epochs=epoches_per_test,
+              callbacks=[TerminateOnNaN(), EarlyStopping(monitor="loss", patience=4),
                          TensorBoard(log_dir=tensorboard_log_dir)])
+        evaluation = evaluate_model(model, test_path, testing_examples)
+
+        print("Fullført runde {0}/{1}, {2} epoker. Brukt {3} minutter.".format(i+1, max_num_of_rounds,
+                                                                               (i+1) * epoches_per_test,
+                                                                               round((os.times().elapsed - time_at_start)/60, 1)))
+
+        if evaluation >= best_loss:
+            num_of_rounds_without_improvement += 1
+            print("Runder uten forbedring: {0}/{1}".format(num_of_rounds_without_improvement, round_patience))
+            if num_of_rounds_without_improvement >= round_patience:
+                break
+        else:
+            num_of_rounds_without_improvement = 0
+            best_loss = evaluation
+        print()
     return model
 
 
@@ -115,15 +142,18 @@ def main():
     example_path = test_path
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
+<<<<<<< HEAD
                                   tensorboard_log_dir, training_epochs, training_examples, train_path)
+=======
+                                  tensorboard_log_dir, training_epochs, training_examples, train_path,
+                                  test_path, testing_examples)
+>>>>>>> d49501671a1bc84275ee8cdd5129141415874fcc
     # TODO: Lagre modellens konfigurasjon som json
     # model_string = model.to_json()
     # with
     model.save_weights(save_weights_path, overwrite=True)
 
-    test_sequences, test_startcoords, test_labels = data_io.fetch_seq_startcoords_labels(test_path, testing_examples)
-    evaluation = model.evaluate([test_sequences, test_startcoords], test_labels)
-    print("Evaluering: ", evaluation, end="\n\n")
+    # evaluate_model(model, test_path, testing_examples)
 
     # Lage og vise eksempler
     example_sequences, example_startcoords, example_labels = data_io.fetch_seq_startcoords_labels(example_path,
@@ -133,7 +163,14 @@ def main():
     for sequence in range(len(predictions)):
         path = os.path.join(example_path, "seq{0:05d}".format(sequence))
         data_io.write_labels(file_names=data_io.get_image_file_names_in_dir(path), labels=predictions[sequence], path=path, json_file_name="predictions.json")
-    print_results(example_labels, example_sequences, predictions, sequence_length, 4)
+    # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
+
+
+def evaluate_model(model, test_path, testing_examples):
+    test_sequences, test_startcoords, test_labels = data_io.fetch_seq_startcoords_labels(test_path, testing_examples)
+    evaluation = model.evaluate([test_sequences, test_startcoords], test_labels)
+    print("\nEvaluering: ", evaluation, end="\n\n")
+    return evaluation
 
 
 main()
