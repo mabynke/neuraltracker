@@ -59,7 +59,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     # Bygge modellen
     # K._set_session(K.tf.Session(config=K.tf.ConfigProto(log_device_placement=True)))
     model = create_model(sequence_length, image_size, interface_vector_length, state_vector_length)
-    model.compile(optimizer="adam", loss="mean_squared_error", sample_weight_mode="temporal")
+    model.compile(optimizer="adam", loss="mean_squared_error")
 
     print("Oppsummering av nettet:")
     model.summary()  # Skrive ut en oversikt over modellen

@@ -9,7 +9,6 @@
 	<style>
 	body {
   		margin: 0px;
-  		padding: 0px;
 		}
 	</style>
 </head>
@@ -86,7 +85,9 @@
 		}
 
 		function clickEvent(event) {
+			//alert('in click event')
 			getCoordinates(event);
+			scale_factor = 1;
 
 			if (click_coords.length == 4) {
 
@@ -96,8 +97,11 @@
 				//'refreshes then draws square'
 				//ctx.clearRect(0, 0, c.width, c.height);
   				ctx.drawImage(img,0,0); // img not defines
+
+  				//alert('trying to draw a square!')
 				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3]);
 				//click_coords = [];
+
 			}
 			if (click_coords.length == 6) { // box has been created, and one 'mousedown' has been registrered
 				var x_within = click_coords[4] < click_coords[2] && click_coords[4] > click_coords[0];
@@ -127,7 +131,7 @@
 			ctx.lineTo(x_A*scale_factor,y_C*scale_factor);
 			ctx.lineTo(x_A*scale_factor,y_A*scale_factor);
 			ctx.lineTo(x_C*scale_factor, y_A*scale_factor); // for å få vekk venstre hjørne hull
-
+			
 			ctx.stroke();
 		}
 
@@ -187,7 +191,7 @@
 
     		document.getElementById("folderTitle").innerHTML = foldername;
 
-			}, 0); // can be increased if neccesary
+			}, 50); // can be increased if neccesary
     	}
 
     	getJsonData(json_labels, json_labels_coords);

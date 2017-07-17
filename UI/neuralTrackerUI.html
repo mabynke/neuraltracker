@@ -1,0 +1,336 @@
+<!-- mousedown event is commented out in this version -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset = "UTF-8">
+	<title> Tracking UI </title>
+	<script src="jquery-3.2.1.js"></script>
+	<style>
+	body {
+  		margin: 0px;
+  		padding: 0px;
+		}
+	</style>
+</head>
+<body>
+	<i id = "MODE" style = "font-size: 15px;"> Write-mode (mark the object to be tracked on each frame) </i>
+	<br>
+	<canvas id="myCanvas" height = "" width=""> </canvas>
+	<script>
+	    var c = document.getElementById("myCanvas"); //c.height
+    	var ctx = c.getContext("2d");// used for drawing
+
+    	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
+
+
+    	var click_coords = [];
+    	var json_file = [];
+
+    	var json_predict_coords = [];
+    	var json_labels_coords = [];
+
+    	var pic_num = 0;
+    	var folder_num = 0;
+
+    	var json_labels = prompt("Please enter the labels (correct answer) jsonfile name","labels.json"); // TODO: turn into userinput!
+    	var json_predict = prompt("Please enter the AI prediction jsonfile name", "predictions.json");
+
+    	var foldername = getFolderName();
+    	var scale_factor = 8; // scalefactor = 1 er original.
+
+    	var clear_image = false;
+  		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
+  		var current_mode = 0 // 0 - write, 1 - ai mode.
+  		
+  		function getFolderName() {
+  			if (folder_num <= 0) {
+  				folder_num = 0;
+       			var foldername = "/seq00000";
+       		}
+       		else if (folder_num < 10) {
+       			var foldername = "/seq0000" + folder_num;
+       		}
+       		else if (folder_num < 100) {
+       			var foldername = "/seq000" + folder_num;
+       		}
+       		else if (folder_num < 1000) {
+       			var foldername = "/seq00" + folder_num;
+       		}
+       	return foldername
+  		}
+
+
+		function getJsonData(jsonfile, datalist) {
+            
+            while(datalist.length > 0) { // makes sure datalist is empty, aka emptys both 'datalist' and the array 'datalist' corresponds to. Which datalist = [] doesn't do. 
+    			datalist.pop();
+			}
+
+            $.ajax({url: input_location + foldername + "/" + jsonfile, async: false, dataType: "json", success: function(data) {
+                x1 = data[pic_num].x1;
+                y1 = data[pic_num].y1;
+                x2 = data[pic_num].x2;
+                y2 = data[pic_num].y2;
+                filename = data[pic_num].filename;
+
+                datalist.push(x1);
+                datalist.push(y1);
+                datalist.push(x2);
+                datalist.push(y2);
+                datalist.push(filename);
+            }})
+        }
+		
+
+		function getCoordinates(event){ //pushes coordinates to 'click_coords'
+		    var rect = c.getBoundingClientRect();
+
+			if (click_coords.length <= 4) {
+				canvas_x = event.clientX - rect.left;
+				canvas_y = event.clientY - rect.top;
+
+				var in_canvas = canvas_x < c.width && canvas_y < c.height
+
+				// Hvis within canvas, push
+				if (in_canvas) {
+					click_coords.push(canvas_x);
+					click_coords.push(canvas_y);
+					//alert('have pushed, click_coords is now: ' + click_coords)					
+				}
+			}
+		}
+
+		function clickEvent(event) {
+			getCoordinates(event);
+			scale_factor = 1; //only works when this is set to 1.
+
+
+			if (click_coords.length == 4) {
+				var img = new Image();  // denne er nå to steder z
+  				img.src = input_location + foldername + "/" + json_labels_coords[4];
+
+				//'refreshes then draws square'
+				//ctx.clearRect(0, 0, c.width, c.height);
+  				//ctx.drawImage(img,0,0); // img not defines
+
+				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3], "#ff1493");
+				//click_coords = [];
+			}
+			if (click_coords.length == 6) { // box has been created, and one 'mousedown' has been registrered
+				var x_within = click_coords[4] < click_coords[2] && click_coords[4] > click_coords[0];
+
+				var y_within = click_coords[5] < click_coords[3] && click_coords[5] > click_coords[1];
+
+				var in_canvas = click_coords[4] < c.width && click_coords[5] < c.height
+
+				if (x_within && y_within){
+					alert('within box!');
+
+					click_coords.splice(4,2);
+					//alert('click_coords: !' + click_coords)
+					//click_coords = [];
+					}
+				else{
+				// will likely do nothing, insert turn this into 'else if (in_canvas) if this codeblack will do SOMETHING that break button functionality. 
+					click_coords.splice(4,2);
+
+					alert('outside of box!');
+					//click_coords = []; // slett firkant!!
+					}
+			}
+		}
+
+		function drawSquare(x_A,y_A,x_C,y_C, colour = "#0066ff"){
+			ctx.globalAlpha = 0.6; // opacity
+			ctx.lineWidth = 6; // potentially 1*scale_factor
+			ctx.strokeStyle = colour;
+
+			ctx.beginPath();
+			ctx.moveTo(x_A*scale_factor, y_A*scale_factor);
+			ctx.lineTo(x_C*scale_factor, y_A*scale_factor);
+			ctx.lineTo(x_C*scale_factor,y_C*scale_factor);
+			ctx.lineTo(x_A*scale_factor,y_C*scale_factor);
+			ctx.lineTo(x_A*scale_factor,y_A*scale_factor);
+			ctx.lineTo(x_C*scale_factor, y_A*scale_factor); 
+			// for å få vekk venstre hjørne hull
+
+			ctx.stroke();
+		}
+
+		$(document).keydown(function(e){ // keyboard-key function
+		
+			if (e.keyCode==40) { // down
+			    changeFolder(-1);
+			}
+			else if (e.keyCode == 39) { // right
+				changePic(+1);
+			}
+			else if (e.keyCode == 38) { // up
+				changeFolder(+1);
+			}
+			else if (e.keyCode == 37) { // left
+				changePic(-1);
+		}
+		});
+
+
+    	function changePic(i) {
+    		sendData(); // before pic is changed
+
+			pic_num = (pic_num + i + 12) % 12;
+			getJsonData(json_labels, json_labels_coords);
+			getJsonData(json_predict, json_predict_coords);
+
+			onLoad();
+    	}
+
+    	function changeFolder(i) {
+    		folder_num = folder_num + i;
+    		foldername = getFolderName();
+    		pic_num = 0;
+
+    		getJsonData(json_labels,json_labels_coords);
+    		getJsonData(json_predict, json_predict_coords);
+
+			onLoad();
+    	}
+
+    	function sendData() {
+    		scale_factor = 8;
+    		if (click_coords.length == 4) {
+    			var dict = {};
+    			dict['x1'] = (click_coords[0] / scale_factor);
+				dict['y1'] = (click_coords[1] / scale_factor);
+				dict['x2'] = (click_coords[2] / scale_factor);
+				dict['y2'] = (click_coords[3] / scale_factor);
+				dict['filename'] = json_predict_coords[4];
+
+				json_file[pic_num] = dict;
+    		}
+    	}
+
+    	function jsonify() {
+    		var json = JSON.stringify(json_file);
+			console.log(json);
+
+			var blob = new Blob([json], {type: "application/json"});
+			var url  = URL.createObjectURL(blob);
+
+			var a = document.createElement('a');
+			a.download    = "labels.json";
+			a.href        = url;
+			a.textContent = "***Download labels.json for" + foldername + "***";
+
+			document.getElementById('content').appendChild(a);
+    	}
+
+
+    	function changeMode() {
+			current_mode = (current_mode + 1) % 2;
+
+			if (current_mode == 0) {
+				document.getElementById("MODE").innerHTML = "Write-mode (mark the object to be tracked on each frame)"
+			}
+			else if (current_mode == 1) {
+				document.getElementById("MODE").innerHTML = "Read-mode (labels: blue, AI-guess: red)"
+			}
+			onLoad();
+    	}
+
+    	function onLoad() { // initializing process.
+			scale_factor = 8;
+			click_coords = [];
+
+    		var img = new Image(32*scale_factor,32*scale_factor);
+  			img.src = input_location + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
+
+  			//alert('waiting...'); // neccesary so far...
+
+  			setTimeout(function(){
+
+			c.height = img.height; // gives canvas a size
+    		c.width = img.width;
+  			
+    		ctx.drawImage(img, 0, 0, 32*scale_factor, 32*scale_factor); // drawImage(img, 0, 0, width, height) draws image onto canvas
+
+            if (current_mode == 0) {// WRITE MODE! (draw img)
+            	document.addEventListener("mousedown", clickEvent);
+
+	            if (json_file[pic_num] && clear_image == false) {
+	            	var image_data = json_file[pic_num];
+
+	            	//alert(image_data["x1"] + "," + image_data["y1"] + "," + image_data["x2"] + "," + image_data["y2"]);
+
+	            	drawSquare(image_data["x1"],image_data["y1"],image_data["x2"],image_data["y2"], "#ff1493");
+	            }
+	            else {
+	            	clear_image = false;
+	            }
+	        }
+
+	        else if (current_mode == 1) { // AI MODE!
+		        document.removeEventListener("mousedown", clickEvent);
+
+		        drawSquare(json_labels_coords[0], json_labels_coords[1], json_labels_coords[2], json_labels_coords[3]);
+
+	    		drawSquare(json_predict_coords[0], json_predict_coords[1], json_predict_coords[2], json_predict_coords[3], "#ff3300");
+		        }
+
+	    	document.getElementById("imageTitle").innerHTML = json_labels_coords[4];
+
+	    	document.getElementById("folderTitle").innerHTML = foldername;
+
+			}, 15); // can be increased if neccesary
+    	}
+
+    	getJsonData(json_labels, json_labels_coords);
+    	getJsonData(json_predict, json_predict_coords);
+
+		window.onload = onLoad();
+
+		//document.addEventListener("mousedown", clickEvent);
+
+		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
+
+	</script>
+	<br style = "line-height: 15px">
+	<i id = "folderTitle" style = "font-size: 15px;"></i>
+	<i id = "imageTitle" style = "font-size: 15px;"></i>
+	<br style = "line-height: 15px">
+	<p> </p>
+	<i id = "info" style = "font-size: 12px; color: DarkGrey"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i>
+
+	<br style = "line-height: 50px">
+
+	<i style = "font-size: 15px;"> Mode:  </i>
+	<i id = "MODE" style = "font-size: 15px;"> Write-mode (mark the object to be tracked on each frame) </i>
+	<br style = "line-height: 15px">
+
+
+	<button type = "button" style = "font-size: 13px; height: 30px; width:150px" onclick= "sendData(); jsonify();" > Save training data </button>
+
+	<button type = "button" style = "font-size: 13px; height: 30px; width:100px" onclick= "clear_image = true; onLoad();" > Clear image </button>
+
+	<button type = "button" style = "font-size: 13px; height: 30px; width:130px" onclick= "changeMode();" > Change mode </button>
+
+	<br>
+
+	<div style = "font-size: 13px"; id="content"> </div>
+
+
+	<!--
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(-1)" > < </button>
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(+1)" > > </button>
+
+	<br style = "line-height: 5px">
+	<i style = "font-size: 5px;"> Folder buttons: </i>
+	<br style = "line-height: 5px">
+
+
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(-1)" > < </button>
+	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(+1)" > > </button>
+	-->
+
+</body>
+</html>
