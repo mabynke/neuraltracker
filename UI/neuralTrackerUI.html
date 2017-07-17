@@ -17,12 +17,15 @@
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<!--  style="border:1px solid #000000"; -->
 	<script>
-	    var c = document.getElementById("myCanvas");
+	    var c = document.getElementById("myCanvas"); //c.height
     	var ctx = c.getContext("2d");// used for drawing
 
     	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
 
+
     	var click_coords = [];
+    	var json_file = [];
+
     	var json_predict_coords = [];
     	var json_labels_coords = [];
 
@@ -78,13 +81,19 @@
 		
 
 		function getCoordinates(event){ //pushes coordinates to 'click_coords'
-			canvas_x = event.pageX; // finnes annen metode i gamle backups
-			canvas_y = event.pageY;
+			if (click_coords.length <= 4) {
+				canvas_x = event.pageX; //finnes annen metode
+				canvas_y = event.pageY;
 
-			// Hvis within canvas, push
-			click_coords.push(canvas_x);
-			click_coords.push(canvas_y);
-			//alert("X=" + canvas_x + " Y=" + canvas_y + "all coordinates:" + click_coords);
+				var in_canvas = canvas_x < c.width && canvas_y < c.height
+
+				// Hvis within canvas, push
+				if (in_canvas) {
+					click_coords.push(canvas_x);
+					click_coords.push(canvas_y);
+					//alert('have pushed, click_coords is now: ' + click_coords)					
+				}
+			}
 		}
 
 		function clickEvent(event) {
@@ -109,14 +118,22 @@
 
 				var y_within = click_coords[5] < click_coords[3] && click_coords[5] > click_coords[1];
 
+				var in_canvas = click_coords[4] < c.width && click_coords[5] < c.height
+
 				if (x_within && y_within){
 					alert('within box!');
-					alert('click_coords: !' + click_coords)
-					click_coords = [];
+
+					click_coords.splice(4,2);
+					//alert('click_coords: !' + click_coords)
+					//click_coords = [];
 					}
-				else {
+				else{
+				// will likely do nothing, insert turn this into 'else if (in_canvas) if this codeblack will do SOMETHING that break button functionality. 
+					click_coords.splice(4,2);
+
 					alert('outside of box!');
-					click_coords = []; // slett firkant!!
+					alert(click_coords)
+					//click_coords = []; // slett firkant!!
 					}
 			}
 		}
@@ -176,7 +193,9 @@
 
 
 
-    	function onLoad() { // initializing process. 
+    	function onLoad() { // initializing process.
+			scale_factor = 8;
+
     		var img = new Image(32*scale_factor,32*scale_factor);
   			img.src = input_location + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
 
@@ -222,7 +241,10 @@
 
 	<br style = "line-height: 50px">
 
-	<button type = "button" style = "font-size: 13px; height: 30px; width:150px" onclick= "alert('pretend training data was saved :^)')" > Save training data </button>
+	<button type = "button" style = "font-size: 13px; height: 30px; width:150px" onclick= "alert('pretend training data was saved and downloaded as a jsonfile :^)')" > Save training data </button>
+
+	<button type = "button" style = "font-size: 13px; height: 30px; width:100px" onclick= "alert(click_coords); click_coords = []; onLoad()" > Clear image </button>
+
 
 	<!--
 	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(-1)" > < </button>
