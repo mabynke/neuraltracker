@@ -14,8 +14,9 @@
 	</style>
 </head>
 <body>
+	<i id = "MODE" style = "font-size: 15px;"> Write-mode (mark the object to be tracked on each frame) </i>
+	<br>
 	<canvas id="myCanvas" height = "" width=""> </canvas>
-	<!--  style="border:1px solid #000000"; -->
 	<script>
 	    var c = document.getElementById("myCanvas"); //c.height
     	var ctx = c.getContext("2d");// used for drawing
@@ -38,7 +39,9 @@
     	var foldername = getFolderName();
     	var scale_factor = 8; // scalefactor = 1 er original.
 
+    	var clear_image = false;
   		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
+  		var current_mode = 0 // 0 - write, 1 - ai mode.
   		
   		function getFolderName() {
   			if (folder_num <= 0) {
@@ -60,7 +63,7 @@
 
 		function getJsonData(jsonfile, datalist) {
             
-            while(datalist.length > 0) { // emptys both arrays, which datalist = [] doesn't do. 
+            while(datalist.length > 0) { // makes sure datalist is empty, aka emptys both 'datalist' and the array 'datalist' corresponds to. Which datalist = [] doesn't do. 
     			datalist.pop();
 			}
 
@@ -81,9 +84,11 @@
 		
 
 		function getCoordinates(event){ //pushes coordinates to 'click_coords'
+		    var rect = c.getBoundingClientRect();
+
 			if (click_coords.length <= 4) {
-				canvas_x = event.pageX; //finnes annen metode
-				canvas_y = event.pageY;
+				canvas_x = event.clientX - rect.left;
+				canvas_y = event.clientY - rect.top;
 
 				var in_canvas = canvas_x < c.width && canvas_y < c.height
 
@@ -98,7 +103,6 @@
 
 		function clickEvent(event) {
 			getCoordinates(event);
-			//alert(click_coords);
 			scale_factor = 1; //only works when this is set to 1.
 
 
@@ -108,9 +112,9 @@
 
 				//'refreshes then draws square'
 				//ctx.clearRect(0, 0, c.width, c.height);
-  				ctx.drawImage(img,0,0); // img not defines
+  				//ctx.drawImage(img,0,0); // img not defines
 
-				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3]);
+				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3], "#ff1493");
 				//click_coords = [];
 			}
 			if (click_coords.length == 6) { // box has been created, and one 'mousedown' has been registrered
@@ -132,7 +136,6 @@
 					click_coords.splice(4,2);
 
 					alert('outside of box!');
-					alert(click_coords)
 					//click_coords = []; // slett firkant!!
 					}
 			}
@@ -173,6 +176,8 @@
 
 
     	function changePic(i) {
+    		sendData(); // before pic is changed
+
 			pic_num = (pic_num + i + 12) % 12;
 			getJsonData(json_labels, json_labels_coords);
 			getJsonData(json_predict, json_predict_coords);
@@ -191,10 +196,51 @@
 			onLoad();
     	}
 
+    	function sendData() {
+    		scale_factor = 8;
+    		if (click_coords.length == 4) {
+    			var dict = {};
+    			dict['x1'] = (click_coords[0] / scale_factor);
+				dict['y1'] = (click_coords[1] / scale_factor);
+				dict['x2'] = (click_coords[2] / scale_factor);
+				dict['y2'] = (click_coords[3] / scale_factor);
+				dict['filename'] = json_predict_coords[4];
 
+				json_file[pic_num] = dict;
+    		}
+    	}
+
+    	function jsonify() {
+    		var json = JSON.stringify(json_file);
+			console.log(json);
+
+			var blob = new Blob([json], {type: "application/json"});
+			var url  = URL.createObjectURL(blob);
+
+			var a = document.createElement('a');
+			a.download    = "labels.json";
+			a.href        = url;
+			a.textContent = "***Download labels.json for" + foldername + "***";
+
+			document.getElementById('content').appendChild(a);
+    	}
+
+
+    	function changeMode() {
+			current_mode = (current_mode + 1) % 2;
+
+			if (current_mode == 0) {
+				document.getElementById("MODE").innerHTML = "Write-mode (mark the object to be tracked on each frame)"
+			}
+			else if (current_mode == 1) {
+				document.getElementById("MODE").innerHTML = "Read-mode (labels: blue, AI-guess: red)"
+			}
+			onLoad();
+    	}
 
     	function onLoad() { // initializing process.
 			scale_factor = 8;
+			click_coords = [];
 
     		var img = new Image(32*scale_factor,32*scale_factor);
   			img.src = input_location + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
@@ -208,18 +254,34 @@
   			
     		ctx.drawImage(img, 0, 0, 32*scale_factor, 32*scale_factor); // drawImage(img, 0, 0, width, height) draws image onto canvas
 
-    		// AI MODE!
-    		/*
-    		drawSquare(json_labels_coords[0], json_labels_coords[1], json_labels_coords[2], json_labels_coords[3]);
+            if (current_mode == 0) {// WRITE MODE! (draw img)
+            	document.addEventListener("mousedown", clickEvent);
 
-    		drawSquare(json_predict_coords[0], json_predict_coords[1], json_predict_coords[2], json_predict_coords[3], "#ff3300");
-    		*/
+	            if (json_file[pic_num] && clear_image == false) {
+	            	var image_data = json_file[pic_num];
 
-    		document.getElementById("imageTitle").innerHTML = json_labels_coords[4];
+	            	//alert(image_data["x1"] + "," + image_data["y1"] + "," + image_data["x2"] + "," + image_data["y2"]);
 
-    		document.getElementById("folderTitle").innerHTML = foldername;
+	            	drawSquare(image_data["x1"],image_data["y1"],image_data["x2"],image_data["y2"], "#ff1493");
+	            }
+	            else {
+	            	clear_image = false;
+	            }
+	        }
 
-			}, 0); // can be increased if neccesary
+	        else if (current_mode == 1) { // AI MODE!
+		        document.removeEventListener("mousedown", clickEvent);
+
+		        drawSquare(json_labels_coords[0], json_labels_coords[1], json_labels_coords[2], json_labels_coords[3]);
+
+	    		drawSquare(json_predict_coords[0], json_predict_coords[1], json_predict_coords[2], json_predict_coords[3], "#ff3300");
+		        }
+
+	    	document.getElementById("imageTitle").innerHTML = json_labels_coords[4];
+
+	    	document.getElementById("folderTitle").innerHTML = foldername;
+
+			}, 15); // can be increased if neccesary
     	}
 
     	getJsonData(json_labels, json_labels_coords);
@@ -227,7 +289,7 @@
 
 		window.onload = onLoad();
 
-		document.addEventListener("mousedown", clickEvent);
+		//document.addEventListener("mousedown", clickEvent);
 
 		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
 
@@ -237,13 +299,24 @@
 	<i id = "imageTitle" style = "font-size: 15px;"></i>
 	<br style = "line-height: 15px">
 	<p> </p>
-	<i id = "imageTitle" style = "font-size: 15px;"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i>
+	<i id = "info" style = "font-size: 12px; color: DarkGrey"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i>
 
 	<br style = "line-height: 50px">
 
-	<button type = "button" style = "font-size: 13px; height: 30px; width:150px" onclick= "alert('pretend training data was saved and downloaded as a jsonfile :^)')" > Save training data </button>
+	<i style = "font-size: 15px;"> Mode:  </i>
+	<i id = "MODE" style = "font-size: 15px;"> Write-mode (mark the object to be tracked on each frame) </i>
+	<br style = "line-height: 15px">
 
-	<button type = "button" style = "font-size: 13px; height: 30px; width:100px" onclick= "alert(click_coords); click_coords = []; onLoad()" > Clear image </button>
+
+	<button type = "button" style = "font-size: 13px; height: 30px; width:150px" onclick= "sendData(); jsonify();" > Save training data </button>
+
+	<button type = "button" style = "font-size: 13px; height: 30px; width:100px" onclick= "clear_image = true; onLoad();" > Clear image </button>
+
+	<button type = "button" style = "font-size: 13px; height: 30px; width:130px" onclick= "changeMode();" > Change mode </button>
+
+	<br>
+
+	<div style = "font-size: 13px"; id="content"> </div>
 
 
 	<!--

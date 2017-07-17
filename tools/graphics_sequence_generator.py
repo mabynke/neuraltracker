@@ -54,13 +54,14 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         # pos_y = round(size_y / 2)
         speed_x = random.gauss(0, 0.05 * size_x)
         speed_y = random.gauss(0, 0.05 * size_y)
-        # square_size = random.randint(3, int(size_x / 3))
-        square_size = 4
+        square_size = random.randint(3, int(size_x / 3))
+        # square_size = 4
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
+    color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
     for frame in range(frames):                                                                     # For hvert bilde i sekvensen
-        draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=(255, 255, 255))   # Tegne inn firkant i bildet
+        draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=color)   # Tegne inn firkant i bildet
 
         # Lagre merkelapp for dette bildet
         radius = square_size / 2
@@ -181,7 +182,9 @@ def create_train_test_examples(path, counts, figures=1):
             print("Mappen \"{0}\" fins allerede.".format(os.path.join(path, name)))
 
         count = counts[folder_names.index(name)]
-        for _ in range(count):
+        for i in range(count):
+            if not i % 1000:
+                print("Skrevet {0}/{1} sekvenser til {2}".format(i, count, name))
             sequence = np.zeros((frames, image_size, image_size, channels), dtype=np.int)
             for figure in range(figures):
                 # Kun den siste versjonen av labels blir beholdt og skrevet til fil

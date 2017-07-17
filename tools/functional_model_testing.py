@@ -25,13 +25,13 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
 
     # Behandle bildesekvensen
     # x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv1")(input_sequence)
-    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)  # 16*16
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv2")(x)
-    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)  # 8*8
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv3")(x)
+    # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv1")(input_sequence)
+    # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)  # 16*16
+    # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv2")(x)
+    # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)  # 8*8
+    # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv3")(x)
 
-    x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
+    x = TimeDistributed(Flatten(), name="Bildeutflating")(input_sequence)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu", name="Grensesnittvektorer"))(x)
 
     # Kode og sette inn informasjon om startkoordinater
@@ -55,7 +55,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
                           tensorboard_log_dir, training_epochs, training_examples, training_path):
     # Bygge modellen
     model = create_model(sequence_length, image_size, interface_vector_length, state_vector_length)
-    model.compile(optimizer="rmsprop", loss="mean_squared_error")
+    model.compile(optimizer="adagrad", loss="mean_squared_error")
 
     print("Oppsummering av nettet:")
     model.summary()  # Skrive ut en oversikt over modellen
@@ -116,7 +116,9 @@ def main():
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
                                   tensorboard_log_dir, training_epochs, training_examples, train_path)
-
+    # TODO: Lagre modellens konfigurasjon som json
+    # model_string = model.to_json()
+    # with
     model.save_weights(save_weights_path, overwrite=True)
 
     test_sequences, test_startcoords, test_labels = data_io.fetch_seq_startcoords_labels(test_path, testing_examples)
