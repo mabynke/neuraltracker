@@ -55,3 +55,7 @@ Resultat: Treningen varte MYE lenger. Treningsloss: 9.9, test: 30.
 Forsøk02:
 Beskrivelse: Brukt et litt annen treningsmetode og "adagrad". Evaluerte med testsettet for hver 10. epoke.
 Resultat: Nådde treningsloss 7.4, testloss 30.9. Testloss var underveis nede på 28,4, så overtilpassing ødela ikke veldig mye for testsettet. Klarer å følge den omtrentlige posisjonen til firkanten, men faller fort ut og er ikke særlig nøyaktig i posisjoneringen.
+
+Forsøk:
+Beskrivelse: Brukte optimeringsalgoritmen adam. Lagd egen rutine som slutter å trene når testloss ikke lenger blir bedre.
+Resultat: Testloss 39.2, treningsloss 37.8. Treningslossen sluttet også å gå nedover. Forskjellen i testloss er ikke spesielt merkbar ved visuell inspeksjon av forutsigelser på testsettet. Velger ofte et punkt mellom de to firkantene, hvilket er fornuftig viss den ikke vet hvilken den skal følge, og vil minimere forventet loss. Den er god på å tilnærme størrelsen til den riktige firkanten.

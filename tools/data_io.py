@@ -49,7 +49,7 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
             label_raw = json.load(label_file)  # Lese merkelapper fra filen
 
         sequence_labels = [(i["x1"], i["y1"], i["x2"], i["y2"]) for i in label_raw]
-        sequence_labels.insert(0, sequence_labels[0])  # Doble den første merkelappen fordi vi får den dobbelt opp fra nettverket (dårlig løsning)
+        sequence_labels.insert(0, sequence_labels[0])  # Doble den første merkelappen fordi vi får den dobbelt opp fra nettverket
         labels.append(sequence_labels)
         startcoords.append(sequence_labels[0])
 

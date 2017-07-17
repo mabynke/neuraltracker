@@ -11,6 +11,8 @@ from keras.layers.recurrent import LSTM
 from keras.layers.wrappers import TimeDistributed
 from keras.models import Model
 
+# import keras.backend.tensorflow_backend as K
+
 # from tools import data_io  # For kjøring fra PyCharm
 import data_io  # For kjøring fra terminal
 
@@ -53,10 +55,11 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
 
 def build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
                           tensorboard_log_dir, training_epochs, training_examples, training_path,
-                          test_path, testing_examples, round_patience=2):
+                          test_path, testing_examples, save_weights_path, round_patience=2):
     # Bygge modellen
+    # K._set_session(K.tf.Session(config=K.tf.ConfigProto(log_device_placement=True)))
     model = create_model(sequence_length, image_size, interface_vector_length, state_vector_length)
-    model.compile(optimizer="adam", loss="mean_squared_error")
+    model.compile(optimizer="adam", loss="mean_squared_error", sample_weight_mode="temporal")
 
     print("Oppsummering av nettet:")
     model.summary()  # Skrive ut en oversikt over modellen
@@ -72,11 +75,11 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     time_at_start = os.times().elapsed
     for i in range(max_num_of_rounds):
         model.fit(x=[train_seq, train_startcoords], y=train_labels, epochs=epoches_per_test,
-              callbacks=[TerminateOnNaN(), EarlyStopping(monitor="loss", patience=4),
+              callbacks=[TerminateOnNaN(),# EarlyStopping(monitor="loss", patience=4),
                          TensorBoard(log_dir=tensorboard_log_dir)])
         evaluation = evaluate_model(model, test_path, testing_examples)
 
-        print("Fullført runde {0}/{1}, {2} epoker. Brukt {3} minutter.".format(i+1, max_num_of_rounds,
+        print("Fullført runde {0}/{1} ({2} epoker). Brukt {3} minutter.".format(i+1, max_num_of_rounds,
                                                                                (i+1) * epoches_per_test,
                                                                                round((os.times().elapsed - time_at_start)/60, 1)))
 
@@ -88,6 +91,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
         else:
             num_of_rounds_without_improvement = 0
             best_loss = evaluation
+            model.save_weights(save_weights_path, overwrite=True)
         print()
     return model
 
@@ -139,11 +143,8 @@ def main():
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
                                   tensorboard_log_dir, training_epochs, training_examples, train_path,
-                                  test_path, testing_examples)
+                                  test_path, testing_examples, save_weights_path, round_patience=3)
     # TODO: Lagre modellens konfigurasjon som json
-    # model_string = model.to_json()
-    # with
-    model.save_weights(save_weights_path, overwrite=True)
 
     # evaluate_model(model, test_path, testing_examples)
 
