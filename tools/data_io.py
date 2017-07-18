@@ -7,16 +7,17 @@ from PIL import Image
 
 def fetch_seq_startcoords_labels(main_path, max_count=0):
     """
-    Leser inn sekvensmapper og genererer to sequences- og labels-arrayer som kan brukes til trening.
-    labels hentes fra en fil ved navn "label.json" i sekvensmappen.
+    Leser inn sekvensmapper og genererer to sequences- og labels_pos-arrayer som kan brukes til trening.
+    labels_pos hentes fra en fil ved navn "label.json" i sekvensmappen.
     :param main_path: Full bane til mappen som inneholder sekvensmappene (og bare det)
     :param max_count: Maksimalt antall sekvenser som skal lastes inn. 0 betyr ingen begrensning.
-    :return: sequences, labels
+    :return: sequences, labels_pos, labels_size
     """
 
     sequences = []
     startcoords = []
-    labels = []
+    labels_pos = []
+    labels_size = []
 
     file_list = os.listdir(main_path)  # os.listdir sorterer ikke alfabetisk.
     file_list.sort()  # For å være konsekvent og for å kunne lettere sammenligne eksemplene
@@ -48,22 +49,38 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
         with open(os.path.join(seq_path, "labels.json")) as label_file:  # Åpne filen
             label_raw = json.load(label_file)  # Lese merkelapper fra filen
 
-        sequence_labels = [(i["x"], i["y"], i["w"], i["h"]) for i in label_raw]
-        sequence_labels.insert(0, sequence_labels[0])  # Doble den første merkelappen fordi vi får den dobbelt opp fra nettverket
-        labels.append(sequence_labels)
-        startcoords.append(sequence_labels[0])
+        sequence_labels_pos = [(i["x"], i["y"]) for i in label_raw]
+        sequence_labels_size = [(i["w"], i["h"]) for i in label_raw]
+        # Doble den første merkelappen fordi vi får den dobbelt opp fra nettverket
+        sequence_labels_pos.insert(0, sequence_labels_pos[0])
+        sequence_labels_size.insert(0, sequence_labels_size[0])
+        labels_pos.append(sequence_labels_pos)
+        labels_size.append(sequence_labels_size)
+        startcoords.append((sequence_labels_pos[0][0],
+                            sequence_labels_pos[0][1],
+                            sequence_labels_size[0][0],
+                            sequence_labels_size[0][1]))
 
     sequences = numpy.array(sequences)
     startcoords = numpy.array(startcoords)
-    return sequences, startcoords, labels
+    labels_pos = numpy.array(labels_pos)
+    labels_size = numpy.array(labels_size)
+    return sequences, startcoords, labels_pos, labels_size
 
 
-def write_labels(file_names, labels, path, json_file_name):
+def write_labels(file_names, labels_pos, labels_size, path, json_file_name):
     # Skrive merkelapper til fil
+
+    print("labels_pos:")
+    print(labels_pos)
+    print("labels_size:")
+    print(labels_size)
+    print()
+    print("len(labels_pos): ", len(labels_pos))
     formatted_labels = [
-        {"filename": file_names[i], "x": float(labels[i][0]), "y": float(labels[i][1]),
-         "w": float(labels[i][2]), "h": float(labels[i][3])} for
-        i in range(len(labels))]
+        {"filename": file_names[i], "x": float(labels_pos[i][0]), "y": float(labels_pos[i][1]),
+         "w": float(labels_size[i][0]), "h": float(labels_size[i][1])} for
+        i in range(len(labels_pos))]
     with open(os.path.join(path, json_file_name), "w") as label_file:
         json.dump(formatted_labels, label_file)
 

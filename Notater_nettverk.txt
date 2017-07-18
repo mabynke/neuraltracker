@@ -59,3 +59,11 @@ Resultat: Nådde treningsloss 7.4, testloss 30.9. Testloss var underveis nede p�
 Forsøk:
 Beskrivelse: Brukte optimeringsalgoritmen adam. Lagd egen rutine som slutter å trene når testloss ikke lenger blir bedre.
 Resultat: Testloss 39.2, treningsloss 37.8. Treningslossen sluttet også å gå nedover. Forskjellen i testloss er ikke spesielt merkbar ved visuell inspeksjon av forutsigelser på testsettet. Velger ofte et punkt mellom de to firkantene, hvilket er fornuftig viss den ikke vet hvilken den skal følge, og vil minimere forventet loss. Den er god på å tilnærme størrelsen til den riktige firkanten.
+
+
+Forsøk:
+Beskrivelse: Endret representasjonen av plasseringen til firkanten på bildet fra (x_min, y_min, x_maks, y_maks) til (x, y, bredde, høyde) i merkelappene. Ikke endret nettverket. Formatet er x og y relativt til midten av bildet og avstanden fra midt til sidekant (x=1,y=1 er nederst til høyre), og bredde og høyde relativt til sidelengden på bildet (w=0.25, h=0.5 i et bilde på 32*32 har bredde 8 og høyde 16). De fire tallene er fortsatt samme utputt-tensor i modellen.
+Resultat: Treningsloss 0.090, testloss 0.093. Tilnærmer fortsatt størrelsen på kvadratet bra, men er betraktelig dårligere på å finne plasseringen. Hopper mye mer enn før fra bilde til bilde.
+
+Forsøk:
+Beskrivelse: Delt opp utputt i to vektorer (tette lag) av størrelse 2. Én (posisjonstensoren) representerer x og y, og den andre (størrelsestensoren) representerer w og h. Satte aktiveringen for størrelsestensoren til "sigmoid" og aktiveringen for posisjonstensoren til "linear". Kan nå sette vektingen for hver av tensorene i lossfunksjonen. Beholder foreløpig lik vekting ettersom loss for størrelsen blir mindre enn loss for posisjon med en faktor på 1000 eller 10000 og dermed uansett teller lite i summen. Loss for posisjonsvektoren (fortsatt mean square error) har nå også en direkte tolkning som kvadratet av den euklidske avstanden mellom fasit og forutsigelse.
