@@ -48,7 +48,7 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
         with open(os.path.join(seq_path, "labels.json")) as label_file:  # Åpne filen
             label_raw = json.load(label_file)  # Lese merkelapper fra filen
 
-        sequence_labels = [(i["x1"], i["y1"], i["x2"], i["y2"]) for i in label_raw]
+        sequence_labels = [(i["x"], i["y"], i["w"], i["h"]) for i in label_raw]
         sequence_labels.insert(0, sequence_labels[0])  # Doble den første merkelappen fordi vi får den dobbelt opp fra nettverket
         labels.append(sequence_labels)
         startcoords.append(sequence_labels[0])
@@ -61,8 +61,8 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
 def write_labels(file_names, labels, path, json_file_name):
     # Skrive merkelapper til fil
     formatted_labels = [
-        {"filename": file_names[i], "x1": float(labels[i][0]), "y1": float(labels[i][1]),
-         "x2": float(labels[i][2]), "y2": float(labels[i][3])} for
+        {"filename": file_names[i], "x": float(labels[i][0]), "y": float(labels[i][1]),
+         "w": float(labels[i][2]), "h": float(labels[i][3])} for
         i in range(len(labels))]
     with open(os.path.join(path, json_file_name), "w") as label_file:
         json.dump(formatted_labels, label_file)

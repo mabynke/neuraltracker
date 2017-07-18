@@ -132,8 +132,8 @@ def main():
 
     tensorboard_log_dir = "/tmp/logg/logg01"
 
-    default_train_path = "/home/mby/Grafikk/Tilfeldig bevegelse/train"
-    default_test_path = "/home/mby/Grafikk/Tilfeldig bevegelse/test"
+    default_train_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater/train"
+    default_test_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater/test"
     default_save_weight_path = "/home/mby/neuraltracker/tools/saved_weights/last_run.h5"
     train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
     test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")

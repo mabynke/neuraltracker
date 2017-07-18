@@ -65,7 +65,11 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
 
         # Lagre merkelapp for dette bildet
         radius = square_size / 2
-        labels.append((max(0, pos_x - radius), max(0, pos_y - radius), min(size_x, pos_x + radius), min(size_y, pos_y + radius)))
+        x = pos_x / size_x * 2 - 1
+        y = pos_y / size_y * 2 - 1
+        w = square_size / size_x
+        h = square_size / size_y
+        labels.append((x, y, w, h))
 
         # Oppdatere posisjon og fart til neste bilde/tidssteg
         pos_x += speed_x
@@ -200,7 +204,7 @@ def create_train_test_examples(path, counts, figures=1):
 def main():
     test_examples = 1000
     train_examples = 10000
-    default_path = "/home/mby/Grafikk/Tilfeldig bevegelse"
+    default_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":
