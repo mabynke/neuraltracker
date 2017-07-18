@@ -68,10 +68,14 @@
 			}
 
             $.ajax({url: input_location + foldername + "/" + jsonfile, async: false, dataType: "json", success: function(data) {
-                x1 = data[pic_num].x1;
-                y1 = data[pic_num].y1;
-                x2 = data[pic_num].x2;
-                y2 = data[pic_num].y2;
+                x = data[pic_num].x;
+                y = data[pic_num].y;
+                w = data[pic_num].w;
+                h = data[pic_num].h;
+				x1 = (x + 1 - w) * 32 / 2
+				y1 = (y + 1 - h) * 32 / 2
+				x2 = (x + 1 + w) * 32 / 2
+				y2 = (y + 1 + w) * 32 / 2
                 filename = data[pic_num].filename;
 
                 datalist.push(x1);
