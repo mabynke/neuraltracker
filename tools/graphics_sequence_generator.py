@@ -44,7 +44,8 @@ def generate_movement_binarylabel(category, binary_type="horizontal-vertical", f
 
 
 def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=32, size_y=32, channels=3):
-    labels = []
+    labels_pos = []
+    labels_size = []
 
     # Initialisere
     if type == "random":
@@ -69,7 +70,8 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         y = pos_y / size_y * 2 - 1
         w = square_size / size_x
         h = square_size / size_y
-        labels.append((x, y, w, h))
+        labels_pos.append((x, y))
+        labels_size.append((w, h))
 
         # Oppdatere posisjon og fart til neste bilde/tidssteg
         pos_x += speed_x
@@ -91,7 +93,7 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
             pos_y = size_y - 1
             speed_y = 0
 
-    return labels
+    return labels_pos, labels_size
 
 
 def draw_rectangle(sequence, frame, pos_x, pos_y, square_size=4, channels=3, color=(255, 255, 255)):
@@ -147,14 +149,8 @@ def save_sequence_binarylabel(sequence, parent_path, type):
         scipy.misc.imsave(os.path.join(path, "frame{0:05d}.jpg".format(frame)), image_array)
 
 
-def save_sequence_labelfile(sequence, labels, parent_path):
-    seq_number = 0
-    while True:
-        path = os.path.join(parent_path, "seq{0:05d}".format(seq_number))
-        if os.access(path, os.F_OK):
-            seq_number += 1
-            continue
-        break
+def save_sequence_labelfile(sequence, labels_pos, labels_size, parent_path, seq_number):
+    path = os.path.join(parent_path, "seq{0:05d}".format(seq_number))
     os.mkdir(path)
 
     # Iterere gjennom bildene i sekvensen
@@ -165,7 +161,7 @@ def save_sequence_labelfile(sequence, labels, parent_path):
         image_array = sequence[frame]
         scipy.misc.imsave(os.path.join(path, file_name), image_array)
 
-    write_labels(file_names, labels, path, "labels.json")
+    write_labels(file_names, labels_pos, labels_size, path, "labels.json")
 
 
 def create_train_test_examples(path, counts, figures=1):
@@ -179,31 +175,32 @@ def create_train_test_examples(path, counts, figures=1):
 
     folder_names = ["train", "test"]
 
-    for name in folder_names:
+    for name_index in range(len(folder_names)):
+        name = folder_names[name_index]
         try:
             os.mkdir(os.path.join(path, name))
         except IOError:
             print("Mappen \"{0}\" fins allerede.".format(os.path.join(path, name)))
 
-        count = counts[folder_names.index(name)]
-        for i in range(count):
-            if not i % 1000:
-                print("Skrevet {0}/{1} sekvenser til {2}".format(i, count, name))
+        count = counts[name_index]
+        for sequence_index in range(count):
+            if not sequence_index % 1000:
+                print("Skrevet {0}/{1} sekvenser til {2}".format(sequence_index, count, name))
             sequence = np.zeros((frames, image_size, image_size, channels), dtype=np.int)
             for figure in range(figures):
                 # Kun den siste versjonen av labels blir beholdt og skrevet til fil
-                labels = generate_movement_positionlabel(sequence,
+                labels_pos, labels_size = generate_movement_positionlabel(sequence,
                                                          type="random",
                                                          frames=frames,
                                                          size_x=image_size,
                                                          size_y=image_size,
                                                          channels=channels)
-            save_sequence_labelfile(sequence, labels, os.path.join(path, name))
+            save_sequence_labelfile(sequence, labels_pos, labels_size, os.path.join(path, name), seq_number=sequence_index)
 
 
 def main():
-    test_examples = 1000
-    train_examples = 10000
+    test_examples = 100
+    train_examples = 100000
     default_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))

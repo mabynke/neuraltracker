@@ -7,7 +7,7 @@ from keras.layers import Input
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers.core import Dense, Flatten, Reshape
 from keras.layers.merge import Concatenate
-from keras.layers.recurrent import LSTM
+from keras.layers.recurrent import LSTM, GRU
 from keras.layers.wrappers import TimeDistributed
 from keras.models import Model
 
@@ -26,15 +26,14 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
-    # x = TimeDistributed(Dense(units=512, activation="relu", name="Tett bildelag"))(x)
-    # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv1")(input_sequence)
-    # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)  # 16*16
-    # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv2")(x)
-    # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)  # 8*8
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv1")(input_sequence)
+    # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv2")(x)
+    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
     # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3)), name="Konv3")(x)
 
-    x = TimeDistributed(Flatten(), name="Bildeutflating")(input_sequence)
-    x = TimeDistributed(Dense(interface_vector_length, activation="relu", name="Grensesnittvektorer"))(x)
+    x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
+    x = TimeDistributed(Dense(interface_vector_length, activation="relu"), name="Grensesnittvektorer")(x)
 
     # Kode og sette inn informasjon om startkoordinater
     # k = Concatenate(name="pos_str_sammensetting")([input_position, input_size])
@@ -43,14 +42,11 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
     x = Concatenate(axis=1, name="Sammensetting")([k, x])
 
     # Behandle sekvens av grensesnittvektorer med LSTM
-    x = LSTM(units=state_vector_length, dropout=0.0, recurrent_dropout=0.0, return_sequences=True, name="LSTM-lag")(x)
-
-    # # Fjerne det første ekstra tidssteget
-    # x = K.gather(x, [None, 1])
+    x = GRU(units=state_vector_length, dropout=0.0, recurrent_dropout=0.0, return_sequences=True, name="GRU-lag")(x)
 
     # Dekode til koordinater
-    position = TimeDistributed(Dense(units=2, activation="linear", name="Posisjon ut"))(x)
-    size = TimeDistributed(Dense(units=2, activation="sigmoid", name="Størrelse ut"))(x)
+    position = TimeDistributed(Dense(units=2, activation="linear"), name="Posisjon_ut")(x)
+    size = TimeDistributed(Dense(units=2, activation="sigmoid"), name="Stoerrelse_ut")(x)
 
     return Model(inputs=[input_sequence, input_coordinates], outputs=[position, size])
 
@@ -90,20 +86,21 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
     # print(train_labels_pos[0])
     # print("train_labels_size[0]:")
     # print(train_labels_size[0])
-    epoches_per_test = 9
+    epoches_per_round = 1
     best_loss = 10000
     num_of_rounds_without_improvement = 0
-    max_num_of_rounds = int(1032 / epoches_per_test)
+    max_num_of_rounds = int(1032 / epoches_per_round)
     time_at_start = os.times().elapsed
     for i in range(max_num_of_rounds):
-        model.fit(x=[train_seq, train_startcoords], y=[train_labels_pos, train_labels_size], epochs=epoches_per_test,
+        model.fit(x=[train_seq, train_startcoords], y=[train_labels_pos, train_labels_size], epochs=epoches_per_round,
                   callbacks=[TerminateOnNaN(),  # EarlyStopping(monitor="loss", patience=4),
-                             TensorBoard(log_dir=tensorboard_log_dir)])
+                             TensorBoard(log_dir=tensorboard_log_dir)],
+                  verbose=1)
 
         evaluation = evaluate_model(model, test_path, testing_examples)
 
         print("Fullført runde {0}/{1} ({2} epoker). Brukt {3} minutter.".format(i + 1, max_num_of_rounds,
-                                                                                (i + 1) * epoches_per_test,
+                                                                                (i + 1) * epoches_per_round,
                                                                                 round((
                                                                                       os.times().elapsed - time_at_start) / 60,
                                                                                       1)))
@@ -117,6 +114,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
             num_of_rounds_without_improvement = 0
             best_loss = evaluation[0]
             model.save_weights(save_weights_path, overwrite=True)
+            print("Lagret vekter til ", save_weights_path)
         print()
 
 
@@ -144,7 +142,7 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
 
 
 def main():
-    training_epochs = 1000  # Stoppes når loss ikke lenger forbedres, av EarlyStopping
+    training_epochs = 1000
     training_examples = 0
     testing_examples = 0
     example_examples = 100
@@ -180,18 +178,22 @@ def make_examples(example_examples, example_path, model):
         = data_io.fetch_seq_startcoords_labels(example_path, example_examples)
     predictions = model.predict([example_sequences, example_startcoords])
 
-    print("predictions[1]:")
-    print(predictions[1])
+    # print("predictions[1]:")
+    # print(predictions[1])
 
-    predictions = np.delete(predictions, 0, 1)  # Fjerne det første ("falske") tidssteget
+    predictions = np.delete(predictions, 0, 2)  # Fjerne det første ("falske") tidssteget
+    print("len(predictions):", len(predictions))
+    print("len(predictions[0]):", len(predictions[0]))
+    print("len(predictions[0][0]):", len(predictions[0][0]))
 
-    print("predictions[1]:")
-    print(predictions[1])
+    # print("predictions[1]:")
+    # print(predictions[1])
 
-    for sequence in range(len(predictions)):
-        path = os.path.join(example_path, "seq{0:05d}".format(sequence))
-        data_io.write_labels(file_names=data_io.get_image_file_names_in_dir(path), labels_pos=predictions[0][sequence],
-                             labels_size=predictions[1][sequence],
+    for sequence_index in range(len(predictions[0])):
+        path = os.path.join(example_path, "seq{0:05d}".format(sequence_index))
+        data_io.write_labels(file_names=data_io.get_image_file_names_in_dir(path),
+                             labels_pos=predictions[0][sequence_index],
+                             labels_size=predictions[1][sequence_index],
                              path=path, json_file_name="predictions.json")
         # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
