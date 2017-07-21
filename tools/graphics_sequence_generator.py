@@ -199,8 +199,8 @@ def create_train_test_examples(path, counts, figures=1):
 
 
 def main():
-    test_examples = 100
-    train_examples = 100000
+    test_examples = 10000
+    train_examples = 0
     default_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
