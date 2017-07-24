@@ -72,7 +72,7 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
     return sequences, startcoords, labels_pos, labels_size
 
 
-def write_labels(file_names, labels_pos, labels_size, path, json_file_name):
+def write_labels(path, json_file_name, labels_pos, labels_size, file_names):
     # Skrive merkelapper til fil
     formatted_labels = []
     for i in range(len(labels_pos)):
@@ -81,6 +81,7 @@ def write_labels(file_names, labels_pos, labels_size, path, json_file_name):
                                  "y": float(labels_pos[i][1]),
                                  "w": float(labels_size[i][0]),
                                  "h": float(labels_size[i][1])})
+    print("data_io.write_labels() skriver til", os.path.join(path, json_file_name))
     with open(os.path.join(path, json_file_name), "w") as label_file:
         json.dump(formatted_labels, label_file)
 

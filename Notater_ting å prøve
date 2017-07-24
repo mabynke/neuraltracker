@@ -1,7 +1,3 @@
-- Innputtkoordinater direkte til tilstand
-- Grensesnittvektor (kjøring 0)
-- Redusere læringsrate
-- Mer maxpooling (kjøring 2)
 - Støy på innkoordinatene
 - To LSTM-lag
 

@@ -160,7 +160,8 @@ def save_sequence_labelfile(sequence, labels_pos, labels_size, parent_path, seq_
         image_array = sequence[frame]
         scipy.misc.imsave(os.path.join(path, file_name), image_array)
 
-    write_labels(file_names, labels_pos, labels_size, path, "labels.json")
+    write_labels(file_names=file_names, labels_pos=labels_pos, labels_size=labels_size, path=path,
+                 json_file_name="labels.json")
 
 
 def create_train_test_examples(path, counts, figures=1):

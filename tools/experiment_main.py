@@ -1,37 +1,33 @@
 import os
 import sys
+import time
+
+os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
 # from tools import data_io  # For kjøring fra PyCharm
 import data_io  # For kjøring fra terminal
-# import random
-import numpy as np
+import plotting
+
 from keras.callbacks import TerminateOnNaN, TensorBoard
 from keras.layers import Input
 from keras.layers.convolutional import Conv2D, MaxPooling2D
-from keras.layers.core import Dense, Flatten, Reshape
-from keras.layers.merge import Concatenate
-from keras.layers.recurrent import GRU, LSTM
+from keras.layers.core import Dense, Flatten
+from keras.layers.recurrent import GRU
 from keras.layers.wrappers import TimeDistributed
 from keras.models import Model
 from keras.optimizers import Adam
+from keras.backend import get_value, set_value
 
-import tensorflow as tf
-
-# from keras import backend as K
-import plotting
-import time
+# import tensorflow as tf
 
 
 RUN_ID = 0
-optimizer = Adam()
-
-
-# import keras.backend.tensorflow_backend as K
+optimizer = Adam()  # TODO: Fjerne denne deklarasjonen herfra
 
 
 def create_model(sequence_length, image_size, interface_vector_length, state_vector_length):
     # Ta innputt
-    input_sequence = Input(shape=(sequence_length, image_size, image_size, 3), name="Innsekvens")
+    input_sequence = Input(shape=(None, None, None, 3), name="Innsekvens")
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
@@ -96,14 +92,15 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
-    best_loss = 10000
+    best_loss = 10000  # Kan like gjerne være uendelig, bare den er høyere enn alle loss-verdier
     num_of_rounds_without_improvement = 0
     max_num_of_rounds = int(1032 / epoches_per_round)
     time_at_start = os.times().elapsed
     for i in range(max_num_of_rounds):
         fit_history = model.fit(x=[train_seq, train_startcoords], y=[train_labels_pos, train_labels_size], epochs=epoches_per_round,
-                  callbacks=[TerminateOnNaN(),  # EarlyStopping(monitor="loss", patience=4),
-                             TensorBoard(log_dir=tensorboard_log_dir)],
+                  callbacks=[TerminateOnNaN()  # EarlyStopping(monitor="loss", patience=4),
+                             # TensorBoard(log_dir=tensorboard_log_dir)],
+                             ],
                   verbose=2)
 
         evaluation = evaluate_model(model, test_path, testing_examples)
@@ -126,9 +123,10 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
             print("Runder uten forbedring: {0}/{1}".format(num_of_rounds_without_improvement, round_patience))
             if RUN_ID == 1:
                 if num_of_rounds_without_improvement >= 6:
-                    print("Senker læringsrate fra {0} til {1}.".format(optimizer.lr.get_value(), optimizer.lr.get_value()/10))
-                    optimizer.lr.set_value(optimizer.lr.get_value()/10)
-                    print(optimizer.lr.get_value())
+                    current_learning_rate = get_value(model.optimizer.lr)
+                    new_learning_rate = current_learning_rate / 10
+                    print("Senker læringsrate fra {0} til {1}.".format(current_learning_rate, new_learning_rate))
+                    set_value(model.optimizer.lr, new_learning_rate)
             if num_of_rounds_without_improvement >= round_patience:
                 print("Laster inn vekter fra ", save_weights_path)
                 model.load_weights(save_weights_path)
@@ -138,6 +136,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
             best_loss = evaluation[0]
             model.save_weights(save_weights_path, overwrite=True)
             print("Lagret vekter til ", save_weights_path)
+        print("Beste testloss så langt:", best_loss)
         print()
 
 
@@ -164,25 +163,7 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
             print("\tLoss: {0:5.2f}".format(mean_squared_error))
 
 
-def main():
-    training_examples = 0
-    testing_examples = 0
-    example_examples = 100
-
-    for i in range(1,2):
-        # 0: Innkoordinater direkte til starttilstand
-        # 1: Redusere læringsraten
-        global RUN_ID
-        RUN_ID = i
-        try:
-            with tf.device("/gpu:{0}".format(i)):
-                do_run(example_examples, testing_examples, training_examples, False, True)
-        except Exception as e:
-            print("Det skjedde en feil med kjøring ", RUN_ID)
-            print(e)
-
-
-def do_run(example_examples, testing_examples, training_examples, load_weights, do_training):
+def do_run(example_examples, testing_examples, training_examples, load_weights, do_training, make_examples):
     # Parametre
     round_patience = 12
 
@@ -218,27 +199,23 @@ def do_run(example_examples, testing_examples, training_examples, load_weights, 
                                   weights_path, run_name, round_patience=round_patience,
                                   load_prevous_weigths=load_weights, do_training=do_training)
     # TODO: Lagre modellens konfigurasjon som json
-    make_examples(example_examples, example_path, model)
+    if make_examples:
+        make_example_jsons(example_examples, example_path, model)
 
     sys.stdout = orig_stdout
 
 
-def make_examples(example_examples, example_path, model):
+def make_example_jsons(example_examples, example_path, model):
     # Lage og vise eksempler
     example_sequences, example_startcoords, example_labels_pos, example_labels_size\
         = data_io.fetch_seq_startcoords_labels(example_path, example_examples)
     predictions = model.predict([example_sequences, example_startcoords])
 
-    # print("predictions[1]:")
-    # print(predictions[1])
-
-    predictions = np.delete(predictions, 0, 2)  # Fjerne det første ("falske") tidssteget
+    # predictions = np.delete(predictions, 0, 2)  # Fjerne det første ("falske") tidssteget
+    print("Debug-info fra make_example_jsons():")
     print("len(predictions):", len(predictions))
     print("len(predictions[0]):", len(predictions[0]))
     print("len(predictions[0][0]):", len(predictions[0][0]))
-
-    # print("predictions[1]:")
-    # print(predictions[1])
 
     for sequence_index in range(len(predictions[0])):
         path = os.path.join(example_path, "seq{0:05d}".format(sequence_index))
@@ -262,4 +239,25 @@ def evaluate_model(model, test_path, testing_examples):
     return evaluation
 
 
-main()
+def main():
+    # Oppsett
+    load_saved_weights = False
+    do_training = True
+    make_examples = True
+    training_examples = 0
+    testing_examples = 0
+    example_examples = 100
+
+    for i in range(1,2):  # Kjøre de angitte eksperimentene
+        global RUN_ID
+        RUN_ID = i
+        try:
+            # with tf.device("/gpu:0"):
+            do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training, make_examples)
+        except Exception as e:
+            print("Det skjedde en feil med kjøring nr.", RUN_ID)
+            print(e)
+
+
+if __name__ == "__main__":
+    main()
