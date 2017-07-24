@@ -1,5 +1,3 @@
-<!-- mousedown event is commented out in this version -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,76 +5,120 @@
 	<title> Tracking UI </title>
 	<script src="jquery-3.2.1.js"></script>
 	<style>
-	body {
-  		margin: 0px;
-  		padding: 0px;
+		body {
+	  		margin: 30px;
+	  		padding: 0px;
+			}
+
+		i {
+			color: #008CBA;
+			font-size: 15px; /* text-align: center; */
 		}
+
+		br {
+			line-height: 15px;
+		}
+
+		b {
+			font-size: 15px
+		}
+
+		canvas {
+			/*border: 10px; */
+		}
+
+		.button {
+		    background-color: white;
+		    border: none;
+		    color: black;
+		    border: 2px solid #008CBA; /*blue*/
+		    padding: 10px 25px;
+		    text-align: center;
+		    text-decoration: none;
+		    display: inline-block;
+		    border-radius: 8px;
+		    font-size: 12px;
+		    -webkit-transition-duration: 0.4s; /* Safari */
+	    	transition-duration: 0.4s;
+		}
+
+		.button:hover {
+	        background-color: #008CBA;
+	    	color: white;
+		}
+
+
 	</style>
 </head>
 <body>
-	<i id = "MODE" style = "font-size: 15px;"> Write-mode (mark the object to be tracked on each frame) </i>
-	<br>
+	<h1> Neural Network Tracker </h1>
+	<i id = "MODE"> Write-mode (mark the object to be tracked on each frame) </i>
+	<br/>
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<script>
-	    var c = document.getElementById("myCanvas"); //c.height
-    	var ctx = c.getContext("2d");// used for drawing
+	    var c = document.getElementById("myCanvas");
+    	var ctx = c.getContext("2d");
 
     	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
 
-
     	var click_coords = [];
     	var json_file = [];
+    	var wmode_draw = []; // needed to autodraw in write-mode
 
     	var json_predict_coords = [];
     	var json_labels_coords = [];
 
+    	var foldername = prompt("Enter folder name", "seq00000"); // input må være på formen STRENG00000, der antall 0-er må være akkurat 5. STRENG er en streng med hvilken som helst lengde.
+    	var foldernum = 0;
     	var pic_num = 0;
-    	var folder_num = 0;
 
-    	var json_labels = prompt("Please enter the labels (correct answer) jsonfile name","labels.json"); // TODO: turn into userinput!
-    	var json_predict = prompt("Please enter the AI prediction jsonfile name", "predictions.json");
+    	var json_labels = prompt("Please enter the name of the labels jsonfile (correct answer)","labels.json");
+    	var json_predict = prompt("Please enter the name of the AI prediction jsonfile", "predictions.json");
 
-    	var foldername = getFolderName();
-    	var scale_factor = 8; // scalefactor = 1 er original.
-
+    	var scale_factor = 8; // scalefactor = 1 gir original størrelse på bildet.
     	var clear_image = false;
-  		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
   		var current_mode = 0 // 0 - write, 1 - ai mode.
-  		
+
+
   		function getFolderName() {
-  			if (folder_num <= 0) {
-  				folder_num = 0;
-       			var foldername = "/seq00000";
-       		}
-       		else if (folder_num < 10) {
-       			var foldername = "/seq0000" + folder_num;
-       		}
-       		else if (folder_num < 100) {
-       			var foldername = "/seq000" + folder_num;
-       		}
-       		else if (folder_num < 1000) {
-       			var foldername = "/seq00" + folder_num;
-       		}
-       	return foldername
+  			// finner filnavn, basert på hvilken verdi "foldernum" har. Hvis input filnavnet ikke er på formen STRENG00000 vil ikke foldernavnet endres.
+
+			if (foldernum < 0) {
+				foldernum = 0;
+			}
+			var foldername_end = foldername.slice(-5);
+			var isnum = /^\d+$/.test(foldername_end);
+
+			if (isnum) {
+					var foldername_beginning = foldername.replace(foldername_end, "");
+					new_foldername = foldername_beginning + "0".repeat(5 - foldernum.toString().length) + foldernum.toString();
+					return new_foldername;
+			}
+			else {
+				return foldername;
+			}
   		}
 
 
 		function getJsonData(jsonfile, datalist) {
+			// 
             
-            while(datalist.length > 0) { // makes sure datalist is empty, aka emptys both 'datalist' and the array 'datalist' corresponds to. Which datalist = [] doesn't do. 
+            while(datalist.length > 0) { // emptys both 'datalist' and the array 'datalist' corresponds to. Which datalist = [] doesn't do.
     			datalist.pop();
 			}
 
-            $.ajax({url: input_location + foldername + "/" + jsonfile, async: false, dataType: "json", success: function(data) {
+            $.ajax({url: input_location + "/" + foldername + "/" + jsonfile, async: false, dataType: "json", success: function(data) {
                 x = data[pic_num].x;
                 y = data[pic_num].y;
                 w = data[pic_num].w;
                 h = data[pic_num].h;
-				x1 = (x + 1 - w) * 32 / 2
-				y1 = (y + 1 - h) * 32 / 2
-				x2 = (x + 1 + w) * 32 / 2
-				y2 = (y + 1 + w) * 32 / 2
                 filename = data[pic_num].filename;
+
+
+				x1 = (x + 1 - w) * img_width / 2; // upper corner
+				y1 = (y + 1 - h) * img_height / 2;
+				x2 = (x + 1 + w) * img_width / 2;
+				y2 = (y + 1 + w) * img_height / 2;
 
                 datalist.push(x1);
                 datalist.push(y1);
@@ -86,42 +128,44 @@
             }})
         }
 		
+        function getMousePos(canvas, evt) {
+    		// funksjon skaffer museposisjon for 'mousemove' 
+        	var rect = canvas.getBoundingClientRect();
+        	return {
+          	x: evt.clientX - rect.left,
+          	y: evt.clientY - rect.top
+        	};
+      	}
 
-		function getCoordinates(event){ //pushes coordinates to 'click_coords'
-		    var rect = c.getBoundingClientRect();
+		function getCoordinates(event){
+			//Finner musekoordinatene og appenderer koordinatene til listen 'click_coords'.
+		    var mousePos = getMousePos(c, event);
 
 			if (click_coords.length <= 4) {
-				canvas_x = event.clientX - rect.left;
-				canvas_y = event.clientY - rect.top;
+				var in_canvas = mousePos.x < c.width && mousePos.y < c.height;
 
-				var in_canvas = canvas_x < c.width && canvas_y < c.height
-
-				// Hvis within canvas, push
-				if (in_canvas) {
-					click_coords.push(canvas_x);
-					click_coords.push(canvas_y);
-					//alert('have pushed, click_coords is now: ' + click_coords)					
+				if (in_canvas) { // Hvis within canvas, push
+					click_coords.push(mousePos.x);
+					click_coords.push(mousePos.y);
 				}
 			}
 		}
 
 		function clickEvent(event) {
+			// skaffer koordinatene hver gang et museklikk blir registert, når man har klikket to ganger tegnes det en firkant fra det første klikk-koordinatene til det andre.
+
 			getCoordinates(event);
 			scale_factor = 1; //only works when this is set to 1.
 
 
 			if (click_coords.length == 4) {
 				var img = new Image();  // denne er nå to steder z
-  				img.src = input_location + foldername + "/" + json_labels_coords[4];
+  				img.src = input_location + "/" + foldername + "/" + json_labels_coords[4];
 
-				//'refreshes then draws square'
-				//ctx.clearRect(0, 0, c.width, c.height);
-  				//ctx.drawImage(img,0,0); // img not defines
-
-				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3], "#ff1493");
+				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3], "#4CAF50");
 				//click_coords = [];
 			}
-			if (click_coords.length == 6) { // box has been created, and one 'mousedown' has been registrered
+			if (click_coords.length == 6) { // Har ingen nyttig funksjon foreløbig. 
 				var x_within = click_coords[4] < click_coords[2] && click_coords[4] > click_coords[0];
 
 				var y_within = click_coords[5] < click_coords[3] && click_coords[5] > click_coords[1];
@@ -130,7 +174,6 @@
 					alert('within box!');
 
 					click_coords.splice(4,2);
-					//alert('click_coords: !' + click_coords)
 					//click_coords = [];
 					}
 				else{
@@ -140,10 +183,13 @@
 					//click_coords = []; // slett firkant!!
 					}
 			}
+			scale_factor = 8;
 		}
 
-		function drawSquare(x_A,y_A,x_C,y_C, colour = "#0066ff"){
-			ctx.globalAlpha = 0.6; // opacity
+		function drawSquare(x_A,y_A,x_C,y_C, colour = "#008CBA"){
+			// tegner selve firkanten
+
+			ctx.globalAlpha = 0.8; // opacity
 			ctx.lineWidth = 6; // potentially 1*scale_factor
 			ctx.strokeStyle = colour;
 
@@ -153,14 +199,24 @@
 			ctx.lineTo(x_C*scale_factor,y_C*scale_factor);
 			ctx.lineTo(x_A*scale_factor,y_C*scale_factor);
 			ctx.lineTo(x_A*scale_factor,y_A*scale_factor);
-			ctx.lineTo(x_C*scale_factor, y_A*scale_factor); 
-			// for å få vekk venstre hjørne hull
+			ctx.lineTo(x_C*scale_factor, y_A*scale_factor); // for å få vekk venstre hjørne hull
 
 			ctx.stroke();
 		}
 
-		$(document).keydown(function(e){ // keyboard-key function
-		
+		function drawSquareNew(x_A,y_A,h,w, colour = "#008CBA") { //IKKE I BRUK! Er en mulig bedre måte å tegne firkanten på. 
+			ctx.globalAlpha = 0.6;
+			ctx.lineWidth = 6;
+			ctx.strokeStyle = colour;
+
+			ctx.rect(50, 50, 50, 100);
+			ctx.stroke();
+
+		}
+
+		$(document).keydown(function(e){
+			// Endrer mappe og bilde ved å klikke på piltastene
+
 			if (e.keyCode==40) { // down
 			    changeFolder(-1);
 			}
@@ -177,7 +233,8 @@
 
 
     	function changePic(i) {
-    		sendData(); // before pic is changed
+    		// sender data før bildet er sent, endrer bilde, og henter ny json_data. 
+    		sendData();
 
 			pic_num = (pic_num + i + 12) % 12;
 			getJsonData(json_labels, json_labels_coords);
@@ -187,7 +244,7 @@
     	}
 
     	function changeFolder(i) {
-    		folder_num = folder_num + i;
+    		foldernum = foldernum + i;
     		foldername = getFolderName();
     		pic_num = 0;
 
@@ -198,20 +255,43 @@
     	}
 
     	function sendData() {
-    		scale_factor = 8;
-    		if (click_coords.length == 4) {
-    			var dict = {};
-    			dict['x1'] = (click_coords[0] / scale_factor);
-				dict['y1'] = (click_coords[1] / scale_factor);
-				dict['x2'] = (click_coords[2] / scale_factor);
-				dict['y2'] = (click_coords[3] / scale_factor);
-				dict['filename'] = json_predict_coords[4];
+    		// Hvis en firkant er tegnet, blir data sent på to ulike formater til to ulike lister.
 
-				json_file[pic_num] = dict;
+    		if (click_coords.length == 4) {
+    			var dict_file = {};
+    			var dict_draw = {};
+
+    			var x1 = (click_coords[0] / scale_factor); // global variable is decleared without var
+    			var y1 = (click_coords[1] / scale_factor);
+    			var x2 = (click_coords[2] / scale_factor);
+    			var y2 = (click_coords[3] / scale_factor);
+    			var filename = json_predict_coords[4];
+
+    			var w = (x2-x1)/img_width;
+    			var h = (y2-y1)/img_height;
+    			var x = (x1*2)/img_width + w - 1;
+    			var y = (y1*2)/img_height + h - 1;
+
+    			dict_draw['x1'] = x1; // info til å tegne
+    			dict_draw['y1'] = y1;
+    			dict_draw['x2'] = x2;
+    			dict_draw['y2'] = y2;
+    			dict_draw['filename'] = filename;
+
+    			dict_file['w'] = w; // info som sendes til json fil
+				dict_file['h'] = h;
+				dict_file['x'] = x;
+				dict_file['y'] = y;
+				dict_file['filename'] = filename;
+
+				json_file[pic_num] = dict_file;
+				wmode_draw[pic_num] = dict_draw;
     		}
     	}
 
     	function jsonify() {
+    		// gjør om listen 'json_file' til en faktisk json fil, som kan bli lastet ned ved å trykke på lenken som dukker opp på skjermen når funksjonen jsonify er kallt. 
+
     		var json = JSON.stringify(json_file);
 			console.log(json);
 
@@ -221,13 +301,15 @@
 			var a = document.createElement('a');
 			a.download    = "labels.json";
 			a.href        = url;
-			a.textContent = "***Download labels.json for" + foldername + "***";
+			a.textContent = "***Download labels.json for " + foldername + "***";
 
 			document.getElementById('content').appendChild(a);
     	}
 
 
     	function changeMode() {
+    		// endrer mellom lese-modus(tegner firkanter for fasit og AIs gjettning) og skrive-modus(skriver json fil, ved å tegne firkanter)
+
 			current_mode = (current_mode + 1) % 2;
 
 			if (current_mode == 0) {
@@ -240,30 +322,29 @@
     	}
 
     	function onLoad() { // initializing process.
-			scale_factor = 8;
+    		// får bildet til å dukke opp, canvas på bildet, tegner ulike firkanter med hensyn på hvilken modus programmet kjører i. 
 			click_coords = [];
 
-    		var img = new Image(32*scale_factor,32*scale_factor);
-  			img.src = input_location + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
+    		img = new Image(img_width*scale_factor,img_height*scale_factor);
+  			img.src = input_location + "/" + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
 
   			//alert('waiting...'); // neccesary so far...
 
   			setTimeout(function(){
 
-			c.height = img.height; // gives canvas a size
+			c.height = img.height;
     		c.width = img.width;
   			
-    		ctx.drawImage(img, 0, 0, 32*scale_factor, 32*scale_factor); // drawImage(img, 0, 0, width, height) draws image onto canvas
 
-            if (current_mode == 0) {// WRITE MODE! (draw img)
+    		ctx.drawImage(img, 0, 0, img_width*scale_factor, img_height*scale_factor); // drawImage(img, 0, 0, width, height) draws image onto canvas
+
+            if (current_mode == 0) {// WRITE MODE!
             	document.addEventListener("mousedown", clickEvent);
 
-	            if (json_file[pic_num] && clear_image == false) {
-	            	var image_data = json_file[pic_num];
+	            if (wmode_draw[pic_num] && clear_image == false) {
+	            	var image_data = wmode_draw[pic_num];
 
-	            	//alert(image_data["x1"] + "," + image_data["y1"] + "," + image_data["x2"] + "," + image_data["y2"]);
-
-	            	drawSquare(image_data["x1"],image_data["y1"],image_data["x2"],image_data["y2"], "#ff1493");
+	            	drawSquare(image_data["x1"],image_data["y1"],image_data["x2"],image_data["y2"], "#4CAF50");
 	            }
 	            else {
 	            	clear_image = false;
@@ -275,63 +356,61 @@
 
 		        drawSquare(json_labels_coords[0], json_labels_coords[1], json_labels_coords[2], json_labels_coords[3]);
 
-	    		drawSquare(json_predict_coords[0], json_predict_coords[1], json_predict_coords[2], json_predict_coords[3], "#ff3300");
+	    		drawSquare(json_predict_coords[0], json_predict_coords[1], json_predict_coords[2], json_predict_coords[3], "#f44336");
 		        }
 
 	    	document.getElementById("imageTitle").innerHTML = json_labels_coords[4];
 
 	    	document.getElementById("folderTitle").innerHTML = foldername;
 
-			}, 15); // can be increased if neccesary
+			}, 30);
     	}
+
+    	//MAIN!
 
     	getJsonData(json_labels, json_labels_coords);
     	getJsonData(json_predict, json_predict_coords);
 
+    	c.addEventListener('mousemove', function(event) {
+    		// viser museposisjon når man 'hoverer' over bildet
+
+        	var mousePos = getMousePos(c, event);
+        	var message = 'x: ' + (mousePos.x/scale_factor).toFixed(1) + 'px y: ' + (mousePos.y/scale_factor).toFixed(1) + 'px';
+        	document.getElementById("MousePos").innerHTML = message;
+    	})
+
+    	var img = new Image();
+  		img.src = input_location + "/" + foldername + "/" + json_labels_coords[4];
+
+  		alert('waiting')
+ 
+  		var img_height = img.height;
+  		var img_width = img.width;
+
 		window.onload = onLoad();
 
-		//document.addEventListener("mousedown", clickEvent);
 
-		//	/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvens/seq00001
+	</script> <br>
+	<b>Folder: </b>
+	<i id = "folderTitle""></i>
+	<b>Image: </b>
+	<i id = "imageTitle""></i> <br>
 
-	</script>
-	<br style = "line-height: 15px">
-	<i id = "folderTitle" style = "font-size: 15px;"></i>
-	<i id = "imageTitle" style = "font-size: 15px;"></i>
-	<br style = "line-height: 15px">
-	<p> </p>
-	<i id = "info" style = "font-size: 12px; color: DarkGrey"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i>
-
-	<br style = "line-height: 50px">
-
-	<i style = "font-size: 15px;"> Mode:  </i>
-	<i id = "MODE" style = "font-size: 15px;"> Write-mode (mark the object to be tracked on each frame) </i>
-	<br style = "line-height: 15px">
+	<br/>
+	<i id = "info" style = "font-size: 12px; color: #99e6ff"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i> <br>
 
 
-	<button type = "button" style = "font-size: 13px; height: 30px; width:150px" onclick= "sendData(); jsonify();" > Save training data </button>
+	<button class="button" onclick= "sendData(); jsonify();" > Save training data </button>
 
-	<button type = "button" style = "font-size: 13px; height: 30px; width:100px" onclick= "clear_image = true; onLoad();" > Clear image </button>
+	<button class="button" onclick= "clear_image = true; onLoad();" > Clear image </button>
 
-	<button type = "button" style = "font-size: 13px; height: 30px; width:130px" onclick= "changeMode();" > Change mode </button>
+	<button class="button" onclick= "changeMode();" >Change mode</button>
 
-	<br>
+	<br/>
+
+	<i">Mouse position: </i>
+	<i id = "MousePos"></i> <br>
 
 	<div style = "font-size: 13px"; id="content"> </div>
-
-
-	<!--
-	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(-1)" > < </button>
-	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changePic(+1)" > > </button>
-
-	<br style = "line-height: 5px">
-	<i style = "font-size: 5px;"> Folder buttons: </i>
-	<br style = "line-height: 5px">
-
-
-	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(-1)" > < </button>
-	<button type = "button" style = "font-size: 5px; height: 10px; width:10px" onclick= "changeFolder(+1)" > > </button>
-	-->
-
 </body>
 </html>
