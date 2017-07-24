@@ -8,11 +8,12 @@ def plot_loss_history(loss_history, run_name):
     array = np.array(loss_history)
     colors = [["#0000ff", "#6060e0", "#6060c0"],
               ["#ff0000", "#e06060", "#c06060"]]
+
+    plt.clf()
     for i in range(2):  # Trening og test
         # for j in range(3):  # loss, loss_pos, loss_str
         plt.plot(array[:, i, 0], colors[i][0])
 
-    plt.clf()
     plt.xlabel("Runder")
     plt.ylabel("mean_squared_error")
     plt.title("Loss for trening (blå) og test (rød)")

@@ -88,7 +88,7 @@ Resultat: Betydelig dårligere. Treningsloss etter 14 epoker: 0.149, testloss 0.
 
 Forsøk 2017-7-20 9:23:38:
 Beskrivelse: Økt til 10 000 testeksempler. Fjernet GRU-lag nr. 2 og byttet ut det eneste gjenværende GRU-laget med et LSTM-lag. Brukt 100 000 treningssekvenser.
-Resultat: Samme som tidligere (med 10 000 treningssekvenser). Ca. 0.22 i loss for både trening og testing.
+Resultat: Samme som tidligere (med 10 000 treningssekvenser). Ca. 0.22 i loss for både trening og testing. Dvs. svært dårlig.
 
 Forsøk 2017-07-20 14:16:11:
 Beskrivelse: Kjøring med ett GRU-lag og 100 000 treningssekvenser, 10 000 testsekvenser.
@@ -105,3 +105,18 @@ Resultat: Svært likt forrige gang. På det beste (24 epoker) testloss 0.0363, t
 Forsøk 2017-07-20 19:41:38:
 Beskrivelse: Utilsiktet gjentagelse av forrige forsøk.
 Resultat: Svært likt forrige gang. På det beste (21 epoker) testloss 0.0352, treningsloss 0.0149.
+
+Forsøk 2017-07-21 12:15:04:
+Beskrivelse: Gjeninnført grensesnittvektoren som før. Innført 0.5 dropout i GRU-laget (ikke i tidssteget).
+Resultat: På det beste (14 epoker) testloss 0.0291, treningsloss 0.0298. Underveis gjennom læringen holder test- og treningsloss seg ganske like. Resultatene ser bra ut visuelt.
+
+Forsøk 2017-07-21 14:35:24:
+Beskrivelse: Innført enda et konvolusjonslag og et maxpoolinglag etter det det eksisterende maxpoolinglaget. Ikke brukt dropout (?).
+Resultat: På det beste (23 epoker) testloss 0.0305, treningsloss 0.0179.
+
+Forsøk 2017-07-21 16:23:31:
+Beskrivelse: Innkoordinatene gis (etter å ha gått gjennom et tett lag) direkte som starttilstanden til GRU-laget og legges ikke på sekvensen som om de var det første bildet. GRU-en får (og gir ut) dermed 12 bilder lange sekvenser istedenfor 13.
+Resultat: På det beste (21 epoker) testloss 0.0244, treningsloss 0.0252. Ikke overfitting (sannsynligvis pga. dropout). Loss holder seg under 0.029 over mange epoker, dvs. målbart bedre enn tidligere.
+
+Forsøk 2017-07-21 17:54:39:
+Skulle teste synkende læringsrate, men noe gikk sannsynligvis galt. Får loss rundt 0.23 – mye dårligere enn før.
