@@ -65,7 +65,6 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=color)   # Tegne inn firkant i bildet
 
         # Lagre merkelapp for dette bildet
-        radius = square_size / 2
         x = pos_x / size_x * 2 - 1
         y = pos_y / size_y * 2 - 1
         w = square_size / size_x
@@ -199,8 +198,8 @@ def create_train_test_examples(path, counts, figures=1):
 
 
 def main():
-    test_examples = 100
-    train_examples = 100000
+    test_examples = 10000
+    train_examples = 0
     default_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))

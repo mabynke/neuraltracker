@@ -65,5 +65,58 @@ Forsøk:
 Beskrivelse: Endret representasjonen av plasseringen til firkanten på bildet fra (x_min, y_min, x_maks, y_maks) til (x, y, bredde, høyde) i merkelappene. Ikke endret nettverket. Formatet er x og y relativt til midten av bildet og avstanden fra midt til sidekant (x=1,y=1 er nederst til høyre), og bredde og høyde relativt til sidelengden på bildet (w=0.25, h=0.5 i et bilde på 32*32 har bredde 8 og høyde 16). De fire tallene er fortsatt samme utputt-tensor i modellen.
 Resultat: Treningsloss 0.090, testloss 0.093. Tilnærmer fortsatt størrelsen på kvadratet bra, men er betraktelig dårligere på å finne plasseringen. Hopper mye mer enn før fra bilde til bilde.
 
-Forsøk:
+Forsøk03:
 Beskrivelse: Delt opp utputt i to vektorer (tette lag) av størrelse 2. Én (posisjonstensoren) representerer x og y, og den andre (størrelsestensoren) representerer w og h. Satte aktiveringen for størrelsestensoren til "sigmoid" og aktiveringen for posisjonstensoren til "linear". Kan nå sette vektingen for hver av tensorene i lossfunksjonen. Beholder foreløpig lik vekting ettersom loss for størrelsen blir mindre enn loss for posisjon med en faktor på 1000 eller 10000 og dermed uansett teller lite i summen. Loss for posisjonsvektoren (fortsatt mean square error) har nå også en direkte tolkning som kvadratet av den euklidske avstanden mellom fasit og forutsigelse.
+Resultat: Ingen merkbar endring.
+
+Forsøk:
+Beskrivelse: Byttet ut LSTM-en med en tilsvarende GRU. Fortsatt 10 000 treningssekvenser.
+Resultat: Testloss 0.142 (0.142 + 0.0000123), treningsloss 0.0052 (0.0052 + 0.0000114). Betraktelig bedre til å følge kvadratet. Mister av og til målet, spesielt i vanskelige tilfeller. Virrer en del rundt målet, men holder seg stort sett rundt det. Blir bare sjeldent betydelig forstyrret av den andre firkanten.
+
+Forsøk04:
+Beskrivelse: Økt antall testsekvenser til 100 000. Manuelt stoppet etter 6 epoker. (forsøk04b: stoppet etter 8 epoker)
+Resultat: Testloss 0.0370 (0.0698 + 0.0000290), treningsloss 0.0316 (0.0316 + 0.0000331). Veldig bra resultat. God på posisjon.
+
+Forsøk05:
+Beskrivelse: Senket antall testsekvenser til 50 000. Stopper nå automatisk etter 6 epoker uten forbedring av testloss.
+Resultat: testloss 0.048. Bra resultat.
+
+
+Forsøk 2017-7-19-14-54:
+Beskrivelse: Økt testsekvenser til 100 000. Lagt til enda et GRU-lag oppå det første. Tanken er at det skal gjøre det mulig med mer ikke-lineær prosessering for hvert tidssteg.
+Resultat: Betydelig dårligere. Treningsloss etter 14 epoker: 0.149, testloss 0.149.
+
+Forsøk 2017-7-20 9:23:38:
+Beskrivelse: Økt til 10 000 testeksempler. Fjernet GRU-lag nr. 2 og byttet ut det eneste gjenværende GRU-laget med et LSTM-lag. Brukt 100 000 treningssekvenser.
+Resultat: Samme som tidligere (med 10 000 treningssekvenser). Ca. 0.22 i loss for både trening og testing. Dvs. svært dårlig.
+
+Forsøk 2017-07-20 14:16:11:
+Beskrivelse: Kjøring med ett GRU-lag og 100 000 treningssekvenser, 10 000 testsekvenser.
+Resultat: Samme som tidligere (på det beste (14 epoker) testloss 0.0323, treningsloss 0.0197).
+
+Forsøk 2017-07-20 15:21:56:
+Beskrivelse: Fjernet laget som konverterer dataene fra den konvolusjonale/maxpoolende delen til en grensesnittvektor. Med andre ord brukt tensoren direkte som grensesnittvektor. Parametre: 7 919 012.
+Resultat: Konvergerer raskt. Ubetydelig forbedring etter 5 epoker. På det beste (39 epoker): testloss 0.0335, treningsloss 0.0121.
+
+Forsøk 2017-07-20 17:52:29:
+Beskrivelse: Utilsiktet gjentagelse av forrige forsøk.
+Resultat: Svært likt forrige gang. På det beste (24 epoker) testloss 0.0363, treningsloss 0.0155.
+
+Forsøk 2017-07-20 19:41:38:
+Beskrivelse: Utilsiktet gjentagelse av forrige forsøk.
+Resultat: Svært likt forrige gang. På det beste (21 epoker) testloss 0.0352, treningsloss 0.0149.
+
+Forsøk 2017-07-21 12:15:04:
+Beskrivelse: Gjeninnført grensesnittvektoren som før. Innført 0.5 dropout i GRU-laget (ikke i tidssteget).
+Resultat: På det beste (14 epoker) testloss 0.0291, treningsloss 0.0298. Underveis gjennom læringen holder test- og treningsloss seg ganske like. Resultatene ser bra ut visuelt.
+
+Forsøk 2017-07-21 14:35:24:
+Beskrivelse: Innført enda et konvolusjonslag og et maxpoolinglag etter det det eksisterende maxpoolinglaget. Ikke brukt dropout (?).
+Resultat: På det beste (23 epoker) testloss 0.0305, treningsloss 0.0179.
+
+Forsøk 2017-07-21 16:23:31:
+Beskrivelse: Innkoordinatene gis (etter å ha gått gjennom et tett lag) direkte som starttilstanden til GRU-laget og legges ikke på sekvensen som om de var det første bildet. GRU-en får (og gir ut) dermed 12 bilder lange sekvenser istedenfor 13.
+Resultat: På det beste (21 epoker) testloss 0.0244, treningsloss 0.0252. Ikke overfitting (sannsynligvis pga. dropout). Loss holder seg under 0.029 over mange epoker, dvs. målbart bedre enn tidligere.
+
+Forsøk 2017-07-21 17:54:39:
+Skulle teste synkende læringsrate, men noe gikk sannsynligvis galt. Får loss rundt 0.23 – mye dårligere enn før.
