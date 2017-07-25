@@ -1,0 +1,118 @@
+run_name:  2017-07-25 11:01:59
+Treningseksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/train
+Testeksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/test
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 224, 224 0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, None, 220, 220 2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, None, 216, 216 25632       Konv1[0][0]                      
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, None, 108, 108 0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Konv3 (TimeDistributed)          (None, None, 104, 104 25632       maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, None, 52, 52,  0           Konv3[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 86528)   0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     44302848    Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 45,935,556
+Trainable params: 45,935,556
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 100/100000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/train
+Epoch 1/1
+Det skjedde en feil med kjøring nr. 0
+OOM when allocating tensor with shape[384,32,216,216]
+	 [[Node: gradients/maxpooling1/MaxPool_grad/MaxPoolGrad = MaxPoolGrad[T=DT_FLOAT, _class=["loc:@maxpooling1/MaxPool"], data_format="NHWC", ksize=[1, 2, 2, 1], padding="VALID", strides=[1, 2, 2, 1], _device="/job:localhost/replica:0/task:0/gpu:0"](maxpooling1/Reshape, maxpooling1/MaxPool, gradients/maxpooling1/Reshape_1_grad/Reshape)]]
+
+Caused by op 'gradients/maxpooling1/MaxPool_grad/MaxPoolGrad', defined at:
+  File "experiment_main.py", line 251, in <module>
+    main()
+  File "experiment_main.py", line 244, in main
+    make_predictions, round_patience=patience_before_lowering_lr, save_results=save_results)
+  File "experiment_main.py", line 189, in do_run
+    do_training=do_training, save_results=save_results)
+  File "experiment_main.py", line 75, in build_and_train_model
+    training_examples, training_path, run_name, save_results=save_results)
+  File "experiment_main.py", line 99, in train_model
+    verbose=2)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/engine/training.py", line 1490, in fit
+    self._make_train_function()
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/engine/training.py", line 1014, in _make_train_function
+    self.total_loss)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/optimizers.py", line 405, in get_updates
+    grads = self.get_gradients(loss, params)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/optimizers.py", line 71, in get_gradients
+    grads = K.gradients(loss, params)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py", line 2307, in gradients
+    return tf.gradients(loss, variables, colocate_gradients_with_ops=True)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/ops/gradients_impl.py", line 540, in gradients
+    grad_scope, op, func_call, lambda: grad_fn(op, *out_grads))
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/ops/gradients_impl.py", line 346, in _MaybeCompile
+    return grad_fn()  # Exit early
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/ops/gradients_impl.py", line 540, in <lambda>
+    grad_scope, op, func_call, lambda: grad_fn(op, *out_grads))
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/ops/nn_grad.py", line 525, in _MaxPoolGrad
+    data_format=op.get_attr("data_format"))
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/ops/gen_nn_ops.py", line 1752, in _max_pool_grad
+    data_format=data_format, name=name)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/framework/op_def_library.py", line 767, in apply_op
+    op_def=op_def)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 2506, in create_op
+    original_op=self._default_original_op, op_def=op_def)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 1269, in __init__
+    self._traceback = _extract_stack()
+
+...which was originally created as op 'maxpooling1/MaxPool', defined at:
+  File "experiment_main.py", line 251, in <module>
+    main()
+[elided 1 identical lines from previous traceback]
+  File "experiment_main.py", line 189, in do_run
+    do_training=do_training, save_results=save_results)
+  File "experiment_main.py", line 61, in build_and_train_model
+    model = create_model(image_size, interface_vector_length, state_vector_length)
+  File "experiment_main.py", line 33, in create_model
+    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/engine/topology.py", line 596, in __call__
+    output = self.call(inputs, **kwargs)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/layers/wrappers.py", line 177, in call
+    y = self.layer.call(inputs)  # (num_samples * timesteps, ...)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/layers/pooling.py", line 154, in call
+    data_format=self.data_format)
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/layers/pooling.py", line 217, in _pooling_function
+    pool_mode='max')
+  File "/home/mby/.local/lib/python3.5/site-packages/keras/backend/tensorflow_backend.py", line 3288, in pool2d
+    x = tf.nn.max_pool(x, pool_size, strides, padding=padding)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/ops/nn_ops.py", line 1769, in max_pool
+    name=name)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/ops/gen_nn_ops.py", line 1605, in _max_pool
+    data_format=data_format, name=name)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/framework/op_def_library.py", line 767, in apply_op
+    op_def=op_def)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 2506, in create_op
+    original_op=self._default_original_op, op_def=op_def)
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/framework/ops.py", line 1269, in __init__
+    self._traceback = _extract_stack()
+
+ResourceExhaustedError (see above for traceback): OOM when allocating tensor with shape[384,32,216,216]
+	 [[Node: gradients/maxpooling1/MaxPool_grad/MaxPoolGrad = MaxPoolGrad[T=DT_FLOAT, _class=["loc:@maxpooling1/MaxPool"], data_format="NHWC", ksize=[1, 2, 2, 1], padding="VALID", strides=[1, 2, 2, 1], _device="/job:localhost/replica:0/task:0/gpu:0"](maxpooling1/Reshape, maxpooling1/MaxPool, gradients/maxpooling1/Reshape_1_grad/Reshape)]]
+

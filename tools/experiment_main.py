@@ -72,18 +72,18 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     if do_training:
         print("Begynner trening.")
         train_model(model, round_patience, weights_path, tensorboard_log_dir, test_path, testing_examples,
-                    training_examples, training_path, run_name, save_results=save_results)
+                    training_examples, training_path, run_name, save_results=save_results, image_size=image_size)
     else:
         print("Hopper over trening.")
     return model
 
 
 def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, test_path, testing_examples,
-                training_examples, training_path, run_name, save_results):
+                training_examples, training_path, run_name, save_results, image_size):
     epoches_per_round = 1
 
     train_seq, train_startcoords, train_labels_pos, train_labels_size = data_io.fetch_seq_startcoords_labels(
-        training_path, training_examples)
+        training_path, training_examples, output_size=image_size)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
@@ -98,7 +98,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                              ],
                   verbose=2)
 
-        evaluation = evaluate_model(model, test_path, testing_examples)
+        evaluation = evaluate_model(model, test_path, testing_examples, image_size=image_size)
 
         # Plotte loss
         if save_results:
@@ -159,7 +159,7 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
 
 def do_run(example_examples=100, testing_examples=0, training_examples=0, load_weights=False, do_training=True,
            make_predictions=True, round_patience=8, interface_vector_length=512, state_vector_length=512,
-           save_results=True, image_size=224):
+           save_results=True, image_size=32):
 
     timestamp = time.localtime()
     run_name = "{0}-{1:02}-{2:02} {3:02}:{4:02}:{5:02}".format(timestamp[0], timestamp[1], timestamp[2], timestamp[3],
@@ -216,8 +216,9 @@ def make_example_jsons(example_examples, example_path, model):
         # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
 
-def evaluate_model(model, test_path, testing_examples):
-    test_sequences, test_startcoords, test_labels_pos, test_labels_size = data_io.fetch_seq_startcoords_labels(test_path, testing_examples)
+def evaluate_model(model, test_path, testing_examples, image_size):
+    test_sequences, test_startcoords, test_labels_pos, test_labels_size =\
+        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
 
     evaluation = model.evaluate([test_sequences, test_startcoords], [test_labels_pos, test_labels_size], verbose=0)
     print("\nEvaluering: ", evaluation, end="\n\n")
@@ -226,22 +227,24 @@ def evaluate_model(model, test_path, testing_examples):
 
 def main():
     # Oppsett
-    save_results = False  # Husk denne!
+    save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
     load_saved_weights = False
     do_training = True
     make_predictions = True
-    training_examples = 0
-    testing_examples = 0
+    training_examples = 50
+    testing_examples = 10
     example_examples = 100
     patience_before_lowering_lr = 8
+    image_size = 32
 
     for i in range(1):  # Kjøre de angitte eksperimentene
         global RUN_ID
         RUN_ID = i
         try:
             # with tf.device("/gpu:0"):
-            do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training, make_predictions,
-                   round_patience=patience_before_lowering_lr, save_results=save_results)
+            do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training,
+                   make_predictions, round_patience=patience_before_lowering_lr, save_results=save_results,
+                   image_size=image_size)
         except Exception as e:
             print("Det skjedde en feil med kjøring nr.", RUN_ID)
             print(e)
