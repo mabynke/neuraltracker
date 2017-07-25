@@ -189,16 +189,16 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
                                   do_training=do_training, save_results=save_results)
     # TODO: Lagre modellens konfigurasjon som json
     if make_predictions:
-        make_example_jsons(example_examples, example_path, model)
+        make_example_jsons(example_examples, example_path, model, image_size=image_size)
 
     if save_results:
         sys.stdout = orig_stdout
 
 
-def make_example_jsons(example_examples, example_path, model):
+def make_example_jsons(example_examples, example_path, model, image_size):
     # Lage og vise eksempler
     example_sequences, example_startcoords, example_labels_pos, example_labels_size\
-        = data_io.fetch_seq_startcoords_labels(example_path, example_examples)
+        = data_io.fetch_seq_startcoords_labels(example_path, example_examples, output_size=image_size)
     predictions = model.predict([example_sequences, example_startcoords])
 
     # predictions = np.delete(predictions, 0, 2)  # Fjerne det første ("falske") tidssteget
@@ -235,7 +235,7 @@ def main():
     testing_examples = 10
     example_examples = 100
     patience_before_lowering_lr = 8
-    image_size = 32
+    image_size = 64
 
     for i in range(1):  # Kjøre de angitte eksperimentene
         global RUN_ID
