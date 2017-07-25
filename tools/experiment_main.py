@@ -2,11 +2,11 @@ import os
 import sys
 import time
 
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
-
 # from tools import data_io  # For kjøring fra PyCharm
 import data_io  # For kjøring fra terminal
 import plotting
+
+os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
 from keras.callbacks import TerminateOnNaN, TensorBoard
 from keras.layers import Input
@@ -18,16 +18,13 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.backend import get_value, set_value
 
-# import tensorflow as tf
-
 
 RUN_ID = 0
-optimizer = Adam()  # TODO: Fjerne denne deklarasjonen herfra
 
 
-def create_model(sequence_length, image_size, interface_vector_length, state_vector_length):
+def create_model(image_size, interface_vector_length, state_vector_length):
     # Ta innputt
-    input_sequence = Input(shape=(None, None, None, 3), name="Innsekvens")
+    input_sequence = Input(shape=(None, image_size, image_size, 3), name="Innsekvens")
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
@@ -41,11 +38,14 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
     x = TimeDistributed(Dense(interface_vector_length, activation="relu"), name="Grensesnittvektorer")(x)
 
     # Kode og sette inn informasjon om startkoordinater
-    # k = Concatenate(name="pos_str_sammensetting")([input_position, input_size])
-    k = Dense(units=state_vector_length, activation="relu", name="Kodede_koordinater")(input_coordinates)
+    coords = Dense(units=state_vector_length, activation="relu", name="Kodede_koordinater")(input_coordinates)
 
     # Behandle sekvens av grensesnittvektorer med LSTM
-    x = GRU(units=state_vector_length, dropout=0.5, recurrent_dropout=0.0, return_sequences=True, name="GRU-lag1")(x, initial_state=k)
+    x = GRU(units=state_vector_length,
+            dropout=0.5,
+            recurrent_dropout=0.0,
+            return_sequences=True,
+            name="GRU-lag1")(x, initial_state=coords)
 
     # Dekode til koordinater
     position = TimeDistributed(Dense(units=2, activation="linear"), name="Posisjon_ut")(x)
@@ -54,13 +54,12 @@ def create_model(sequence_length, image_size, interface_vector_length, state_vec
     return Model(inputs=[input_sequence, input_coordinates], outputs=[position, size])
 
 
-def build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
-                          tensorboard_log_dir, training_examples, training_path, test_path, testing_examples,
-                          weights_path, run_name, round_patience=6, load_prevous_weigths=False, do_training=True):
+def build_and_train_model(state_vector_length, image_size, interface_vector_length, tensorboard_log_dir,
+                          training_examples, training_path, test_path, testing_examples, weights_path, run_name,
+                          round_patience, load_prevous_weigths, do_training, save_results):
     # Bygge modellen
-    # K._set_session(K.tf.Session(config=K.tf.ConfigProto(log_device_placement=True)))
-    model = create_model(sequence_length, image_size, interface_vector_length, state_vector_length)
-    model.compile(optimizer=optimizer, loss=["mean_squared_error", "mean_squared_error"], loss_weights=[1, 1])
+    model = create_model(image_size, interface_vector_length, state_vector_length)
+    model.compile(optimizer=Adam(), loss=["mean_squared_error", "mean_squared_error"], loss_weights=[1, 1])
 
     print("Oppsummering av nettet:")
     model.summary()  # Skrive ut en oversikt over modellen
@@ -73,22 +72,18 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     if do_training:
         print("Begynner trening.")
         train_model(model, round_patience, weights_path, tensorboard_log_dir, test_path, testing_examples,
-                    training_examples, training_path, run_name)
+                    training_examples, training_path, run_name, save_results=save_results)
     else:
         print("Hopper over trening.")
     return model
 
 
 def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, test_path, testing_examples,
-                training_examples, training_path, run_name):
+                training_examples, training_path, run_name, save_results):
     epoches_per_round = 1
 
     train_seq, train_startcoords, train_labels_pos, train_labels_size = data_io.fetch_seq_startcoords_labels(
         training_path, training_examples)
-    # if RUN_ID == 0:
-    #     # train_seq = np.delete(train_seq, 0, 1)
-    #     train_labels_pos = np.delete(train_labels_pos, 0, 1)
-    #     train_labels_size = np.delete(train_labels_size, 0, 1)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
@@ -104,13 +99,13 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                   verbose=2)
 
         evaluation = evaluate_model(model, test_path, testing_examples)
-        # print(fit_history.history)
 
         # Plotte loss
-        train_loss = (fit_history.history["loss"][0], fit_history.history["Posisjon_ut_loss"][0], fit_history.history["Stoerrelse_ut_loss"][0])
-        test_loss = tuple(evaluation)
-        loss_history.append((train_loss, test_loss))
-        plotting.plot_loss_history(loss_history, run_name)
+        if save_results:
+            train_loss = (fit_history.history["loss"][0], fit_history.history["Posisjon_ut_loss"][0], fit_history.history["Stoerrelse_ut_loss"][0])
+            test_loss = tuple(evaluation)
+            loss_history.append((train_loss, test_loss))
+            plotting.plot_loss_history(loss_history, run_name)
 
         print("Fullført runde {0}/{1} ({2} epoker). Brukt {3} minutter."
               .format(i + 1,
@@ -121,21 +116,20 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
         if evaluation[0] >= best_loss:
             num_of_rounds_without_improvement += 1
             print("Runder uten forbedring: {0}/{1}".format(num_of_rounds_without_improvement, round_patience))
-            if RUN_ID == 1:
-                if num_of_rounds_without_improvement >= 6:
-                    current_learning_rate = get_value(model.optimizer.lr)
-                    new_learning_rate = current_learning_rate / 10
-                    print("Senker læringsrate fra {0} til {1}.".format(current_learning_rate, new_learning_rate))
-                    set_value(model.optimizer.lr, new_learning_rate)
-            if num_of_rounds_without_improvement >= round_patience:
-                print("Laster inn vekter fra ", save_weights_path)
-                model.load_weights(save_weights_path)
+            if num_of_rounds_without_improvement == round_patience:  # Senke læringsrate
+                set_value(model.optimizer.lr, get_value(model.optimizer.lr) / 10)
+                print("Senket læringsrate til", get_value(model.optimizer.lr))
+            if num_of_rounds_without_improvement >= round_patience + 2:  # Avslutte treningen
+                if save_results:
+                    print("Laster inn vekter fra ", save_weights_path)
+                    model.load_weights(save_weights_path)
                 break
         else:
             num_of_rounds_without_improvement = 0
             best_loss = evaluation[0]
-            model.save_weights(save_weights_path, overwrite=True)
-            print("Lagret vekter til ", save_weights_path)
+            if save_results:
+                model.save_weights(save_weights_path, overwrite=True)
+                print("Lagret vekter til ", save_weights_path)
         print("Beste testloss så langt:", best_loss)
         print()
 
@@ -163,23 +157,18 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
             print("\tLoss: {0:5.2f}".format(mean_squared_error))
 
 
-def do_run(example_examples, testing_examples, training_examples, load_weights, do_training, make_examples):
-    # Parametre
-    round_patience = 12
-
-    interface_vector_length = 512
-    state_vector_length = 512
-
-    sequence_length = 12
-    image_size = 32  # Antar kvadrat og 3 kanaler
+def do_run(example_examples=100, testing_examples=0, training_examples=0, load_weights=False, do_training=True,
+           make_predictions=True, round_patience=8, interface_vector_length=512, state_vector_length=512,
+           save_results=True, image_size=224):
 
     timestamp = time.localtime()
     run_name = "{0}-{1:02}-{2:02} {3:02}:{4:02}:{5:02}".format(timestamp[0], timestamp[1], timestamp[2], timestamp[3],
                                                                timestamp[4], timestamp[5])
-    print_path = "saved_outputs"
-    print("Skriver utdata til", os.path.join(print_path, run_name))
-    orig_stdout = sys.stdout
-    sys.stdout = open(os.path.join(print_path, run_name), 'w', buffering=1)
+    if save_results:
+        print_path = "saved_outputs"
+        print("Skriver utdata til", os.path.join(print_path, run_name))
+        orig_stdout = sys.stdout
+        sys.stdout = open(os.path.join(print_path, run_name), 'w', buffering=1)
 
     print("run_name: ", run_name)
     # default_train_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater/train"
@@ -194,15 +183,16 @@ def do_run(example_examples, testing_examples, training_examples, load_weights, 
     weights_path = os.path.join("saved_weights", run_name + ".h5")
     tensorboard_log_dir = "tensorboard_logs"
 
-    model = build_and_train_model(state_vector_length, image_size, interface_vector_length, sequence_length,
-                                  tensorboard_log_dir, training_examples, train_path, test_path, testing_examples,
-                                  weights_path, run_name, round_patience=round_patience,
-                                  load_prevous_weigths=load_weights, do_training=do_training)
+    model = build_and_train_model(state_vector_length, image_size, interface_vector_length, tensorboard_log_dir,
+                                  training_examples, train_path, test_path, testing_examples, weights_path, run_name,
+                                  round_patience=round_patience, load_prevous_weigths=load_weights,
+                                  do_training=do_training, save_results=save_results)
     # TODO: Lagre modellens konfigurasjon som json
-    if make_examples:
+    if make_predictions:
         make_example_jsons(example_examples, example_path, model)
 
-    sys.stdout = orig_stdout
+    if save_results:
+        sys.stdout = orig_stdout
 
 
 def make_example_jsons(example_examples, example_path, model):
@@ -229,11 +219,6 @@ def make_example_jsons(example_examples, example_path, model):
 def evaluate_model(model, test_path, testing_examples):
     test_sequences, test_startcoords, test_labels_pos, test_labels_size = data_io.fetch_seq_startcoords_labels(test_path, testing_examples)
 
-    # if RUN_ID == 0:
-    #     # test_sequences = np.delete(test_sequences, 0, 1)
-    #     test_labels_pos = np.delete(test_labels_pos, 0, 1)
-    #     test_labels_size = np.delete(test_labels_size, 0, 1)
-
     evaluation = model.evaluate([test_sequences, test_startcoords], [test_labels_pos, test_labels_size], verbose=0)
     print("\nEvaluering: ", evaluation, end="\n\n")
     return evaluation
@@ -241,19 +226,22 @@ def evaluate_model(model, test_path, testing_examples):
 
 def main():
     # Oppsett
+    save_results = False  # Husk denne!
     load_saved_weights = False
     do_training = True
-    make_examples = True
+    make_predictions = True
     training_examples = 0
     testing_examples = 0
     example_examples = 100
+    patience_before_lowering_lr = 8
 
-    for i in range(1,2):  # Kjøre de angitte eksperimentene
+    for i in range(1):  # Kjøre de angitte eksperimentene
         global RUN_ID
         RUN_ID = i
         try:
             # with tf.device("/gpu:0"):
-            do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training, make_examples)
+            do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training, make_predictions,
+                   round_patience=patience_before_lowering_lr, save_results=save_results)
         except Exception as e:
             print("Det skjedde en feil med kjøring nr.", RUN_ID)
             print(e)

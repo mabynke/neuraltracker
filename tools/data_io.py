@@ -5,7 +5,7 @@ import json
 from PIL import Image
 
 
-def fetch_seq_startcoords_labels(main_path, max_count=0):
+def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224):
     """
     Leser inn sekvensmapper og genererer to sequences- og labels_pos-arrayer som kan brukes til trening.
     labels_pos hentes fra en fil ved navn "label.json" i sekvensmappen.
@@ -39,6 +39,7 @@ def fetch_seq_startcoords_labels(main_path, max_count=0):
             image_path = os.path.join(sequence_path, image_name)
             try:
                 im = Image.open(image_path)
+                im = im.resize((output_size, output_size), Image.BILINEAR)
                 image_array = numpy.array(im)
                 sequence.append(image_array)  # Legger til bildet i sekvensen
             except OSError:  # Dette er ikke en bildefil.
@@ -81,7 +82,6 @@ def write_labels(path, json_file_name, labels_pos, labels_size, file_names):
                                  "y": float(labels_pos[i][1]),
                                  "w": float(labels_size[i][0]),
                                  "h": float(labels_size[i][1])})
-    print("data_io.write_labels() skriver til", os.path.join(path, json_file_name))
     with open(os.path.join(path, json_file_name), "w") as label_file:
         json.dump(formatted_labels, label_file)
 

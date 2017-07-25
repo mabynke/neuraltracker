@@ -1,0 +1,267 @@
+Using TensorFlow backend.
+run_name:  2017-7-20 9:23:38
+Treningseksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/train
+Testeksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/test
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, 12, 32, 32, 3) 0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, 12, 28, 28, 32 2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, 12, 24, 24, 32 25632       Konv1[0][0]                      
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, 12, 12, 12, 32 0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, 12, 4608)      0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Omforming (Reshape)              (None, 1, 512)        0           Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, 12, 512)       2359808     Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Sammensetting (Concatenate)      (None, 13, 512)       0           Omforming[0][0]                  
+                                                                   Grensesnittvektorer[0][0]        
+____________________________________________________________________________________________________
+GRU-lag1 (LSTM)                  (None, 13, 512)       2099200     Sammensetting[0][0]              
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, 13, 2)         1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, 13, 2)         1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 4,491,684
+Trainable params: 4,491,684
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 100000/100000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/train
+2017-07-20 09:27:15.524920: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.1 instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 09:27:15.524940: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use SSE4.2 instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 09:27:15.524956: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 09:27:15.524960: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use AVX2 instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 09:27:15.524963: W tensorflow/core/platform/cpu_feature_guard.cc:45] The TensorFlow library wasn't compiled to use FMA instructions, but these are available on your machine and could speed up CPU computations.
+2017-07-20 09:27:15.890804: I tensorflow/core/common_runtime/gpu/gpu_device.cc:940] Found device 0 with properties: 
+name: GeForce GTX TITAN X
+major: 5 minor: 2 memoryClockRate (GHz) 1.076
+pciBusID 0000:0a:00.0
+Total memory: 11.92GiB
+Free memory: 11.81GiB
+2017-07-20 09:27:16.104906: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x4f7a160 exists before initializing the StreamExecutor. We haven't verified StreamExecutor works with that.
+2017-07-20 09:27:16.105992: I tensorflow/core/common_runtime/gpu/gpu_device.cc:940] Found device 1 with properties: 
+name: GeForce GTX TITAN X
+major: 5 minor: 2 memoryClockRate (GHz) 1.076
+pciBusID 0000:09:00.0
+Total memory: 11.92GiB
+Free memory: 11.81GiB
+2017-07-20 09:27:16.337279: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x4f7df90 exists before initializing the StreamExecutor. We haven't verified StreamExecutor works with that.
+2017-07-20 09:27:16.338327: I tensorflow/core/common_runtime/gpu/gpu_device.cc:940] Found device 2 with properties: 
+name: GeForce GTX TITAN X
+major: 5 minor: 2 memoryClockRate (GHz) 1.076
+pciBusID 0000:06:00.0
+Total memory: 11.92GiB
+Free memory: 11.81GiB
+2017-07-20 09:27:16.573112: W tensorflow/stream_executor/cuda/cuda_driver.cc:523] A non-primary context 0x4f81dc0 exists before initializing the StreamExecutor. We haven't verified StreamExecutor works with that.
+2017-07-20 09:27:16.574171: I tensorflow/core/common_runtime/gpu/gpu_device.cc:940] Found device 3 with properties: 
+name: GeForce GTX TITAN X
+major: 5 minor: 2 memoryClockRate (GHz) 1.076
+pciBusID 0000:05:00.0
+Total memory: 11.92GiB
+Free memory: 11.56GiB
+2017-07-20 09:27:16.577354: I tensorflow/core/common_runtime/gpu/gpu_device.cc:961] DMA: 0 1 2 3 
+2017-07-20 09:27:16.577365: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971] 0:   Y Y Y Y 
+2017-07-20 09:27:16.577369: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971] 1:   Y Y Y Y 
+2017-07-20 09:27:16.577372: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971] 2:   Y Y Y Y 
+2017-07-20 09:27:16.577376: I tensorflow/core/common_runtime/gpu/gpu_device.cc:971] 3:   Y Y Y Y 
+2017-07-20 09:27:16.577383: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Creating TensorFlow device (/gpu:0) -> (device: 0, name: GeForce GTX TITAN X, pci bus id: 0000:0a:00.0)
+2017-07-20 09:27:16.577389: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Creating TensorFlow device (/gpu:1) -> (device: 1, name: GeForce GTX TITAN X, pci bus id: 0000:09:00.0)
+2017-07-20 09:27:16.577394: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Creating TensorFlow device (/gpu:2) -> (device: 2, name: GeForce GTX TITAN X, pci bus id: 0000:06:00.0)
+2017-07-20 09:27:16.577398: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1030] Creating TensorFlow device (/gpu:3) -> (device: 3, name: GeForce GTX TITAN X, pci bus id: 0000:05:00.0)
+Epoch 1/1
+    32/100000 [..............................] - ETA: 1759s - loss: 0.7185 - Posisjon_ut_loss: 0.5997 - Stoerrelse_ut_loss: 0.11882017-07-20 09:27:17.885455: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 2399 get requests, put_count=2292 evicted_count=1000 eviction_rate=0.4363 and unsatisfied allocation rate=0.503126
+2017-07-20 09:27:17.885505: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 100 to 110
+   704/100000 [..............................] - ETA: 214s - loss: 0.6928 - Posisjon_ut_loss: 0.6717 - Stoerrelse_ut_loss: 0.02112017-07-20 09:27:18.893858: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 3538 get requests, put_count=3369 evicted_count=1000 eviction_rate=0.296824 and unsatisfied allocation rate=0.336914
+2017-07-20 09:27:18.893907: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:259] Raising pool_size_limit_ from 256 to 281
+ 29632/100000 [=======>......................] - ETA: 107s - loss: 0.2124 - Posisjon_ut_loss: 0.2062 - Stoerrelse_ut_loss: 0.00622017-07-20 09:28:02.688816: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 1018409 get requests, put_count=1018442 evicted_count=1000 eviction_rate=0.000981892 and unsatisfied allocation rate=0.00100745
+100000/100000 [==============================] - 150s - loss: 0.1910 - Posisjon_ut_loss: 0.1883 - Stoerrelse_ut_loss: 0.0027     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9952/10000 [============================>.] - ETA: 0s 
+Evaluering:  [0.22421393105983733, 0.22412646100521089, 8.746994372922927e-05]
+
+Fullført runde 1/1032 (1 epoker). Brukt 3.0 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+ 89664/100000 [=========================>....] - ETA: 15s - loss: 0.2308 - Posisjon_ut_loss: 0.2305 - Stoerrelse_ut_loss: 3.3735e-042017-07-20 09:32:27.532045: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 7038806 get requests, put_count=7038839 evicted_count=11000 eviction_rate=0.00156276 and unsatisfied allocation rate=0.00156646
+100000/100000 [==============================] - 147s - loss: 0.2311 - Posisjon_ut_loss: 0.2308 - Stoerrelse_ut_loss: 3.0662e-04    
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.22721554305553437, 0.22712287306785583, 9.2670332652050998e-05]
+
+Fullført runde 2/1032 (2 epoker). Brukt 5.9 minutter.
+Runder uten forbedring: 1/6
+
+Epoch 1/1
+100000/100000 [==============================] - 147s - loss: 0.2239 - Posisjon_ut_loss: 0.2239 - Stoerrelse_ut_loss: 3.2264e-05     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.22372219018936157, 0.22368447694778443, 3.7713120406260716e-05]
+
+Fullført runde 3/1032 (3 epoker). Brukt 8.8 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+ 49664/100000 [=============>................] - ETA: 72s - loss: 0.2247 - Posisjon_ut_loss: 0.2247 - Stoerrelse_ut_loss: 1.8973e-052017-07-20 09:37:12.578023: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 13088567 get requests, put_count=13088599 evicted_count=21000 eviction_rate=0.00160445 and unsatisfied allocation rate=0.00160652
+100000/100000 [==============================] - 148s - loss: 0.2245 - Posisjon_ut_loss: 0.2245 - Stoerrelse_ut_loss: 1.6345e-05    
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+10000/10000 [==============================] - 4s     
+
+Evaluering:  [0.2193389732837677, 0.21930938689708709, 2.9586103471228853e-05]
+
+Fullført runde 4/1032 (4 epoker). Brukt 11.7 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+ 99840/100000 [============================>.] - ETA: 0s - loss: 0.2201 - Posisjon_ut_loss: 0.2199 - Stoerrelse_ut_loss: 1.3908e-042017-07-20 09:41:23.252684: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 18742098 get requests, put_count=18742130 evicted_count=31000 eviction_rate=0.00165403 and unsatisfied allocation rate=0.00165547
+100000/100000 [==============================] - 148s - loss: 0.2201 - Posisjon_ut_loss: 0.2199 - Stoerrelse_ut_loss: 1.3892e-04   
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21916855673789978, 0.21912468378543853, 4.3873113417066637e-05]
+
+Fullført runde 5/1032 (5 epoker). Brukt 14.6 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+100000/100000 [==============================] - 152s - loss: 0.2180 - Posisjon_ut_loss: 0.2179 - Stoerrelse_ut_loss: 1.2828e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+10000/10000 [==============================] - 4s     
+
+Evaluering:  [0.21497974517345428, 0.2146599943637848, 0.000319751023221761]
+
+Fullført runde 6/1032 (6 epoker). Brukt 17.5 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+  6496/100000 [>.............................] - ETA: 139s - loss: 0.2212 - Posisjon_ut_loss: 0.2210 - Stoerrelse_ut_loss: 2.1108e-042017-07-20 09:44:56.654627: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 22794330 get requests, put_count=22794363 evicted_count=41000 eviction_rate=0.00179869 and unsatisfied allocation rate=0.00179983
+100000/100000 [==============================] - 148s - loss: 0.2184 - Posisjon_ut_loss: 0.2181 - Stoerrelse_ut_loss: 3.3374e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21190540351867676, 0.21180161960124969, 0.00010378403468057514]
+
+Fullført runde 7/1032 (7 epoker). Brukt 20.4 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+  2336/100000 [..............................] - ETA: 142s - loss: 0.2102 - Posisjon_ut_loss: 0.2101 - Stoerrelse_ut_loss: 1.0264e-042017-07-20 09:47:43.935534: I tensorflow/core/common_runtime/gpu/pool_allocator.cc:247] PoolAllocator: After 26412227 get requests, put_count=26412257 evicted_count=51000 eviction_rate=0.00193092 and unsatisfied allocation rate=0.00193202
+100000/100000 [==============================] - 150s - loss: 0.2135 - Posisjon_ut_loss: 0.2134 - Stoerrelse_ut_loss: 6.2744e-05     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9984/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21188386516571045, 0.21184897320270538, 3.4891906462144104e-05]
+
+Fullført runde 8/1032 (8 epoker). Brukt 23.4 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+100000/100000 [==============================] - 151s - loss: 0.2174 - Posisjon_ut_loss: 0.2166 - Stoerrelse_ut_loss: 8.0299e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21357439987659455, 0.21262501647472382, 0.00094938297886401418]
+
+Fullført runde 9/1032 (9 epoker). Brukt 26.3 minutter.
+Runder uten forbedring: 1/6
+
+Epoch 1/1
+100000/100000 [==============================] - 152s - loss: 0.2165 - Posisjon_ut_loss: 0.2157 - Stoerrelse_ut_loss: 7.9085e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9984/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21255786833763124, 0.2123992540359497, 0.00015861416826955975]
+
+Fullført runde 10/1032 (10 epoker). Brukt 29.3 minutter.
+Runder uten forbedring: 2/6
+
+Epoch 1/1
+100000/100000 [==============================] - 153s - loss: 0.2154 - Posisjon_ut_loss: 0.2153 - Stoerrelse_ut_loss: 1.1109e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9984/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21482038390636443, 0.21467745089530946, 0.00014293333715759216]
+
+Fullført runde 11/1032 (11 epoker). Brukt 32.3 minutter.
+Runder uten forbedring: 3/6
+
+Epoch 1/1
+100000/100000 [==============================] - 150s - loss: 0.2124 - Posisjon_ut_loss: 0.2122 - Stoerrelse_ut_loss: 1.1542e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21098532798290254, 0.2108596140384674, 0.00012571428846567869]
+
+Fullført runde 12/1032 (12 epoker). Brukt 35.2 minutter.
+Lagret vekter til  saved_weights/2017-7-20 9:23:38.h5
+
+Epoch 1/1
+100000/100000 [==============================] - 151s - loss: 0.2136 - Posisjon_ut_loss: 0.2127 - Stoerrelse_ut_loss: 8.2268e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21617185380458831, 0.21529253592491149, 0.00087931789429858322]
+
+Fullført runde 13/1032 (13 epoker). Brukt 38.2 minutter.
+Runder uten forbedring: 1/6
+
+Epoch 1/1
+100000/100000 [==============================] - 149s - loss: 0.2171 - Posisjon_ut_loss: 0.2163 - Stoerrelse_ut_loss: 8.3261e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9888/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21800156221389771, 0.2178546872138977, 0.00014687456681858747]
+
+Fullført runde 14/1032 (14 epoker). Brukt 41.1 minutter.
+Runder uten forbedring: 2/6
+
+Epoch 1/1
+100000/100000 [==============================] - 146s - loss: 0.2192 - Posisjon_ut_loss: 0.2189 - Stoerrelse_ut_loss: 2.9606e-04     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+10000/10000 [==============================] - 4s     
+
+Evaluering:  [0.2245338532924652, 0.22411478099822998, 0.0004190726748201996]
+
+Fullført runde 15/1032 (15 epoker). Brukt 43.9 minutter.
+Runder uten forbedring: 3/6
+
+Epoch 1/1
+100000/100000 [==============================] - 145s - loss: 0.2265 - Posisjon_ut_loss: 0.2254 - Stoerrelse_ut_loss: 0.0011         
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+10000/10000 [==============================] - 4s     
+
+Evaluering:  [0.21808893158435821, 0.21643268165588378, 0.0016562501234933735]
+
+Fullført runde 16/1032 (16 epoker). Brukt 46.8 minutter.
+Runder uten forbedring: 4/6
+
+Epoch 1/1
+100000/100000 [==============================] - 152s - loss: 0.2204 - Posisjon_ut_loss: 0.2189 - Stoerrelse_ut_loss: 0.0015     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9920/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21754025413990022, 0.21573018794059753, 0.0018100665625184775]
+
+Fullført runde 17/1032 (17 epoker). Brukt 49.7 minutter.
+Runder uten forbedring: 5/6
+
+Epoch 1/1
+100000/100000 [==============================] - 147s - loss: 0.2184 - Posisjon_ut_loss: 0.2168 - Stoerrelse_ut_loss: 0.0017     
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+ 9984/10000 [============================>.] - ETA: 0s
+Evaluering:  [0.21496921551227569, 0.21378998827934265, 0.0011792266158387064]
+
+Fullført runde 18/1032 (18 epoker). Brukt 52.6 minutter.
+Runder uten forbedring: 6/6
+Laster inn vekter fra  saved_weights/2017-7-20 9:23:38.h5
+Henter 100/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+len(predictions): 2
+len(predictions[0]): 100
+len(predictions[0][0]): 12
+Exception ignored in: <bound method BaseSession.__del__ of <tensorflow.python.client.session.Session object at 0x7fd9df4f5e10>>
+Traceback (most recent call last):
+  File "/home/mby/.local/lib/python3.5/site-packages/tensorflow/python/client/session.py", line 595, in __del__
+TypeError: 'NoneType' object is not callable

@@ -1,0 +1,330 @@
+run_name:  2017-07-24 11:23:32
+Treningseksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/train
+Testeksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/test
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, 12, 32, 32, 3) 0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, 12, 28, 28, 32 2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, 12, 24, 24, 32 25632       Konv1[0][0]                      
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, 12, 12, 12, 32 0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Konv3 (TimeDistributed)          (None, 12, 8, 8, 32)  25632       maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, 12, 4, 4, 32)  0           Konv3[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, 12, 512)       0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, 12, 512)       262656      Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, 12, 512)       1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, 12, 2)         1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, 12, 2)         1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 1,895,364
+Trainable params: 1,895,364
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 100000/100000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/train
+Epoch 1/1
+128s - loss: 0.1661 - Posisjon_ut_loss: 0.1639 - Stoerrelse_ut_loss: 0.0022
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.088216510975360873, 0.088039208376407621, 0.00017730272011831402]
+
+Fullført runde 1/1032 (1 epoker). Brukt 2.7 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0772 - Posisjon_ut_loss: 0.0770 - Stoerrelse_ut_loss: 1.0918e-04
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.060907274413108822, 0.06085263822674751, 5.4636338993441313e-05]
+
+Fullført runde 2/1032 (2 epoker). Brukt 5.2 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0610 - Posisjon_ut_loss: 0.0610 - Stoerrelse_ut_loss: 5.1866e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.054257417535781859, 0.054224700117111203, 3.2717331836465748e-05]
+
+Fullført runde 3/1032 (3 epoker). Brukt 7.8 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0538 - Posisjon_ut_loss: 0.0538 - Stoerrelse_ut_loss: 3.9713e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.050502863043546675, 0.050475454139709476, 2.7408825742895714e-05]
+
+Fullført runde 4/1032 (4 epoker). Brukt 10.4 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0470 - Posisjon_ut_loss: 0.0469 - Stoerrelse_ut_loss: 2.9526e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.045127568688988685, 0.04510878973007202, 1.8778964891680517e-05]
+
+Fullført runde 5/1032 (5 epoker). Brukt 13.0 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0429 - Posisjon_ut_loss: 0.0429 - Stoerrelse_ut_loss: 2.6824e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.037149029412865638, 0.03712807697057724, 2.0952411994221622e-05]
+
+Fullført runde 6/1032 (6 epoker). Brukt 15.6 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0386 - Posisjon_ut_loss: 0.0386 - Stoerrelse_ut_loss: 1.9208e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.03747033534646034, 0.037455753526091574, 1.4581804366025607e-05]
+
+Fullført runde 7/1032 (7 epoker). Brukt 18.1 minutter.
+Runder uten forbedring: 1/12
+
+Epoch 1/1
+131s - loss: 0.0358 - Posisjon_ut_loss: 0.0358 - Stoerrelse_ut_loss: 1.7591e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.03517083422243595, 0.035155643570423126, 1.5190566431556363e-05]
+
+Fullført runde 8/1032 (8 epoker). Brukt 20.8 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+130s - loss: 0.0355 - Posisjon_ut_loss: 0.0355 - Stoerrelse_ut_loss: 1.8524e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.034050474205613135, 0.034035430711507796, 1.5043531275296119e-05]
+
+Fullført runde 9/1032 (9 epoker). Brukt 23.3 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0327 - Posisjon_ut_loss: 0.0327 - Stoerrelse_ut_loss: 1.8083e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.033468841519951824, 0.033457708415389059, 1.1132988205645233e-05]
+
+Fullført runde 10/1032 (10 epoker). Brukt 25.9 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0317 - Posisjon_ut_loss: 0.0317 - Stoerrelse_ut_loss: 1.7971e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.032737019762396811, 0.032724009189009667, 1.3010606823081617e-05]
+
+Fullført runde 11/1032 (11 epoker). Brukt 28.5 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+130s - loss: 0.0306 - Posisjon_ut_loss: 0.0306 - Stoerrelse_ut_loss: 1.7350e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.03102973855137825, 0.03101505145430565, 1.4687033838708886e-05]
+
+Fullført runde 12/1032 (12 epoker). Brukt 31.1 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+130s - loss: 0.0299 - Posisjon_ut_loss: 0.0299 - Stoerrelse_ut_loss: 1.8164e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.034950335299968723, 0.0349373067766428, 1.302842255536234e-05]
+
+Fullført runde 13/1032 (13 epoker). Brukt 33.7 minutter.
+Runder uten forbedring: 1/12
+
+Epoch 1/1
+129s - loss: 0.0290 - Posisjon_ut_loss: 0.0290 - Stoerrelse_ut_loss: 1.7213e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.029678544059395792, 0.029666836610436439, 1.1707488181127701e-05]
+
+Fullført runde 14/1032 (14 epoker). Brukt 36.2 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+130s - loss: 0.0288 - Posisjon_ut_loss: 0.0287 - Stoerrelse_ut_loss: 1.5469e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.028341128772497177, 0.028329170534014701, 1.1958200985100121e-05]
+
+Fullført runde 15/1032 (15 epoker). Brukt 38.8 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+129s - loss: 0.0290 - Posisjon_ut_loss: 0.0290 - Stoerrelse_ut_loss: 1.3451e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.030501397663354874, 0.030484435859322548, 1.6961833322420717e-05]
+
+Fullført runde 16/1032 (16 epoker). Brukt 41.4 minutter.
+Runder uten forbedring: 1/12
+
+Epoch 1/1
+131s - loss: 0.0290 - Posisjon_ut_loss: 0.0290 - Stoerrelse_ut_loss: 1.1762e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.031614112433791162, 0.03159404652118683, 2.0065928835538216e-05]
+
+Fullført runde 17/1032 (17 epoker). Brukt 44.0 minutter.
+Runder uten forbedring: 2/12
+
+Epoch 1/1
+130s - loss: 0.0289 - Posisjon_ut_loss: 0.0289 - Stoerrelse_ut_loss: 1.1403e-05
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.032162087327241899, 0.032153187039494512, 8.9003115426748988e-06]
+
+Fullført runde 18/1032 (18 epoker). Brukt 46.6 minutter.
+Runder uten forbedring: 3/12
+
+Epoch 1/1
+129s - loss: 0.0278 - Posisjon_ut_loss: 0.0278 - Stoerrelse_ut_loss: 9.8192e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.032037365198135374, 0.032027338412404058, 1.0026772882702062e-05]
+
+Fullført runde 19/1032 (19 epoker). Brukt 49.2 minutter.
+Runder uten forbedring: 4/12
+
+Epoch 1/1
+129s - loss: 0.0281 - Posisjon_ut_loss: 0.0281 - Stoerrelse_ut_loss: 9.9802e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.027982274943590166, 0.027972367918491364, 9.9070284602930773e-06]
+
+Fullført runde 20/1032 (20 epoker). Brukt 51.8 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+128s - loss: 0.0276 - Posisjon_ut_loss: 0.0276 - Stoerrelse_ut_loss: 8.6997e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.032382948070764542, 0.03237600921392441, 6.9388532429002226e-06]
+
+Fullført runde 21/1032 (21 epoker). Brukt 54.3 minutter.
+Runder uten forbedring: 1/12
+
+Epoch 1/1
+128s - loss: 0.0259 - Posisjon_ut_loss: 0.0259 - Stoerrelse_ut_loss: 8.0263e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.027330809974670411, 0.027312551960349082, 1.8258064068504608e-05]
+
+Fullført runde 22/1032 (22 epoker). Brukt 56.9 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+128s - loss: 0.0265 - Posisjon_ut_loss: 0.0265 - Stoerrelse_ut_loss: 7.4992e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.030274062576889992, 0.030268539115786551, 5.523387825087411e-06]
+
+Fullført runde 23/1032 (23 epoker). Brukt 59.4 minutter.
+Runder uten forbedring: 1/12
+
+Epoch 1/1
+129s - loss: 0.0259 - Posisjon_ut_loss: 0.0259 - Stoerrelse_ut_loss: 8.6266e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.027311548796296121, 0.027304862719774246, 6.6861413019069004e-06]
+
+Fullført runde 24/1032 (24 epoker). Brukt 62.0 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+128s - loss: 0.0256 - Posisjon_ut_loss: 0.0255 - Stoerrelse_ut_loss: 7.5015e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.061767356747388841, 0.061759424901008608, 7.9319200536701835e-06]
+
+Fullført runde 25/1032 (25 epoker). Brukt 64.6 minutter.
+Runder uten forbedring: 1/12
+
+Epoch 1/1
+128s - loss: 0.0258 - Posisjon_ut_loss: 0.0258 - Stoerrelse_ut_loss: 7.8275e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.026297748270630836, 0.026289915612339974, 7.83262313780142e-06]
+
+Fullført runde 26/1032 (26 epoker). Brukt 67.1 minutter.
+Lagret vekter til  saved_weights/2017-07-24 11:23:32.h5
+
+Epoch 1/1
+127s - loss: 0.0257 - Posisjon_ut_loss: 0.0257 - Stoerrelse_ut_loss: 7.1169e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.02750759228616953, 0.027503943449258803, 3.6488409507001051e-06]
+
+Fullført runde 27/1032 (27 epoker). Brukt 69.7 minutter.
+Runder uten forbedring: 1/12
+
+Epoch 1/1
+128s - loss: 0.0252 - Posisjon_ut_loss: 0.0252 - Stoerrelse_ut_loss: 6.5539e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.028312396243214608, 0.028301719042658807, 1.0677242750534788e-05]
+
+Fullført runde 28/1032 (28 epoker). Brukt 72.2 minutter.
+Runder uten forbedring: 2/12
+
+Epoch 1/1
+128s - loss: 0.0260 - Posisjon_ut_loss: 0.0260 - Stoerrelse_ut_loss: 6.4444e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.026651361286640168, 0.026646119478344919, 5.2417634593439285e-06]
+
+Fullført runde 29/1032 (29 epoker). Brukt 74.8 minutter.
+Runder uten forbedring: 3/12
+
+Epoch 1/1
+128s - loss: 0.0260 - Posisjon_ut_loss: 0.0260 - Stoerrelse_ut_loss: 7.2745e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.029371854358911514, 0.029366426447033883, 5.4279107629554346e-06]
+
+Fullført runde 30/1032 (30 epoker). Brukt 77.3 minutter.
+Runder uten forbedring: 4/12
+
+Epoch 1/1
+128s - loss: 0.0265 - Posisjon_ut_loss: 0.0265 - Stoerrelse_ut_loss: 6.9050e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.028806388244032859, 0.028797045800089835, 9.342425569775515e-06]
+
+Fullført runde 31/1032 (31 epoker). Brukt 79.9 minutter.
+Runder uten forbedring: 5/12
+
+Epoch 1/1
+128s - loss: 0.0260 - Posisjon_ut_loss: 0.0260 - Stoerrelse_ut_loss: 6.5868e-06
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.032376581877470015, 0.032372611451148989, 3.9704685441392943e-06]
+
+Fullført runde 32/1032 (32 epoker). Brukt 82.4 minutter.
+Runder uten forbedring: 6/12
+Det skjedde en feil med kjøring  1
+'Variable' object has no attribute 'get_value'
