@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 
 import numpy as np
@@ -199,9 +200,10 @@ def create_train_test_examples(path, counts, figures=1):
 
 
 def main():
+    os.chdir(os.path.dirname(sys.argv[0]))
     test_examples = 10000
     train_examples = 0
-    default_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater"
+    default_path = "../Grafikk/tilfeldig_relativeKoordinater"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":

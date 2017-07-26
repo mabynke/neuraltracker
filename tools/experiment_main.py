@@ -171,13 +171,13 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
         sys.stdout = open(os.path.join(print_path, run_name), 'w', buffering=1)
 
     print("run_name: ", run_name)
-    # default_train_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater/train"
-    # default_test_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater/test"
+    # default_train_path = "../Grafikk/tilfeldig_relativeKoordinater/train"
+    # default_test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
     # train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
     # test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
-    train_path = "../../Grafikk/tilfeldig_relativeKoordinater/train"
+    train_path = "../Grafikk/tilfeldig_relativeKoordinater/train"
     print("Treningseksempler hentes fra ", train_path)
-    test_path = "../../Grafikk/tilfeldig_relativeKoordinater/test"
+    test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
     example_path = test_path
     print("Testeksempler hentes fra ", test_path)
     weights_path = os.path.join("saved_weights", run_name + ".h5")
@@ -226,6 +226,7 @@ def evaluate_model(model, test_path, testing_examples, image_size):
 
 
 def main():
+    os.chdir(os.path.dirname(sys.argv[0])) # set working directory to that of the script
     # Oppsett
     save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
     load_saved_weights = False
