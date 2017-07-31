@@ -55,10 +55,10 @@ def create_model(image_size, interface_vector_length, state_vector_length):
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv1")(input_sequence)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv2")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv1")(input_sequence)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv2")(x)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv3")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv3")(x)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
