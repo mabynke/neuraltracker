@@ -1,7 +1,14 @@
 import os
 import sys
 
-import tensorflow as tf
+#import tensorflow.contrib.keras as keras
+#Input = keras.layers.Input
+#TimeDistributed = keras.layers.TimeDistributed
+#Conv2D = keras.layers.Conv2D
+#MaxPooling2D = keras.layers.MaxPooling2D
+#Flatten = keras.layers.Flatten
+#Dense = keras.layers.Dense
+#Model = keras.models.Model
 from keras.layers import Input
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers.core import Dense, Flatten
@@ -79,6 +86,7 @@ def create_model(image_size, interface_vector_length, state_vector_length):
 
     return Model(inputs=[input_sequence, input_coordinates], outputs=[position, size])
 
+    
 
 def main():
     os.chdir(os.path.dirname(sys.argv[0])) # set working directory to that of the script
