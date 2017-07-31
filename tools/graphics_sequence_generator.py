@@ -76,6 +76,8 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         # Oppdatere posisjon og fart til neste bilde/tidssteg
         pos_x += speed_x
         pos_y += speed_y
+        # burde vi ha en deskaleringsfaktor her? unngå ukontrollert økning
+        # i fart for lange sekvenser?
         speed_x += random.gauss(0, 0.03 * size_x)
         speed_y += random.gauss(0, 0.03 * size_y)
 
