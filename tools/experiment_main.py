@@ -68,7 +68,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     if load_prevous_weigths:
         print("Laster inn vekter fra ", weights_path)
         model.load_weights(weights_path)
-        evaluate_model(model, test_path, testing_examples)
+        # evaluate_model(model, test_path, testing_examples)
     if do_training:
         print("Begynner trening.")
         train_model(model, round_patience, weights_path, tensorboard_log_dir, test_path, testing_examples,
@@ -84,6 +84,8 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
 
     train_seq, train_startcoords, train_labels_pos, train_labels_size = data_io.fetch_seq_startcoords_labels(
         training_path, training_examples, output_size=image_size)
+    test_sequences, test_startcoords, test_labels_pos, test_labels_size = \
+        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
@@ -98,7 +100,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                              ],
                   verbose=2)
 
-        evaluation = evaluate_model(model, test_path, testing_examples, image_size=image_size)
+        evaluation = evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, test_labels_size)
 
         # Plotte loss
         if save_results:
@@ -216,9 +218,8 @@ def make_example_jsons(example_examples, example_path, model, image_size):
         # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
 
-def evaluate_model(model, test_path, testing_examples, image_size):
-    test_sequences, test_startcoords, test_labels_pos, test_labels_size =\
-        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
+def evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, test_labels_size):
+
 
     evaluation = model.evaluate([test_sequences, test_startcoords], [test_labels_pos, test_labels_size], verbose=0)
     print("\nEvaluering: ", evaluation, end="\n\n")
@@ -227,15 +228,15 @@ def evaluate_model(model, test_path, testing_examples, image_size):
 
 def main():
     # Oppsett
-    save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
+    save_results = True  # Husk denne! Lagrer vekter, plott og stdout.
     load_saved_weights = False
     do_training = True
     make_predictions = True
-    training_examples = 50
-    testing_examples = 10
+    training_examples = 100000
+    testing_examples = 10000
     example_examples = 100
     patience_before_lowering_lr = 8
-    image_size = 64
+    image_size = 32
 
     for i in range(1):  # Kjøre de angitte eksperimentene
         global RUN_ID
