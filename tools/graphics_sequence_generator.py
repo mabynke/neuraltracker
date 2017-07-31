@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 
 import numpy as np
@@ -75,6 +76,8 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         # Oppdatere posisjon og fart til neste bilde/tidssteg
         pos_x += speed_x
         pos_y += speed_y
+        # burde vi ha en deskaleringsfaktor her? unngå ukontrollert økning
+        # i fart for lange sekvenser?
         speed_x += random.gauss(0, 0.03 * size_x)
         speed_y += random.gauss(0, 0.03 * size_y)
 
@@ -199,9 +202,10 @@ def create_train_test_examples(path, counts, figures=1):
 
 
 def main():
+    os.chdir(os.path.dirname(sys.argv[0]))
     test_examples = 10000
     train_examples = 0
-    default_path = "/home/mby/Grafikk/tilfeldig_relativeKoordinater"
+    default_path = "../Grafikk/tilfeldig_relativeKoordinater"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":
