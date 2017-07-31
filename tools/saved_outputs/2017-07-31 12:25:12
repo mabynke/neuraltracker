@@ -1,0 +1,430 @@
+run_name:  2017-07-31 12:25:12
+Treningseksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/train
+Testeksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/test
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 32, 32,  0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, None, 32, 32,  2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, None, 32, 32,  25632       Konv1[0][0]                      
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, None, 16, 16,  0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Konv3 (TimeDistributed)          (None, None, 16, 16,  25632       maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, None, 8, 8, 32 0           Konv3[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 2048)    0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     1049088     Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 2,681,796
+Trainable params: 2,681,796
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 100000/100000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/train
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+Epoch 1/1
+184s - loss: 0.2316 - Posisjon_ut_loss: 0.2291 - Stoerrelse_ut_loss: 0.0025
+
+Evaluering:  [0.13613725169897078, 0.13605042692422867, 8.6824524961411954e-05]
+
+Fullført runde 1/1032 (1 epoker). Brukt 3.2 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.136137251699
+
+Epoch 1/1
+186s - loss: 0.0950 - Posisjon_ut_loss: 0.0949 - Stoerrelse_ut_loss: 1.1372e-04
+
+Evaluering:  [0.059768692964315417, 0.059695069533586505, 7.3623339144978671e-05]
+
+Fullført runde 2/1032 (2 epoker). Brukt 6.4 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0597686929643
+
+Epoch 1/1
+187s - loss: 0.0603 - Posisjon_ut_loss: 0.0602 - Stoerrelse_ut_loss: 5.4036e-05
+
+Evaluering:  [0.048711901956796644, 0.048671169823408127, 4.0732222481165078e-05]
+
+Fullført runde 3/1032 (3 epoker). Brukt 9.6 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0487119019568
+
+Epoch 1/1
+186s - loss: 0.0507 - Posisjon_ut_loss: 0.0507 - Stoerrelse_ut_loss: 3.9684e-05
+
+Evaluering:  [0.043977299070358279, 0.043956770610809326, 2.0528568982263097e-05]
+
+Fullført runde 4/1032 (4 epoker). Brukt 12.9 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0439772990704
+
+Epoch 1/1
+185s - loss: 0.0446 - Posisjon_ut_loss: 0.0446 - Stoerrelse_ut_loss: 1.8801e-05
+
+Evaluering:  [0.043387103387713434, 0.043378972539305685, 8.1307527245371605e-06]
+
+Fullført runde 5/1032 (5 epoker). Brukt 16.1 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0433871033877
+
+Epoch 1/1
+186s - loss: 0.0415 - Posisjon_ut_loss: 0.0415 - Stoerrelse_ut_loss: 1.1631e-05
+
+Evaluering:  [0.037403019344806672, 0.037378706517815587, 2.4312764414935373e-05]
+
+Fullført runde 6/1032 (6 epoker). Brukt 19.3 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0374030193448
+
+Epoch 1/1
+186s - loss: 0.0392 - Posisjon_ut_loss: 0.0391 - Stoerrelse_ut_loss: 1.2142e-05
+
+Evaluering:  [0.037156465151906015, 0.037144526010751723, 1.1939190684643108e-05]
+
+Fullført runde 7/1032 (7 epoker). Brukt 22.5 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0371564651519
+
+Epoch 1/1
+186s - loss: 0.0373 - Posisjon_ut_loss: 0.0373 - Stoerrelse_ut_loss: 1.2427e-05
+
+Evaluering:  [0.039431050023436547, 0.039415177690982815, 1.587235016922932e-05]
+
+Fullført runde 8/1032 (8 epoker). Brukt 25.7 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0371564651519
+
+Epoch 1/1
+186s - loss: 0.0348 - Posisjon_ut_loss: 0.0348 - Stoerrelse_ut_loss: 1.2339e-05
+
+Evaluering:  [0.035305858579277989, 0.035293912550807001, 1.1946043937496142e-05]
+
+Fullført runde 9/1032 (9 epoker). Brukt 29.0 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0353058585793
+
+Epoch 1/1
+186s - loss: 0.0334 - Posisjon_ut_loss: 0.0334 - Stoerrelse_ut_loss: 1.1059e-05
+
+Evaluering:  [0.037085821011662481, 0.037078857278823853, 6.9637594511732459e-06]
+
+Fullført runde 10/1032 (10 epoker). Brukt 32.2 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0353058585793
+
+Epoch 1/1
+186s - loss: 0.0317 - Posisjon_ut_loss: 0.0317 - Stoerrelse_ut_loss: 1.0694e-05
+
+Evaluering:  [0.03315495328903198, 0.033145278200507167, 9.675142380001489e-06]
+
+Fullført runde 11/1032 (11 epoker). Brukt 35.4 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.033154953289
+
+Epoch 1/1
+187s - loss: 0.0313 - Posisjon_ut_loss: 0.0313 - Stoerrelse_ut_loss: 9.9900e-06
+
+Evaluering:  [0.032048019081354143, 0.032037932017445564, 1.0087122359254863e-05]
+
+Fullført runde 12/1032 (12 epoker). Brukt 38.6 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0320480190814
+
+Epoch 1/1
+187s - loss: 0.0301 - Posisjon_ut_loss: 0.0301 - Stoerrelse_ut_loss: 1.0112e-05
+
+Evaluering:  [0.031180405756831168, 0.031170192003250122, 1.0213773422583472e-05]
+
+Fullført runde 13/1032 (13 epoker). Brukt 41.9 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0311804057568
+
+Epoch 1/1
+186s - loss: 0.0288 - Posisjon_ut_loss: 0.0288 - Stoerrelse_ut_loss: 1.1896e-05
+
+Evaluering:  [0.028722372326254846, 0.028715683230757714, 6.6890738635265731e-06]
+
+Fullført runde 14/1032 (14 epoker). Brukt 45.1 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0287223723263
+
+Epoch 1/1
+186s - loss: 0.0277 - Posisjon_ut_loss: 0.0277 - Stoerrelse_ut_loss: 9.9282e-06
+
+Evaluering:  [0.028030302995443346, 0.028021369159221651, 8.9338358055101706e-06]
+
+Fullført runde 15/1032 (15 epoker). Brukt 48.3 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0280303029954
+
+Epoch 1/1
+177s - loss: 0.0278 - Posisjon_ut_loss: 0.0278 - Stoerrelse_ut_loss: 1.2959e-05
+
+Evaluering:  [0.028799547064304352, 0.028790008082985877, 9.5389708396396601e-06]
+
+Fullført runde 16/1032 (16 epoker). Brukt 51.3 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0280303029954
+
+Epoch 1/1
+170s - loss: 0.0260 - Posisjon_ut_loss: 0.0260 - Stoerrelse_ut_loss: 1.3824e-05
+
+Evaluering:  [0.030028069591522218, 0.030019955369830133, 8.1141685914190021e-06]
+
+Fullført runde 17/1032 (17 epoker). Brukt 54.3 minutter.
+Runder uten forbedring: 2/8
+Beste testloss så langt: 0.0280303029954
+
+Epoch 1/1
+169s - loss: 0.0239 - Posisjon_ut_loss: 0.0238 - Stoerrelse_ut_loss: 1.2909e-05
+
+Evaluering:  [0.025796010217070578, 0.025786783529818058, 9.2267002197331749e-06]
+
+Fullført runde 18/1032 (18 epoker). Brukt 57.2 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0257960102171
+
+Epoch 1/1
+169s - loss: 0.0230 - Posisjon_ut_loss: 0.0230 - Stoerrelse_ut_loss: 1.0756e-05
+
+Evaluering:  [0.024200575600564479, 0.024193413923680782, 7.1616595341765788e-06]
+
+Fullført runde 19/1032 (19 epoker). Brukt 60.1 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0242005756006
+
+Epoch 1/1
+169s - loss: 0.0225 - Posisjon_ut_loss: 0.0225 - Stoerrelse_ut_loss: 1.1754e-05
+
+Evaluering:  [0.025697519075870513, 0.025689780779182912, 7.738302166399081e-06]
+
+Fullført runde 20/1032 (20 epoker). Brukt 63.0 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0242005756006
+
+Epoch 1/1
+169s - loss: 0.0213 - Posisjon_ut_loss: 0.0213 - Stoerrelse_ut_loss: 1.0711e-05
+
+Evaluering:  [0.026919418445229531, 0.026909036237001419, 1.0382224649947602e-05]
+
+Fullført runde 21/1032 (21 epoker). Brukt 66.0 minutter.
+Runder uten forbedring: 2/8
+Beste testloss så langt: 0.0242005756006
+
+Epoch 1/1
+169s - loss: 0.0216 - Posisjon_ut_loss: 0.0216 - Stoerrelse_ut_loss: 9.9046e-06
+
+Evaluering:  [0.022918269571661948, 0.02291059890985489, 7.6707044761860735e-06]
+
+Fullført runde 22/1032 (22 epoker). Brukt 68.9 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0229182695717
+
+Epoch 1/1
+169s - loss: 0.0216 - Posisjon_ut_loss: 0.0216 - Stoerrelse_ut_loss: 1.1637e-05
+
+Evaluering:  [0.022842403967678546, 0.022834576603770255, 7.8273379884194581e-06]
+
+Fullført runde 23/1032 (23 epoker). Brukt 71.8 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0228424039677
+
+Epoch 1/1
+169s - loss: 0.0201 - Posisjon_ut_loss: 0.0201 - Stoerrelse_ut_loss: 1.0690e-05
+
+Evaluering:  [0.022211389513313771, 0.022197161504626275, 1.4228033019753639e-05]
+
+Fullført runde 24/1032 (24 epoker). Brukt 74.7 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0222113895133
+
+Epoch 1/1
+168s - loss: 0.0187 - Posisjon_ut_loss: 0.0187 - Stoerrelse_ut_loss: 9.1536e-06
+
+Evaluering:  [0.021632527866959572, 0.021613913361728191, 1.8614553118823098e-05]
+
+Fullført runde 25/1032 (25 epoker). Brukt 77.6 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.021632527867
+
+Epoch 1/1
+169s - loss: 0.0194 - Posisjon_ut_loss: 0.0194 - Stoerrelse_ut_loss: 1.0001e-05
+
+Evaluering:  [0.026867007300257682, 0.026840862846374512, 2.6144470612052829e-05]
+
+Fullført runde 26/1032 (26 epoker). Brukt 80.5 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.021632527867
+
+Epoch 1/1
+169s - loss: 0.0192 - Posisjon_ut_loss: 0.0192 - Stoerrelse_ut_loss: 1.0899e-05
+
+Evaluering:  [0.021940261170268059, 0.021931878679990767, 8.3825188332411933e-06]
+
+Fullført runde 27/1032 (27 epoker). Brukt 83.4 minutter.
+Runder uten forbedring: 2/8
+Beste testloss så langt: 0.021632527867
+
+Epoch 1/1
+168s - loss: 0.0208 - Posisjon_ut_loss: 0.0208 - Stoerrelse_ut_loss: 1.1593e-05
+
+Evaluering:  [0.022829518677294255, 0.022816423799097537, 1.3094881927827373e-05]
+
+Fullført runde 28/1032 (28 epoker). Brukt 86.4 minutter.
+Runder uten forbedring: 3/8
+Beste testloss så langt: 0.021632527867
+
+Epoch 1/1
+168s - loss: 0.0185 - Posisjon_ut_loss: 0.0184 - Stoerrelse_ut_loss: 1.1546e-05
+
+Evaluering:  [0.021108317492902279, 0.021101679162681103, 6.6383865185343891e-06]
+
+Fullført runde 29/1032 (29 epoker). Brukt 89.3 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0211083174929
+
+Epoch 1/1
+168s - loss: 0.0173 - Posisjon_ut_loss: 0.0173 - Stoerrelse_ut_loss: 9.7330e-06
+
+Evaluering:  [0.02058738889694214, 0.020577641494572162, 9.7474446614796766e-06]
+
+Fullført runde 30/1032 (30 epoker). Brukt 92.2 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0205873888969
+
+Epoch 1/1
+168s - loss: 0.0179 - Posisjon_ut_loss: 0.0179 - Stoerrelse_ut_loss: 1.0312e-05
+
+Evaluering:  [0.022567151373624802, 0.022559603273868561, 7.5481092178961266e-06]
+
+Fullført runde 31/1032 (31 epoker). Brukt 95.1 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0205873888969
+
+Epoch 1/1
+168s - loss: 0.0182 - Posisjon_ut_loss: 0.0182 - Stoerrelse_ut_loss: 9.1431e-06
+
+Evaluering:  [0.020108093807101251, 0.020102411651611328, 5.6821970698365474e-06]
+
+Fullført runde 32/1032 (32 epoker). Brukt 98.0 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0201080938071
+
+Epoch 1/1
+168s - loss: 0.0182 - Posisjon_ut_loss: 0.0181 - Stoerrelse_ut_loss: 1.0440e-05
+
+Evaluering:  [0.019641588474810123, 0.01962812733054161, 1.3461118996201549e-05]
+
+Fullført runde 33/1032 (33 epoker). Brukt 100.9 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0196415884748
+
+Epoch 1/1
+168s - loss: 0.0201 - Posisjon_ut_loss: 0.0201 - Stoerrelse_ut_loss: 9.2553e-06
+
+Evaluering:  [0.021486590126156807, 0.021479627974331381, 6.962130787724163e-06]
+
+Fullført runde 34/1032 (34 epoker). Brukt 103.8 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0196415884748
+
+Epoch 1/1
+167s - loss: 0.0180 - Posisjon_ut_loss: 0.0180 - Stoerrelse_ut_loss: 7.3680e-06
+
+Evaluering:  [0.019559004947543143, 0.019553184504806996, 5.8204308712447528e-06]
+
+Fullført runde 35/1032 (35 epoker). Brukt 106.7 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0195590049475
+
+Epoch 1/1
+168s - loss: 0.0185 - Posisjon_ut_loss: 0.0185 - Stoerrelse_ut_loss: 6.9575e-06
+
+Evaluering:  [0.023482466554641725, 0.023475806611776354, 6.6598792043805591e-06]
+
+Fullført runde 36/1032 (36 epoker). Brukt 109.6 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0195590049475
+
+Epoch 1/1
+168s - loss: 0.0182 - Posisjon_ut_loss: 0.0182 - Stoerrelse_ut_loss: 6.4134e-06
+
+Evaluering:  [0.019481431803107262, 0.01947812163680792, 3.310134799903608e-06]
+
+Fullført runde 37/1032 (37 epoker). Brukt 112.5 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0194814318031
+
+Epoch 1/1
+169s - loss: 0.0168 - Posisjon_ut_loss: 0.0168 - Stoerrelse_ut_loss: 5.8821e-06
+
+Evaluering:  [0.021036618600785734, 0.02103024783283472, 6.370771361980587e-06]
+
+Fullført runde 38/1032 (38 epoker). Brukt 115.4 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0194814318031
+
+Epoch 1/1
+169s - loss: 0.0173 - Posisjon_ut_loss: 0.0173 - Stoerrelse_ut_loss: 7.3903e-06
+
+Evaluering:  [0.021215153622627259, 0.02120844815224409, 6.7055110746878201e-06]
+
+Fullført runde 39/1032 (39 epoker). Brukt 118.3 minutter.
+Runder uten forbedring: 2/8
+Beste testloss så langt: 0.0194814318031
+
+Epoch 1/1
+167s - loss: 0.0177 - Posisjon_ut_loss: 0.0176 - Stoerrelse_ut_loss: 6.8973e-06
+
+Evaluering:  [0.018309514349699019, 0.018304610413312911, 4.9039448014809749e-06]
+
+Fullført runde 40/1032 (40 epoker). Brukt 121.2 minutter.
+Lagret vekter til  saved_weights/2017-07-31 12:25:12.h5
+Beste testloss så langt: 0.0183095143497
+
+Epoch 1/1
+169s - loss: 0.0157 - Posisjon_ut_loss: 0.0157 - Stoerrelse_ut_loss: 8.1804e-06
+
+Evaluering:  [0.018895000077784063, 0.018883941838145256, 1.1058292607776821e-05]
+
+Fullført runde 41/1032 (41 epoker). Brukt 124.1 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.0183095143497
+
+Epoch 1/1
+168s - loss: 0.0208 - Posisjon_ut_loss: 0.0208 - Stoerrelse_ut_loss: 8.8861e-06
+
+Evaluering:  [0.024174117569625377, 0.024166490450501441, 7.6270713718258773e-06]
+
+Fullført runde 42/1032 (42 epoker). Brukt 127.0 minutter.
+Runder uten forbedring: 2/8
+Beste testloss så langt: 0.0183095143497
+
+Epoch 1/1
+168s - loss: 0.0181 - Posisjon_ut_loss: 0.0181 - Stoerrelse_ut_loss: 8.8537e-06
+
+Evaluering:  [0.019353558088839054, 0.019348653338849546, 4.9047584288928189e-06]
+
+Fullført runde 43/1032 (43 epoker). Brukt 129.9 minutter.
+Runder uten forbedring: 3/8
+Beste testloss så langt: 0.0183095143497
+
+Epoch 1/1

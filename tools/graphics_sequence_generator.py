@@ -62,8 +62,8 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
     color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
-    for frame in range(frames):                                                                     # For hvert bilde i sekvensen
-        draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=color)   # Tegne inn firkant i bildet
+    for frame in range(frames):  # For hvert bilde i sekvensen
+        draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=color)  # Tegne inn firkant i bildet
 
         # Lagre merkelapp for dette bildet
         x = pos_x / size_x * 2 - 1
@@ -76,7 +76,7 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         # Oppdatere posisjon og fart til neste bilde/tidssteg
         pos_x += speed_x
         pos_y += speed_y
-        # burde vi ha en deskaleringsfaktor her? unngå ukontrollert økning
+        # TODO: burde vi ha en deskaleringsfaktor her? unngå ukontrollert økning
         # i fart for lange sekvenser?
         speed_x += random.gauss(0, 0.03 * size_x)
         speed_y += random.gauss(0, 0.03 * size_y)

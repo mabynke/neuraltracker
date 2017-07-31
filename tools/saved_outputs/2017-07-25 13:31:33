@@ -1,0 +1,52 @@
+run_name:  2017-07-25 13:31:33
+Treningseksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/train
+Testeksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/test
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 64, 64,  0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, None, 60, 60,  2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, None, 56, 56,  25632       Konv1[0][0]                      
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, None, 28, 28,  0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Konv3 (TimeDistributed)          (None, None, 24, 24,  25632       maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, None, 12, 12,  0           Konv3[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 4608)    0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     2359808     Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 3,992,516
+Trainable params: 3,992,516
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 10000/100000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/train
+Epoch 1/1
+39s - loss: 0.4219 - Posisjon_ut_loss: 0.4120 - Stoerrelse_ut_loss: 0.0099
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+
+Evaluering:  [0.19218323907852172, 0.18688063976764679, 0.0053025992438197134]
+
+Fullført runde 1/1032 (1 epoker). Brukt 2.6 minutter.
+Lagret vekter til  saved_weights/2017-07-25 13:31:33.h5
+Beste testloss så langt: 0.192183239079
+
+Epoch 1/1

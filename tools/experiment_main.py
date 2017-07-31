@@ -5,8 +5,10 @@ import time
 # from tools import data_io  # For kjøring fra PyCharm
 import data_io  # For kjøring fra terminal
 import plotting
+import tf_tracker
 
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
+# Ta GPU-enhet som argument
+os.environ["CUDA_VISIBLE_DEVICES"]=sys.argv[1]
 
 from keras.callbacks import TerminateOnNaN, TensorBoard
 from keras.layers import Input
@@ -28,10 +30,10 @@ def create_model(image_size, interface_vector_length, state_vector_length):
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv1")(input_sequence)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv2")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv1")(input_sequence)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv2")(x)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv3")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv3")(x)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
@@ -58,7 +60,8 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
                           training_examples, training_path, test_path, testing_examples, weights_path, run_name,
                           round_patience, load_prevous_weigths, do_training, save_results):
     # Bygge modellen
-    model = create_model(image_size, interface_vector_length, state_vector_length)
+    # model = create_model(image_size, interface_vector_length, state_vector_length)
+    model = tf_tracker.create_model(image_size, interface_vector_length, state_vector_length)
     model.compile(optimizer=Adam(), loss=["mean_squared_error", "mean_squared_error"], loss_weights=[1, 1])
 
     print("Oppsummering av nettet:")
@@ -68,7 +71,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     if load_prevous_weigths:
         print("Laster inn vekter fra ", weights_path)
         model.load_weights(weights_path)
-        evaluate_model(model, test_path, testing_examples)
+        # evaluate_model(model, test_path, testing_examples)
     if do_training:
         print("Begynner trening.")
         train_model(model, round_patience, weights_path, tensorboard_log_dir, test_path, testing_examples,
@@ -84,6 +87,8 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
 
     train_seq, train_startcoords, train_labels_pos, train_labels_size = data_io.fetch_seq_startcoords_labels(
         training_path, training_examples, output_size=image_size)
+    test_sequences, test_startcoords, test_labels_pos, test_labels_size = \
+        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
@@ -98,7 +103,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                              ],
                   verbose=2)
 
-        evaluation = evaluate_model(model, test_path, testing_examples, image_size=image_size)
+        evaluation = evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, test_labels_size)
 
         # Plotte loss
         if save_results:
@@ -175,12 +180,15 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
     # default_test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
     # train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
     # test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
-    train_path = "../Grafikk/tilfeldig_relativeKoordinater/train"
+    train_path = "../../Grafikk/tilfeldig_relativeKoordinater/train"
     print("Treningseksempler hentes fra ", train_path)
-    test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
+    test_path = "../../Grafikk/tilfeldig_relativeKoordinater/test"
     example_path = test_path
     print("Testeksempler hentes fra ", test_path)
-    weights_path = os.path.join("saved_weights", run_name + ".h5")
+    if load_weights:
+        weights_path = os.path.join("saved_weights", input("Skriv filnavnet til vektene som skal lastes inn (ikke inkludert \".h5\"):") + ".h5")
+    else:
+        weights_path = os.path.join("saved_weights", run_name + ".h5")
     tensorboard_log_dir = "tensorboard_logs"
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, tensorboard_log_dir,
@@ -216,9 +224,8 @@ def make_example_jsons(example_examples, example_path, model, image_size):
         # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
 
-def evaluate_model(model, test_path, testing_examples, image_size):
-    test_sequences, test_startcoords, test_labels_pos, test_labels_size =\
-        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
+def evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, test_labels_size):
+
 
     evaluation = model.evaluate([test_sequences, test_startcoords], [test_labels_pos, test_labels_size], verbose=0)
     print("\nEvaluering: ", evaluation, end="\n\n")
@@ -226,17 +233,17 @@ def evaluate_model(model, test_path, testing_examples, image_size):
 
 
 def main():
-    os.chdir(os.path.dirname(sys.argv[0])) # set working directory to that of the script
+    os.chdir(os.path.dirname(sys.argv[0]))  # set working directory to that of the script
     # Oppsett
-    save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
+    save_results = True  # Husk denne! Lagrer vekter, plott og stdout.
     load_saved_weights = False
     do_training = True
     make_predictions = True
-    training_examples = 50
-    testing_examples = 10
+    training_examples = 100000
+    testing_examples = 10000
     example_examples = 100
     patience_before_lowering_lr = 8
-    image_size = 64
+    image_size = 32
 
     for i in range(1):  # Kjøre de angitte eksperimentene
         global RUN_ID
