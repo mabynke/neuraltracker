@@ -86,6 +86,7 @@ def create_model(image_size, interface_vector_length, state_vector_length):
 
 def main():
     os.chdir(os.path.dirname(sys.argv[0])) # set working directory to that of the script
+
     sess = tf.Session()
     image_size = 32
     interface_vector_length = 512
@@ -100,6 +101,7 @@ def main():
         log_dir,
         graph=sess.graph)
 
+    model.summary()  # Skrive ut en oversikt over modellen
 
 if __name__ == "__main__":
     main()
