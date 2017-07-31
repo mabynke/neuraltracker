@@ -1,5 +1,7 @@
 import os
 import sys
+
+import tensorflow as tf
 from keras.layers import Input
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers.core import Dense, Flatten
@@ -8,6 +10,43 @@ from keras.layers.wrappers import TimeDistributed
 from keras.models import Model
 from keras.optimizers import Adam
 import tensorflow as tf
+from keras.engine.topology import Layer
+
+# TODO: change padding from 'valid' to 'same'
+# TODO: not hand-code sequence_length, may also change to None?
+sequence_length = 12
+
+class GRULayer(Layer):
+
+    def __init__(self, state_size, **kwargs):
+        self.state_size = state_size
+        super(GRULayer, self).__init__(**kwargs)
+
+    def build(self, input_shape):
+        # Create a trainable weight variable for this layer.
+        self.gru = tf.contrib.rnn.GRUCell(self.state_size)
+        self._trainable_weights = self.gru._trainable_weights
+        # TODO: add trainable weights
+        super(GRULayer, self).build(input_shape)  # Be sure to call this somewhere!
+
+    def call(self, inputs):
+        x, coded_cords = inputs
+        self.state = coded_cords
+        outputs = []
+        for frame in range(sequence_length):
+            # assume x has shape [batch_size, sequence_length, interface_vector_length]
+            output, self.state = self.gru(x[:, frame, :], self.state)
+            outputs.append(output)
+        x = tf.stack(outputs, axis=1)
+        return x
+
+    def compute_output_shape(self, input_shape):
+        data_input = input_shape[0]
+        output_shape = list(data_input)
+        output_shape[-1] = self.state_size
+        return tuple(output_shape)
+
+
 
 
 def create_model(image_size, interface_vector_length, state_vector_length):
