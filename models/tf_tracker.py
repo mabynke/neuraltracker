@@ -70,15 +70,11 @@ def create_model(image_size, interface_vector_length, state_vector_length):
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu"), name="Grensesnittvektorer")(x)
-    # Kode og sette inn informasjon om startkoordinater
-    coords = Dense(units=state_vector_length, activation="relu", name="Kodede_koordinater")(input_coordinates)
 
-    # Behandle sekvens av grensesnittvektorer med LSTM
-    x = GRU(units=state_vector_length,
-            dropout=0.5,
-            recurrent_dropout=0.0,
-            return_sequences=True,
-            name="GRU-lag1")(x, initial_state=coords)
+    coded_coords = Dense(units=state_vector_length, activation="relu", name="Kodede_koordinater")(input_coordinates)
+    with tf.name_scope("GRULag"):
+        # Kode og sette inn informasjon om startkoordinater
+        x = GRULayer(state_vector_length)([x, coded_coords])
 
     # Dekode til koordinater
     position = TimeDistributed(Dense(units=2, activation="linear"), name="Posisjon_ut")(x)
