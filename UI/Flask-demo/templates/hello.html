@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block body %}
+
+  <h1> Welcome to the hello part of the page </h1>
+  {% if name %}
+  	<b>Hello <i> {{ name }}! </i> </b>
+  {% else %}
+  	<b>Hello, World!</b>
+  {% endif %}
+
+{% endblock %}

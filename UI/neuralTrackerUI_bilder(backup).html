@@ -21,7 +21,11 @@
 		}
 
 		b {
-			font-size: 15px;
+			font-size: 15px
+		}
+
+		canvas {
+			/*border: 10px; */
 		}
 
 		.button {
@@ -84,15 +88,14 @@
     	var json_labels = prompt("Enter the name of the labels jsonfile (correct answer)","labels0.json");
     	var json_predict = prompt("Enter the name of the AI prediction jsonfile", "predictions.json");
 
-    	var scale = 1; // har ingen funksjon, men må fjernes fra hele dokumentet for å fungere.
-    	var current_mode = 1; // 0 - write, 1 - ai mode.
+    	var scale = 1;
+    	var current_mode = 1 // 0 - write, 1 - ai mode.
 
 
     	var clear_image = false;
-  		var current_mode = 1; // 0 - write, 1 - ai mode.
-  		var img_amount = 1000; // just a random high number, is changed in the code later to be the number of marked pictures of a spesific object.
+  		var current_mode = 1 // 0 - write, 1 - ai mode.
+  		var img_amount = 1000 // just a random high number, is changed in the code later to be the number of marked pictures of a spesific object.
 
-  		var json_string = '?'
 
   		function getFolderName() {
   			// finner filnavn, basert på hvilken verdi "foldernum" har. Hvis input filnavnet ikke er på formen STRENG00000 vil ikke foldernavnet endres.
@@ -107,10 +110,8 @@
 			if (isnum) {
 					var foldername_beginning = foldername.replace(foldername_end, "");
 					new_foldername = foldername_beginning + "0".repeat(5 - foldernum.toString().length) + foldernum.toString();
-
 					return new_foldername;
 			}
-
 			else {
 				return foldername;
 			}
@@ -172,6 +173,7 @@
 			// skaffer koordinatene hver gang et museklikk blir registert, når man har klikket to ganger tegnes det en firkant fra det første klikk-koordinatene til det andre.
 
 			getCoordinates(event);
+			//scale = 1; //used for previous scaling feature
 
 			if (click_coords.length == 4) {
 				var img = new Image();
@@ -179,6 +181,27 @@
 
 				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3], "#4CAF50");
 			}
+
+			/*
+			if (click_coords.length == 6) { // Bør slettes, skulle potensiellt bli en funksjon som lar bruker modifisere firkanten før den ble sent til click_coords
+				var x_within = click_coords[4] < click_coords[2] && click_coords[4] > click_coords[0];
+
+				var y_within = click_coords[5] < click_coords[3] && click_coords[5] > click_coords[1];
+
+				if (x_within && y_within){
+					alert('within box!');
+
+					click_coords.splice(4,2);
+					}
+
+				else {
+					click_coords.splice(4,2);
+
+					alert('outside of box!');
+					}
+			}
+			scale = 1;'
+			*/
 		}
 
 		function drawSquare(x_A,y_A,x_C,y_C, colour = "#008CBA"){
@@ -248,14 +271,11 @@
     	}
 
     	function changeFolder(i) {
-    		pic_num = 0;
-    		obj_nr = 0;
-
     		foldernum = (foldernum + i) % 5 ; // NB, only works with 5 folders
     		foldername = getFolderName();
 
-    		//pic_num = 0;
-    		//obj_nr = 0;
+    		pic_num = 0;
+    		obj_nr = 0;
 
 			onLoad();
     	}
@@ -312,9 +332,24 @@
     	}
 
     	function jsonify() {
-    		json_string = JSON.stringify(json_file);
-			console.log(json_string);
+    		// gjør om listen 'json_file' til en faktisk json fil, som kan bli lastet ned ved å trykke på lenken som dukker opp på skjermen når funksjonen jsonify er kallt. 
+
+    		var json = JSON.stringify(json_file);
+    		alert(json)
+    		
+			console.log(json);
+
+			var blob = new Blob([json], {type: "application/json"});
+			var url  = URL.createObjectURL(blob);
+
+			var a = document.createElement('a');
+			a.download    = "labels.json";
+			a.href        = url;
+			a.textContent = "***Download labels.json for " + foldername + "***";
+
+			document.getElementById('content').appendChild(a);
     	}
+
 
     	function changeMode() {
     		// endrer mellom lese-modus(tegner firkanter for fasit og AIs gjettning) og skrive-modus(skriver json fil, ved å tegne firkanter)
@@ -336,24 +371,15 @@
 			getJsonData(json_predict, json_predict_data);
 			imagename = json_labels_data[4];
 
-			/*
-			if (imagename == undefined) {
-				imagename = "00000001.jpg"; // bør ideelt være første bildet i sekvensen
-			}
-			*/
-			
-			console.log(imagename)
-
     		var img = new Image();
   			img.src = input_location + "/" + foldername + "/" + imagename;  // "/frame00000.jpg";
 
   			//alert('waiting...'); // neccesary so far...
 
-  			console.log(img.src)
 
   			setTimeout(function(){
 
-			c.height = original_height; // Denne er veldig asynkron (console.log(original_width) for å se)
+			c.height = original_height;
     		c.width = original_width;
 
     		ctx.drawImage(img, 0, 0, original_width*scale, original_height*scale); // drawImage(img, 0, 0, width, height) draws image onto canvas
@@ -421,8 +447,27 @@
 
 		window.onload = onLoad();
 
+		/*
+		Putt dette der det passer!
+
+		Dette funker ikke!
+		var slider = document.createElement('INPUT');
+		slider.setAttribute("id", "myRange");
+		slider.setAttribute("type", "range");
+		slider.setAttribute("min", 0);
+		slider.setAttribute("max", img_amount);
+		slider.setAttribute("step", 1);
+		slider.setAttribute("value", img_amount);
+		slider.setAttribute("oninput", alert('ey'));
+		document.body.appendChild(slider);
+		*/
+
 
 	</script> <br>
+	<!--
+	<input id="slider" type="range" min = "0" max = img_amount value = "0" step = "1" oninput = alert(value) />
+	<br/>
+	-->
 
 	<b>Folder: </b>
 	<i id = "folderTitle""></i>
@@ -443,10 +488,12 @@
 		document.getElementById("imgAmount").innerHTML = img_amount;
 
 		function inputPicnum() {
+			//alert('img_amount: ' + img_amount)
 			var new_picnum = document.getElementById("inputPicNum").value;
 
 			if (new_picnum >= 0 && new_picnum <= img_amount) {
 				pic_num =  Number(new_picnum);
+				//alert('pic_num changed to: ' + pic_num);
 				onLoad();
 			}
 			else {
@@ -456,11 +503,14 @@
 
 	</script>
 	<br> <br>
+	<!--
+	 </i> <b> out of </b> <i id ="imgAmount"> unknown lol <i/> <br>
+	-->
 
 	<i id = "info" style = "font-size: 13px; color: #66b3ff"> Press up/down arrow keys to change folder, left/right arrow keys to change picture, <br> A/D to change object, enter to submit image number .</i> <br> <br>
 
 
-	<button class="button" onclick= "sendData(); jsonify();" > Save training data </button> <!-- knapp gjorde før jsonifyFile(); i stedenfor å lage en json streng --> 
+	<button class="button" onclick= "sendData(); jsonify();" > Save training data </button>
 	<button class="button" onclick= "clear_image = true; onLoad();" > Clear image </button>
 	<button class="button" onclick= "changeMode();" >Change mode</button>
 
