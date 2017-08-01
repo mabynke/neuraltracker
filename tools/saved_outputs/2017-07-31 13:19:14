@@ -474,3 +474,61 @@ Runder uten forbedring: 4/8
 Beste testloss så langt: 0.0220467062235
 
 Epoch 1/1
+93s - loss: 0.0043 - Posisjon_ut_loss: 0.0043 - Stoerrelse_ut_loss: 2.2599e-06
+
+Evaluering:  [0.022251851093769072, 0.022250199493765832, 1.6516532539753825e-06]
+
+Fullført runde 49/1032 (49 epoker). Brukt 79.4 minutter.
+Runder uten forbedring: 5/8
+Beste testloss så langt: 0.0220467062235
+
+Epoch 1/1
+93s - loss: 0.0041 - Posisjon_ut_loss: 0.0041 - Stoerrelse_ut_loss: 1.7117e-06
+
+Evaluering:  [0.022452383492887019, 0.022450738903880118, 1.6446337987872539e-06]
+
+Fullført runde 50/1032 (50 epoker). Brukt 81.0 minutter.
+Runder uten forbedring: 6/8
+Beste testloss så langt: 0.0220467062235
+
+Epoch 1/1
+93s - loss: 0.0040 - Posisjon_ut_loss: 0.0040 - Stoerrelse_ut_loss: 1.6940e-06
+
+Evaluering:  [0.022310735014081002, 0.022309068082273006, 1.6669210886902875e-06]
+
+Fullført runde 51/1032 (51 epoker). Brukt 82.6 minutter.
+Runder uten forbedring: 7/8
+Beste testloss så langt: 0.0220467062235
+
+Epoch 1/1
+93s - loss: 0.0038 - Posisjon_ut_loss: 0.0038 - Stoerrelse_ut_loss: 1.6529e-06
+
+Evaluering:  [0.02261061304435134, 0.022609201921522618, 1.4111994287304698e-06]
+
+Fullført runde 52/1032 (52 epoker). Brukt 84.2 minutter.
+Runder uten forbedring: 8/8
+Senket læringsrate til 1e-05
+Beste testloss så langt: 0.0220467062235
+
+Epoch 1/1
+93s - loss: 0.0035 - Posisjon_ut_loss: 0.0035 - Stoerrelse_ut_loss: 1.3720e-06
+
+Evaluering:  [0.022583897131681442, 0.022582573923468591, 1.3232331715698819e-06]
+
+Fullført runde 53/1032 (53 epoker). Brukt 85.8 minutter.
+Runder uten forbedring: 9/8
+Beste testloss så langt: 0.0220467062235
+
+Epoch 1/1
+93s - loss: 0.0035 - Posisjon_ut_loss: 0.0035 - Stoerrelse_ut_loss: 1.3621e-06
+
+Evaluering:  [0.02258676558583975, 0.022585432861000298, 1.3327326703802101e-06]
+
+Fullført runde 54/1032 (54 epoker). Brukt 87.5 minutter.
+Runder uten forbedring: 10/8
+Laster inn vekter fra  saved_weights/2017-07-31 13:19:14.h5
+Henter 100/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+Debug-info fra make_example_jsons():
+len(predictions): 2
+len(predictions[0]): 100
+len(predictions[0][0]): 12

@@ -1,14 +1,16 @@
 import os
 import sys
 import time
+import numpy
 
 # from tools import data_io  # For kjøring fra PyCharm
 import data_io  # For kjøring fra terminal
 import plotting
-import tf_tracker
+# import tf_tracker
 
-# Ta GPU-enhet som argument
-os.environ["CUDA_VISIBLE_DEVICES"]=sys.argv[1]
+# Tar GPU-enhet som første argument
+os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
+os.environ["CUDA_VISIBLE_DEVICES"] = sys.argv[1]
 
 from keras.callbacks import TerminateOnNaN, TensorBoard
 from keras.layers import Input
@@ -30,11 +32,14 @@ def create_model(image_size, interface_vector_length, state_vector_length):
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv1")(input_sequence)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv2")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="same"), name="Konv1")(input_sequence)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="valid"), name="Konv3")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv2")(x)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv3")(x)
+    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling3")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv4")(x)
+    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling4")(x)
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu"), name="Grensesnittvektorer")(x)
@@ -61,7 +66,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
                           round_patience, load_prevous_weigths, do_training, save_results):
     # Bygge modellen
     # model = create_model(image_size, interface_vector_length, state_vector_length)
-    model = tf_tracker.create_model(image_size, interface_vector_length, state_vector_length)
+    model = create_model(image_size, interface_vector_length, state_vector_length)
     model.compile(optimizer=Adam(), loss=["mean_squared_error", "mean_squared_error"], loss_weights=[1, 1])
 
     print("Oppsummering av nettet:")
@@ -85,9 +90,9 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                 training_examples, training_path, run_name, save_results, image_size):
     epoches_per_round = 1
 
-    train_seq, train_startcoords, train_labels_pos, train_labels_size = data_io.fetch_seq_startcoords_labels(
-        training_path, training_examples, output_size=image_size)
-    test_sequences, test_startcoords, test_labels_pos, test_labels_size = \
+    train_seqs, train_startcoords, train_labels_pos, train_labels_size =\
+        data_io.fetch_seq_startcoords_labels(training_path, training_examples, output_size=image_size)
+    test_seqs, test_startcoords, test_labels_pos, test_labels_size = \
         data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
@@ -96,29 +101,52 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
     num_of_rounds_without_improvement = 0
     max_num_of_rounds = int(1032 / epoches_per_round)
     time_at_start = os.times().elapsed
-    for i in range(max_num_of_rounds):
-        fit_history = model.fit(x=[train_seq, train_startcoords], y=[train_labels_pos, train_labels_size], epochs=epoches_per_round,
-                  callbacks=[TerminateOnNaN()  # EarlyStopping(monitor="loss", patience=4),
-                             # TensorBoard(log_dir=tensorboard_log_dir)],
-                             ],
-                  verbose=2)
+    for round_index in range(max_num_of_rounds):
+        train_loss_history = []
+        test_loss_history = []
 
-        evaluation = evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, test_labels_size)
+        # Trene
+        print("Trener ...")
+        for j in range(len(train_seqs)):  # For hver objektsekvens i treningssettet
+            train_losses = model.train_on_batch(x=[numpy.array(train_seqs[j:j+1]),
+                                                   numpy.array(train_startcoords[j:j+1])],
+                                                y=[numpy.array(train_labels_pos[j:j+1]),
+                                                   numpy.array(train_labels_size[j:j+1])])
+            train_loss_history.append(train_losses)
 
-        # Plotte loss
+        train_loss_history = numpy.array(train_loss_history)
+        train_loss = (numpy.mean(train_loss_history[:, 0]),
+                      numpy.mean(train_loss_history[:, 1]),
+                      numpy.mean(train_loss_history[:, 2]))
+        print("Treningsloss:", train_loss)
+
+        # Teste
+        print("Tester ...")
+        for j in range(len(test_seqs)):  # For hver objektsekvens i testsettet
+            test_losses = model.test_on_batch(x=[numpy.array(test_seqs[j:j+1]),
+                                                 numpy.array(test_startcoords[j:j+1])],
+                                              y=[numpy.array(test_labels_pos[j:j+1]),
+                                                 numpy.array(test_labels_size[j:j+1])])
+            test_loss_history.append(test_losses)
+
+        test_loss_history = numpy.array(test_loss_history)
+        test_loss = (numpy.mean(test_loss_history[:, 0]),
+                     numpy.mean(test_loss_history[:, 1]),
+                     numpy.mean(test_loss_history[:, 2]))
+        print("Testloss:", test_loss)
+
         if save_results:
-            train_loss = (fit_history.history["loss"][0], fit_history.history["Posisjon_ut_loss"][0], fit_history.history["Stoerrelse_ut_loss"][0])
-            test_loss = tuple(evaluation)
+            # Plotte loss
             loss_history.append((train_loss, test_loss))
             plotting.plot_loss_history(loss_history, run_name)
 
         print("Fullført runde {0}/{1} ({2} epoker). Brukt {3} minutter."
-              .format(i + 1,
+              .format(round_index + 1,
                       max_num_of_rounds,
-                      (i + 1) * epoches_per_round,
+                      (round_index + 1) * epoches_per_round,
                       round((os.times().elapsed - time_at_start) / 60, 1)))
 
-        if evaluation[0] >= best_loss:
+        if train_loss[0] >= best_loss:
             num_of_rounds_without_improvement += 1
             print("Runder uten forbedring: {0}/{1}".format(num_of_rounds_without_improvement, round_patience))
             if num_of_rounds_without_improvement == round_patience:  # Senke læringsrate
@@ -131,11 +159,11 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                 break
         else:
             num_of_rounds_without_improvement = 0
-            best_loss = evaluation[0]
+            best_loss = train_loss[0]
             if save_results:
                 model.save_weights(save_weights_path, overwrite=True)
                 print("Lagret vekter til ", save_weights_path)
-        print("Beste testloss så langt:", best_loss)
+        print("Beste treningsloss så langt:", best_loss)
         print()
 
 
@@ -180,9 +208,9 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
     # default_test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
     # train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
     # test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
-    train_path = "../../Grafikk/tilfeldig_relativeKoordinater/train"
+    train_path = "../../Grafikk/urbantracker"
     print("Treningseksempler hentes fra ", train_path)
-    test_path = "../../Grafikk/tilfeldig_relativeKoordinater/test"
+    test_path = "../../Grafikk/urbantracker"
     example_path = test_path
     print("Testeksempler hentes fra ", test_path)
     if load_weights:
@@ -238,12 +266,12 @@ def main():
     save_results = True  # Husk denne! Lagrer vekter, plott og stdout.
     load_saved_weights = False
     do_training = True
-    make_predictions = True
-    training_examples = 100000
-    testing_examples = 10000
+    make_predictions = False
+    training_examples = 0
+    testing_examples = 0
     example_examples = 100
     patience_before_lowering_lr = 8
-    image_size = 32
+    image_size = 128
 
     for i in range(1):  # Kjøre de angitte eksperimentene
         global RUN_ID
@@ -253,7 +281,7 @@ def main():
             do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training,
                    make_predictions, round_patience=patience_before_lowering_lr, save_results=save_results,
                    image_size=image_size)
-        except Exception as e:
+        except IOError as e:
             print("Det skjedde en feil med kjøring nr.", RUN_ID)
             print(e)
 

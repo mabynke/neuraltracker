@@ -1,0 +1,351 @@
+run_name:  2017-08-01 14:40:56
+Treningseksempler hentes fra  ../../Grafikk/urbantracker
+Testeksempler hentes fra  ../../Grafikk/urbantracker
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 128, 128 0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, None, 128, 128 2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, None, 128, 128 25632       Konv1[0][0]                      
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, None, 64, 64,  0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Konv3 (TimeDistributed)          (None, None, 64, 64,  25632       maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, None, 32, 32,  0           Konv3[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 32768)   0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     16777728    Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 18,410,436
+Trainable params: 18,410,436
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 7/7 sekvenser fra mappe: ../../Grafikk/urbantracker
+Bildestørrelse: 128*128
+Fant 20 objektsekvenser i seq00000.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 16 objektsekvenser i seq00001.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels15.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 28 objektsekvenser i seq00002.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 29 objektsekvenser i seq00003.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 53 objektsekvenser i seq00004.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels41.json
+Laster inn fra labels43.json
+Laster inn fra labels5.json
+Laster inn fra labels31.json
+Laster inn fra labels50.json
+Laster inn fra labels1.json
+Laster inn fra labels45.json
+Laster inn fra labels16.json
+Laster inn fra labels37.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels29.json
+Laster inn fra labels38.json
+Laster inn fra labels2.json
+Laster inn fra labels51.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels48.json
+Laster inn fra labels49.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels35.json
+Laster inn fra labels42.json
+Laster inn fra labels52.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels46.json
+Laster inn fra labels47.json
+Laster inn fra labels40.json
+Laster inn fra labels36.json
+Laster inn fra labels39.json
+Laster inn fra labels44.json
+Laster inn fra labels30.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels34.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels32.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels33.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 0 objektsekvenser i test.
+Fant 0 objektsekvenser i train.
+Henter 7/7 sekvenser fra mappe: ../../Grafikk/urbantracker
+Bildestørrelse: 128*128
+Fant 20 objektsekvenser i seq00000.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 16 objektsekvenser i seq00001.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels15.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 28 objektsekvenser i seq00002.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 29 objektsekvenser i seq00003.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 53 objektsekvenser i seq00004.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels41.json
+Laster inn fra labels43.json
+Laster inn fra labels5.json
+Laster inn fra labels31.json
+Laster inn fra labels50.json
+Laster inn fra labels1.json
+Laster inn fra labels45.json
+Laster inn fra labels16.json
+Laster inn fra labels37.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels29.json
+Laster inn fra labels38.json
+Laster inn fra labels2.json
+Laster inn fra labels51.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels48.json
+Laster inn fra labels49.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels35.json
+Laster inn fra labels42.json
+Laster inn fra labels52.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels46.json
+Laster inn fra labels47.json
+Laster inn fra labels40.json
+Laster inn fra labels36.json
+Laster inn fra labels39.json
+Laster inn fra labels44.json
+Laster inn fra labels30.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels34.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels32.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels33.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 0 objektsekvenser i test.
+Fant 0 objektsekvenser i train.
+Trener ...
