@@ -1,0 +1,509 @@
+run_name:  2017-08-01 15:22:27
+Treningseksempler hentes fra  ../../Grafikk/urbantracker
+Testeksempler hentes fra  ../../Grafikk/urbantracker
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 128, 128 0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, None, 128, 128 2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, None, 64, 64,  0           Konv1[0][0]                      
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, None, 64, 64,  9248        maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, None, 32, 32,  0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Konv3 (TimeDistributed)          (None, None, 32, 32,  9248        maxpooling2[0][0]                
+____________________________________________________________________________________________________
+maxpooling3 (TimeDistributed)    (None, None, 16, 16,  0           Konv3[0][0]                      
+____________________________________________________________________________________________________
+Konv4 (TimeDistributed)          (None, None, 16, 16,  9248        maxpooling3[0][0]                
+____________________________________________________________________________________________________
+maxpooling4 (TimeDistributed)    (None, None, 8, 8, 32 0           Konv4[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 2048)    0           maxpooling4[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     1049088     Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 2,658,276
+Trainable params: 2,658,276
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 7/7 sekvenser fra mappe: ../../Grafikk/urbantracker
+Bildestørrelse: 128*128
+Fant 20 objektsekvenser i seq00000.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 16 objektsekvenser i seq00001.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels15.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 28 objektsekvenser i seq00002.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 29 objektsekvenser i seq00003.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 53 objektsekvenser i seq00004.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels41.json
+Laster inn fra labels43.json
+Laster inn fra labels5.json
+Laster inn fra labels31.json
+Laster inn fra labels50.json
+Laster inn fra labels1.json
+Laster inn fra labels45.json
+Laster inn fra labels16.json
+Laster inn fra labels37.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels29.json
+Laster inn fra labels38.json
+Laster inn fra labels2.json
+Laster inn fra labels51.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels48.json
+Laster inn fra labels49.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels35.json
+Laster inn fra labels42.json
+Laster inn fra labels52.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels46.json
+Laster inn fra labels47.json
+Laster inn fra labels40.json
+Laster inn fra labels36.json
+Laster inn fra labels39.json
+Laster inn fra labels44.json
+Laster inn fra labels30.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels34.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels32.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels33.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 0 objektsekvenser i test.
+Fant 0 objektsekvenser i train.
+Henter 7/7 sekvenser fra mappe: ../../Grafikk/urbantracker
+Bildestørrelse: 128*128
+Fant 20 objektsekvenser i seq00000.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 16 objektsekvenser i seq00001.
+Laster inn fra labels13.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels15.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 28 objektsekvenser i seq00002.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 29 objektsekvenser i seq00003.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 53 objektsekvenser i seq00004.
+Laster inn fra labels13.json
+Laster inn fra labels24.json
+Laster inn fra labels41.json
+Laster inn fra labels43.json
+Laster inn fra labels5.json
+Laster inn fra labels31.json
+Laster inn fra labels50.json
+Laster inn fra labels1.json
+Laster inn fra labels45.json
+Laster inn fra labels16.json
+Laster inn fra labels37.json
+Laster inn fra labels23.json
+Laster inn fra labels25.json
+Laster inn fra labels12.json
+Laster inn fra labels6.json
+Laster inn fra labels10.json
+Laster inn fra labels20.json
+Laster inn fra labels29.json
+Laster inn fra labels38.json
+Laster inn fra labels2.json
+Laster inn fra labels51.json
+Laster inn fra labels18.json
+Laster inn fra labels26.json
+Laster inn fra labels22.json
+Laster inn fra labels48.json
+Laster inn fra labels49.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels35.json
+Laster inn fra labels42.json
+Laster inn fra labels52.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels46.json
+Laster inn fra labels47.json
+Laster inn fra labels40.json
+Laster inn fra labels36.json
+Laster inn fra labels39.json
+Laster inn fra labels44.json
+Laster inn fra labels30.json
+Laster inn fra labels21.json
+Laster inn fra labels9.json
+Laster inn fra labels28.json
+Laster inn fra labels34.json
+Laster inn fra labels17.json
+Laster inn fra labels27.json
+Laster inn fra labels32.json
+Laster inn fra labels15.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels33.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Fant 0 objektsekvenser i test.
+Fant 0 objektsekvenser i train.
+Trener ...
+Treningsloss: (1.0063158, 0.97968405, 0.02663175)
+Tester ...
+Testloss: (0.29422301, 0.28114778, 0.013075209)
+Fullført runde 1/1032 (1 epoker). Brukt 1.1 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 1.00632
+
+Trener ...
+Treningsloss: (0.8184424, 0.80449915, 0.013943297)
+Tester ...
+Testloss: (0.32332692, 0.31016508, 0.013161824)
+Fullført runde 2/1032 (2 epoker). Brukt 1.6 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.818442
+
+Trener ...
+Treningsloss: (0.63191682, 0.61741257, 0.014504284)
+Tester ...
+Testloss: (0.37578279, 0.36524284, 0.010540005)
+Fullført runde 3/1032 (3 epoker). Brukt 2.1 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.631917
+
+Trener ...
+Treningsloss: (0.62204903, 0.60749114, 0.014557927)
+Tester ...
+Testloss: (0.28290704, 0.27170342, 0.01120363)
+Fullført runde 4/1032 (4 epoker). Brukt 2.7 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.622049
+
+Trener ...
+Treningsloss: (0.52205217, 0.5095157, 0.012536446)
+Tester ...
+Testloss: (0.32734126, 0.31510198, 0.012239255)
+Fullført runde 5/1032 (5 epoker). Brukt 3.2 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.522052
+
+Trener ...
+Treningsloss: (0.45037979, 0.4347156, 0.015664173)
+Tester ...
+Testloss: (0.2224136, 0.21157095, 0.01084266)
+Fullført runde 6/1032 (6 epoker). Brukt 3.8 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.45038
+
+Trener ...
+Treningsloss: (0.40900692, 0.39701587, 0.011991091)
+Tester ...
+Testloss: (0.27225399, 0.25878185, 0.013472141)
+Fullført runde 7/1032 (7 epoker). Brukt 4.3 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.409007
+
+Trener ...
+Treningsloss: (0.41826212, 0.40481663, 0.013445526)
+Tester ...
+Testloss: (0.22402434, 0.21316077, 0.010863559)
+Fullført runde 8/1032 (8 epoker). Brukt 4.8 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.409007
+
+Trener ...
+Treningsloss: (0.36006206, 0.34927848, 0.010783587)
+Tester ...
+Testloss: (0.22772737, 0.21872897, 0.0089984071)
+Fullført runde 9/1032 (9 epoker). Brukt 5.4 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.360062
+
+Trener ...
+Treningsloss: (0.34919867, 0.33687919, 0.012319442)
+Tester ...
+Testloss: (0.24868119, 0.2342272, 0.014453989)
+Fullført runde 10/1032 (10 epoker). Brukt 5.9 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.349199
+
+Trener ...
+Treningsloss: (0.36266688, 0.3528572, 0.0098096495)
+Tester ...
+Testloss: (0.23101799, 0.2219765, 0.0090415087)
+Fullført runde 11/1032 (11 epoker). Brukt 6.5 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.349199
+
+Trener ...
+Treningsloss: (0.34019312, 0.3274681, 0.012725032)
+Tester ...
+Testloss: (0.24076378, 0.23171176, 0.0090520205)
+Fullført runde 12/1032 (12 epoker). Brukt 7.0 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.340193
+
+Trener ...
+Treningsloss: (0.36838996, 0.35767782, 0.010712123)
+Tester ...
+Testloss: (0.21938418, 0.20697442, 0.012409731)
+Fullført runde 13/1032 (13 epoker). Brukt 7.5 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.340193
+
+Trener ...
+Treningsloss: (0.33230072, 0.32119486, 0.011105861)
+Tester ...
+Testloss: (0.23817235, 0.22857311, 0.0095992628)
+Fullført runde 14/1032 (14 epoker). Brukt 8.1 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.332301
+
+Trener ...
+Treningsloss: (0.32236281, 0.31073013, 0.01163267)
+Tester ...
+Testloss: (0.24839051, 0.23786947, 0.010521048)
+Fullført runde 15/1032 (15 epoker). Brukt 8.6 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.322363
+
+Trener ...
+Treningsloss: (0.34130734, 0.33077565, 0.010531727)
+Tester ...
+Testloss: (0.42765969, 0.40878001, 0.018879678)
+Fullført runde 16/1032 (16 epoker). Brukt 9.2 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.322363
+
+Trener ...
+Treningsloss: (0.35791895, 0.34478617, 0.013132758)
+Tester ...
+Testloss: (0.32426041, 0.31455454, 0.0097059179)
+Fullført runde 17/1032 (17 epoker). Brukt 9.7 minutter.
+Runder uten forbedring: 2/8
+Beste testloss så langt: 0.322363
+
+Trener ...
+Treningsloss: (0.30022624, 0.28926244, 0.010963832)
+Tester ...
+Testloss: (0.23960686, 0.23031412, 0.0092927478)
+Fullført runde 18/1032 (18 epoker). Brukt 10.2 minutter.
+Lagret vekter til  saved_weights/2017-08-01 15:22:27.h5
+Beste testloss så langt: 0.300226
+
+Trener ...
+Treningsloss: (0.3216221, 0.31138304, 0.010239071)
+Tester ...
+Testloss: (0.23442431, 0.22547635, 0.0089479517)
+Fullført runde 19/1032 (19 epoker). Brukt 10.8 minutter.
+Runder uten forbedring: 1/8
+Beste testloss så langt: 0.300226
+
+Trener ...

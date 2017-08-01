@@ -120,3 +120,22 @@ Resultat: På det beste (21 epoker) testloss 0.0244, treningsloss 0.0252. Ikke o
 
 Forsøk 2017-07-21 17:54:39:
 Skulle teste synkende læringsrate, men noe gikk sannsynligvis galt. Får loss rundt 0.23 – mye dårligere enn før.
+
+Forsøk 2017-07-25 14:30:21:
+Bildestørrelse 32*32. Usikker på hva som har blitt endret her utover at bildene blir "reskalert" fra 32*32 til 32*32.
+Mye bedre enn tidligere. Beste (71 epoker): testloss  0.0168, treningsloss 0.0072
+
+Forsøk 2017-07-31 12:25:12:
+La til padding.
+Enda mye bedre resultat: Beste (86 epoker): testloss 0.0117, treningsloss 0.0069. Ser visuelt veldig bra ut.
+
+Forsøk 2017-07-31 13:19:14:
+Kjører med tf_tracker sin make_model().
+Overfitting, mangelen på dropout er sannsynlig årsak til at beste resultat (44 epoker) var testloss 0.022, treningsloss 0.0056.
+
+Forsøk 2017-08-01 14:49:34:
+128*128-bilder fra urbantracker.
+Resultat: 
+
+Forsøk 2017-08-01 15:22:27:
+128*128-bilder fra urbantracker. Økt konvolusjon.
