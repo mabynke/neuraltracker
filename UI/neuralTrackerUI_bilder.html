@@ -97,12 +97,6 @@
   		function getFolderName() {
   			// finner filnavn, basert på hvilken verdi "foldernum" har. Hvis input filnavnet ikke er på formen STRENG00000 vil ikke foldernavnet endres.
 
-  			/*
-			if (foldernum < 0) {
-				foldernum = 0;
-			}
-			*/
-
 			var foldername_end = foldername.slice(-5);
 			var isnum = /^\d+$/.test(foldername_end);
 
@@ -120,8 +114,7 @@
 
 
 		function getJsonData(jsonfile, datalist) { // NB! bør kanskje endre picnum, til å matche filnavnet.
-			// 
-            
+
             while(datalist.length > 0) { // emptys both 'datalist' and the array 'datalist' corresponds to (e.g json_labels_data). Which datalist = [] doesn't do
     			datalist.pop();
 			}
@@ -185,7 +178,7 @@
 
 		function drawSquare(x_A,y_A,x_C,y_C, colour = "#008CBA"){
 			// tegner selve firkanten
-
+			
 			ctx.globalAlpha = 0.6; // opacity
 			ctx.lineWidth = 3; // potentially 1*scale
 			ctx.strokeStyle = colour;
@@ -198,15 +191,6 @@
 			ctx.lineTo(x_A*scale,y_A*scale);
 			ctx.lineTo(x_C*scale, y_A*scale); // for å få vekk venstre hjørne hull
 
-			ctx.stroke();
-		}
-
-		function drawSquareNew(x_A,y_A,h,w, colour = "#008CBA") { //IKKE I BRUK! Er en mulig bedre måte å tegne firkanten på. 
-			ctx.globalAlpha = 0.6;
-			ctx.lineWidth = 6;
-			ctx.strokeStyle = colour;
-
-			ctx.rect(50, 50, 50, 100);
 			ctx.stroke();
 		}
 
@@ -317,8 +301,7 @@
 
     	function jsonify() {
     		json_string = JSON.stringify(json_file);
-
-			console.log(json_string); // skal fremtidig 
+			alert(json_string); // skal fremtidig bli sent 
     	}
 
     	function changeMode() {
@@ -336,7 +319,7 @@
 			onLoad();
     	}
 
-    	function onLoad() { // initializing process.
+    	function onLoad() {
     		// får bildet til å dukke opp, canvas på bildet, tegner ulike firkanter med hensyn på hvilken modus programmet kjører i.
     		getJsonData(json_predict, json_predict_data);
     		getJsonData(json_labels, json_labels_data);
@@ -348,12 +331,6 @@
 				onLoad();
 				return;
 			}
-
-			/*
-			if (imagename == undefined) {
-				imagename = "00000001.jpg"; // bør ideelt være første bildet i sekvensen
-			}
-			*/
 
     		var img = new Image();
   			img.src = input_location + "/" + foldername + "/" + imagename;
@@ -463,12 +440,12 @@
 	</script>
 	<br> <br>
 
-	<i id = "info" style = "font-size: 13px; color: #66b3ff"> <b> info: <b> </i>
+	<i id = "info" style = "font-size: 13px; color: #66b3ff"> <b> info: </b> </i>
 
 	<i id = "info" style = "font-size: 13px; color: #66b3ff"> Press up/down arrow keys to change folder, left/right arrow keys to change picture, <br> A/D to change object, enter to submit image number .</i> <br> <br>
 
 
-	<button class="button" onclick= "sendData(); jsonify();" > Save training data </button> <!-- knapp gjorde før jsonifyFile(); i stedenfor å lage en json streng --> 
+	<button class="button" onclick= "sendData(); jsonify();" > Submit data </button>
 	<button class="button" onclick= "clear_image = true; onLoad();" > Clear image </button>
 	<button class="button" onclick= "changeMode();" >Change mode</button>
 
@@ -478,11 +455,13 @@
 	<br/>
 	<br/>
 
+	<b>
 	<i">Mouseposition in pixels: </i>
 	<i id = "MousePosPxl"></i> <br>
 
 	<i">Mouseposition coordinate-ver: </i>
 	<i id = "MousePosCoords"></i> <br>
+	</b>
 
 	<div style = "font-size: 13px"; id="content"> </div>
 </body>

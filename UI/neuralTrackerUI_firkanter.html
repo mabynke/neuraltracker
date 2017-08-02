@@ -52,14 +52,14 @@
 </head>
 <body>
 	<h1> Neural Network Tracker </h1>
-	<i id = "MODE"> Write-mode (mark the object to be tracked on each frame) </i>
+	<i id = "MODE"> Read-mode (labels: blue, AI-guess: red) </i>
 	<br/>
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<script>
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");
 
-    	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser");
+    	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser_firkanter");
 
     	var click_coords = [];
     	var json_file = [];
@@ -75,9 +75,9 @@
     	var json_labels = prompt("Please enter the name of the labels jsonfile (correct answer)","labels.json");
     	var json_predict = prompt("Please enter the name of the AI prediction jsonfile", "predictions.json");
 
-    	var scale_factor = 8; // scalefactor = 1 gir original størrelse på bildet.
+    	var scale = 10; // scalefactor = 1 gir original størrelse på bildet.
     	var clear_image = false;
-  		var current_mode = 0 // 0 - write, 1 - ai mode.
+  		var current_mode = 1; // 0 - write, 1 - ai mode.
 
 
   		function getFolderName() {
@@ -155,7 +155,7 @@
 			// skaffer koordinatene hver gang et museklikk blir registert, når man har klikket to ganger tegnes det en firkant fra det første klikk-koordinatene til det andre.
 
 			getCoordinates(event);
-			scale_factor = 1; //only works when this is set to 1.
+			scale = 1; //only works when this is set to 1.
 
 
 			if (click_coords.length == 4) {
@@ -183,23 +183,23 @@
 					//click_coords = []; // slett firkant!!
 					}
 			}
-			scale_factor = 8;
+			scale = 10;
 		}
 
 		function drawSquare(x_A,y_A,x_C,y_C, colour = "#008CBA"){
 			// tegner selve firkanten
 
 			ctx.globalAlpha = 0.8; // opacity
-			ctx.lineWidth = 6; // potentially 1*scale_factor
+			ctx.lineWidth = 6; // potentially 1*scale
 			ctx.strokeStyle = colour;
 
 			ctx.beginPath();
-			ctx.moveTo(x_A*scale_factor, y_A*scale_factor);
-			ctx.lineTo(x_C*scale_factor, y_A*scale_factor);
-			ctx.lineTo(x_C*scale_factor,y_C*scale_factor);
-			ctx.lineTo(x_A*scale_factor,y_C*scale_factor);
-			ctx.lineTo(x_A*scale_factor,y_A*scale_factor);
-			ctx.lineTo(x_C*scale_factor, y_A*scale_factor); // for å få vekk venstre hjørne hull
+			ctx.moveTo(x_A*scale, y_A*scale);
+			ctx.lineTo(x_C*scale, y_A*scale);
+			ctx.lineTo(x_C*scale,y_C*scale);
+			ctx.lineTo(x_A*scale,y_C*scale);
+			ctx.lineTo(x_A*scale,y_A*scale);
+			ctx.lineTo(x_C*scale, y_A*scale); // for å få vekk venstre hjørne hull
 
 			ctx.stroke();
 		}
@@ -261,10 +261,10 @@
     			var dict_file = {};
     			var dict_draw = {};
 
-    			var x1 = (click_coords[0] / scale_factor); // global variable is decleared without var
-    			var y1 = (click_coords[1] / scale_factor);
-    			var x2 = (click_coords[2] / scale_factor);
-    			var y2 = (click_coords[3] / scale_factor);
+    			var x1 = (click_coords[0] / scale); // global variable is decleared without var
+    			var y1 = (click_coords[1] / scale);
+    			var x2 = (click_coords[2] / scale);
+    			var y2 = (click_coords[3] / scale);
     			var filename = json_predict_coords[4];
 
     			var w = (x2-x1)/img_width;
@@ -325,7 +325,7 @@
     		// får bildet til å dukke opp, canvas på bildet, tegner ulike firkanter med hensyn på hvilken modus programmet kjører i. 
 			click_coords = [];
 
-    		img = new Image(img_width*scale_factor,img_height*scale_factor);
+    		img = new Image(img_width*scale,img_height*scale);
   			img.src = input_location + "/" + foldername + "/" + json_labels_coords[4];  // "/frame00000.jpg";
 
   			//alert('waiting...'); // neccesary so far...
@@ -334,9 +334,8 @@
 
 			c.height = img.height;
     		c.width = img.width;
-  			
 
-    		ctx.drawImage(img, 0, 0, img_width*scale_factor, img_height*scale_factor); // drawImage(img, 0, 0, width, height) draws image onto canvas
+    		ctx.drawImage(img, 0, 0, img_width*scale, img_height*scale); // drawImage(img, 0, 0, width, height) draws image onto canvas
 
             if (current_mode == 0) {// WRITE MODE!
             	document.addEventListener("mousedown", clickEvent);
@@ -375,8 +374,11 @@
     		// viser museposisjon når man 'hoverer' over bildet
 
         	var mousePos = getMousePos(c, event);
-        	var message = 'x: ' + (mousePos.x/scale_factor).toFixed(1) + 'px y: ' + (mousePos.y/scale_factor).toFixed(1) + 'px';
-        	document.getElementById("MousePos").innerHTML = message;
+        	var message_pxl = 'x: ' + (mousePos.x/scale).toFixed(1) + 'px, y: ' + (mousePos.y/scale).toFixed(1) + 'px';
+        	var message_coords = 'x: ' + (((mousePos.x/scale)*2)/img_height + w -1).toFixed(3) + ', y: ' + (((mousePos.y/scale)*2)/img_width + h -1).toFixed(3); // don't ask me how this algorithm works :3 
+
+        	document.getElementById("MousePosPxl").innerHTML = message_pxl;
+        	document.getElementById("MousePosCoords").innerHTML = message_coords;
     	})
 
     	var img = new Image();
@@ -397,8 +399,8 @@
 	<i id = "imageTitle""></i> <br>
 
 	<br/>
-	<i id = "info" style = "font-size: 12px; color: #99e6ff"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i> <br>
-
+	<i id = "info" style = "font-size: 13px; color: #66b3ff"> Use up/down arrow keys to change folder, left/right arrow keys to change picture.</i> <br>
+	<br/>
 
 	<button class="button" onclick= "sendData(); jsonify();" > Save training data </button>
 
@@ -409,7 +411,10 @@
 	<br/>
 
 	<i">Mouse position: </i>
-	<i id = "MousePos"></i> <br>
+	<i id = "MousePosPxl"></i> <br>
+
+	<i">Mouseposition coordinate-ver: </i>
+	<i id = "MousePosCoords"></i> <br>
 
 	<div style = "font-size: 13px"; id="content"> </div>
 </body>
