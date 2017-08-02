@@ -5,19 +5,20 @@ import json
 from PIL import Image
 
 
-def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224):
+def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_stride=2):
     """
     Leser inn sekvensmapper og genererer to sequences- og labels_pos-arrayer som kan brukes til trening.
     labels_pos hentes fra en fil ved navn "label.json" i sekvensmappen.
     :param main_path: Full bane til mappen som inneholder sekvensmappene (og bare det)
     :param max_count: Maksimalt antall sekvenser som skal lastes inn. 0 betyr ingen begrensning.
-    :return: sequences, startcoords, labels_pos, labels_size
+    :return: sequences, startcoords, labels_pos, labels_size, json_paths
     """
 
     sequences = []  # Sekvensene av bilder – ett element per sekvens
     startcoords = []  # Startkoordinatene for hver sekvens
     labels_pos = []  # x og y for hvert bilde i hver sekvens
     labels_size = []  # w og h for hvert bilde i hver sekvens
+    json_paths = []
 
     list_of_sequence_folders = os.listdir(main_path)  # os.listdir sorterer ikke alfabetisk.
     list_of_sequence_folders.sort()  # For å være konsekvent og for å lagre eksemplene i riktige mapper
@@ -43,11 +44,15 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224):
 
         for object_sequence_index in range(len(label_files_in_sequence_dir)):
             print("Laster inn fra", label_files_in_sequence_dir[object_sequence_index])
+
             # Hente ut bildene som viser det gitte objektet, fra dets json-fil.
             image_names_in_object_sequence = []
-            with open(os.path.join(sequence_dir, label_files_in_sequence_dir[object_sequence_index])) as label_file:
+            json_path = os.path.join(sequence_dir, label_files_in_sequence_dir[object_sequence_index])
+            json_paths.append(json_path)
+            with open(json_path) as label_file:
                 labels = json.load(label_file)
-            labels = labels[::2]
+            if frame_stride > 1:
+                labels = labels[::frame_stride]
             for image_label in labels:
                 try:
                     image_names_in_object_sequence.append(image_label["filename"])
@@ -87,7 +92,7 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224):
     # labels_pos = numpy.array(labels_pos)
     # labels_size = numpy.array(labels_size)
 
-    return sequences, startcoords, labels_pos, labels_size
+    return sequences, startcoords, labels_pos, labels_size, json_paths
 
 
 def write_labels(path, json_file_name, labels_pos, labels_size, file_names):
@@ -103,11 +108,17 @@ def write_labels(path, json_file_name, labels_pos, labels_size, file_names):
         json.dump(formatted_labels, label_file)
 
 
-def get_image_file_names_in_dir(dir_path, suffix=".jpg"):
-    files = os.listdir(dir_path)
-    files = [i for i in files if i.endswith(suffix)]
-    files.sort()
-    return files
+def get_image_file_names_in_json(json_path):
+    with open(json_path, "r") as json_file:
+        json_content = json.load(json_file)
+    image_file_names = []
+    for entry in json_content:
+        try:
+            image_file_names.append(entry["filename"])
+        except KeyError:
+            pass
+    image_file_names.sort()
+    return image_file_names
 
 
 def get_path_from_user(default_path, description):

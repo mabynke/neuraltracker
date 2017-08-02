@@ -12,7 +12,7 @@ import plotting
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
 os.environ["CUDA_VISIBLE_DEVICES"] = sys.argv[1]
 
-from keras.callbacks import TerminateOnNaN, TensorBoard
+# from keras.callbacks import TerminateOnNaN, TensorBoard
 from keras.layers import Input
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers.core import Dense, Flatten
@@ -24,6 +24,7 @@ from keras.backend import get_value, set_value
 
 
 RUN_ID = 0
+USE_DENSENET = True
 
 
 def create_model(image_size, interface_vector_length, state_vector_length):
@@ -90,9 +91,9 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                 training_examples, training_path, run_name, save_results, image_size):
     epoches_per_round = 1
 
-    train_seqs, train_startcoords, train_labels_pos, train_labels_size =\
+    train_seqs, train_startcoords, train_labels_pos, train_labels_size, _ =\
         data_io.fetch_seq_startcoords_labels(training_path, training_examples, output_size=image_size)
-    test_seqs, test_startcoords, test_labels_pos, test_labels_size = \
+    test_seqs, test_startcoords, test_labels_pos, test_labels_size, _ = \
         data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
@@ -152,7 +153,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
             if num_of_rounds_without_improvement == round_patience:  # Senke læringsrate
                 set_value(model.optimizer.lr, get_value(model.optimizer.lr) / 10)
                 print("Senket læringsrate til", get_value(model.optimizer.lr))
-            if num_of_rounds_without_improvement >= round_patience + 2:  # Avslutte treningen
+            if num_of_rounds_without_improvement >= round_patience + 4:  # Avslutte treningen
                 if save_results:
                     print("Laster inn vekter fra ", save_weights_path)
                     model.load_weights(save_weights_path)
@@ -208,13 +209,13 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
     # default_test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
     # train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
     # test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
-    train_path = "../../Grafikk/urbantracker"
+    train_path = "../../Grafikk/urbantracker/train"
     print("Treningseksempler hentes fra ", train_path)
-    test_path = "../../Grafikk/urbantracker"
-    example_path = test_path
+    test_path = "../../Grafikk/urbantracker/test"
+    example_path = "../../Grafikk/urbantracker/all"
     print("Testeksempler hentes fra ", test_path)
     if load_weights:
-        weights_path = os.path.join("saved_weights", input("Skriv filnavnet til vektene som skal lastes inn (ikke inkludert \".h5\"):") + ".h5")
+        weights_path = os.path.join("saved_weights", input("Skriv filnavnet til vektene som skal lastes inn (ikke inkludert \".h5\"): ") + ".h5")
     else:
         weights_path = os.path.join("saved_weights", run_name + ".h5")
     tensorboard_log_dir = "tensorboard_logs"
@@ -233,22 +234,34 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
 
 def make_example_jsons(example_examples, example_path, model, image_size):
     # Lage og vise eksempler
-    example_sequences, example_startcoords, example_labels_pos, example_labels_size\
-        = data_io.fetch_seq_startcoords_labels(example_path, example_examples, output_size=image_size)
-    predictions = model.predict([example_sequences, example_startcoords])
+    example_sequences, example_startcoords, _, _, json_paths\
+        = data_io.fetch_seq_startcoords_labels(example_path, example_examples, output_size=image_size, frame_stride=1)
 
-    # predictions = np.delete(predictions, 0, 2)  # Fjerne det første ("falske") tidssteget
-    print("Debug-info fra make_example_jsons():")
-    print("len(predictions):", len(predictions))
-    print("len(predictions[0]):", len(predictions[0]))
-    print("len(predictions[0][0]):", len(predictions[0][0]))
+    for sequence_index in range(len(example_sequences)):
 
-    for sequence_index in range(len(predictions[0])):
-        path = os.path.join(example_path, "seq{0:05d}".format(sequence_index))
-        data_io.write_labels(file_names=data_io.get_image_file_names_in_dir(path),
-                             labels_pos=predictions[0][sequence_index],
-                             labels_size=predictions[1][sequence_index],
-                             path=path, json_file_name="predictions.json")
+        # if sequence_index == 20:
+        #     import pdb
+        #     pdb.set_trace()
+
+        print("sequence_index:", sequence_index)
+        # print("sekvens:", numpy.array(example_sequences[sequence_index:sequence_index+1]))
+        predictions = model.predict([numpy.array(example_sequences[sequence_index:sequence_index+1]),
+                                     numpy.array(example_startcoords[sequence_index:sequence_index+1])])
+
+        json_label_path = json_paths[sequence_index]
+        dir_path = os.path.split(json_label_path)[0]
+        json_pred_name = "predictions" + os.path.split(json_label_path)[1][6:]
+
+        # print("Debug-info fra make_example_jsons():")
+        # print("len(predictions):", len(predictions))
+        # print("len(predictions[0]):", len(predictions[0]))
+        # print("len(predictions[0][0]):", len(predictions[0][0]))
+        # print("label path:", json_label_path)
+
+        data_io.write_labels(file_names=data_io.get_image_file_names_in_json(json_label_path),
+                             labels_pos=predictions[0][0],
+                             labels_size=predictions[1][0],
+                             path=dir_path, json_file_name=json_pred_name)
         # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
 
@@ -263,13 +276,13 @@ def evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, tes
 def main():
     os.chdir(os.path.dirname(sys.argv[0]))  # set working directory to that of the script
     # Oppsett
-    save_results = True  # Husk denne! Lagrer vekter, plott og stdout.
-    load_saved_weights = False
-    do_training = True
-    make_predictions = False
+    save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
+    load_saved_weights = True
+    do_training = False
+    make_example_jsons = True
     training_examples = 0
     testing_examples = 0
-    example_examples = 100
+    example_examples = 0
     patience_before_lowering_lr = 8
     image_size = 128
 
@@ -279,7 +292,7 @@ def main():
         try:
             # with tf.device("/gpu:0"):
             do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training,
-                   make_predictions, round_patience=patience_before_lowering_lr, save_results=save_results,
+                   make_example_jsons, round_patience=patience_before_lowering_lr, save_results=save_results,
                    image_size=image_size)
         except IOError as e:
             print("Det skjedde en feil med kjøring nr.", RUN_ID)

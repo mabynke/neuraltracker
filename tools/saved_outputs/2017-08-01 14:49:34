@@ -721,3 +721,7 @@ Beste testloss så langt: 0.206331
 Trener ...
 Treningsloss: (0.23538788, 0.22587784, 0.00951003)
 Tester ...
+Testloss: (0.21106991, 0.20211934, 0.0089505874)
+Fullført runde 47/1032 (47 epoker). Brukt 43.9 minutter.
+Runder uten forbedring: 10/8
+Laster inn vekter fra  saved_weights/2017-08-01 14:49:34.h5
