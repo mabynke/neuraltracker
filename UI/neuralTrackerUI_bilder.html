@@ -97,9 +97,11 @@
   		function getFolderName() {
   			// finner filnavn, basert på hvilken verdi "foldernum" har. Hvis input filnavnet ikke er på formen STRENG00000 vil ikke foldernavnet endres.
 
+  			/*
 			if (foldernum < 0) {
 				foldernum = 0;
 			}
+			*/
 
 			var foldername_end = foldername.slice(-5);
 			var isnum = /^\d+$/.test(foldername_end);
@@ -250,12 +252,11 @@
     	function changeFolder(i) {
     		pic_num = 0;
     		obj_nr = 0;
+    		json_labels = 'labels0.json';
+    		json_predict = 'predictions0.json';
 
-    		foldernum = (foldernum + i) % 5 ; // NB, only works with 5 folders
+    		foldernum = (foldernum + i + 5) % 5 ; // NB, only works with 5 folders
     		foldername = getFolderName();
-
-    		//pic_num = 0;
-    		//obj_nr = 0;
 
 			onLoad();
     	}
@@ -266,11 +267,13 @@
     		obj_nr += i;
 
     		if (obj_nr >= 0) {
-    			json_labels = 'labels' + obj_nr + '.json'
+    			json_labels = 'labels' + obj_nr + '.json';
+    			json_predict = 'predictions' + obj_nr + '.json';
     		}
     		else {
-    			obj_nr = 0
-    			'labels0.json'
+    			obj_nr = 0;
+    			json_labels = 'labels0.json';
+    			json_predict = 'predictions0.json';
     		}
 
     		onLoad();
