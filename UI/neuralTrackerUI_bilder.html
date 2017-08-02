@@ -339,8 +339,8 @@
     	function onLoad() { // initializing process.
     		// får bildet til å dukke opp, canvas på bildet, tegner ulike firkanter med hensyn på hvilken modus programmet kjører i.
     		getJsonData(json_predict, json_predict_data);
-			imagename = json_labels_data[4];
     		getJsonData(json_labels, json_labels_data);
+    		imagename = json_labels_data[4];
 
 			if (json_labels_data.length < 5) {
 				changeObject(-obj_nr);
