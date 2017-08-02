@@ -1,5 +1,5 @@
 from flask import Flask, render_template, url_for, jsonify, request
-import heavyMaths
+import fakeNeuralNetwork
 
 app = Flask(__name__)
 
@@ -8,11 +8,10 @@ app = Flask(__name__)
 def hello(name=None):
 	return render_template('hello.html',name=name)
 
-@app.route('/_add_numbers') #Add two numbers server side, ridiculous but well...
-def add_numbers():
-	a = request.args.get('a', 0, type=list)
-	b = request.args.get('b', 0, type=int)
-	return jsonify(result=heavyMaths.listMultiply(a,b))
+@app.route('/_AI_prediction')
+def _AI_prediction():
+	a = request.args.get('a', 0, type=str)
+	return jsonify(result=fakeNeuralNetwork.AImagic(a))
 
 @app.route('/')
 def index():

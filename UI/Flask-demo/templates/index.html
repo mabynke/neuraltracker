@@ -22,14 +22,14 @@
 
 
 <!-- kode som gjør flask magic -->
-<script type="text/javascript"> // script bør være i en seperat javascript fil.
+<script type="text/javascript">
 
-  $(function() { // 1. denne funksjonen kjøres når grunnleggende deler av hjemmesiden er nedlastet
+  $(function() { // 1. kjøres når grunnleggende deler av hjemmesiden er nedlastet
     
     var submit_form = function(e) {
-      $.getJSON($SCRIPT_ROOT + '/_add_numbers', { // $.getJSON(url, data, func);  sender get request til url-en
-        a: $('input[name="a"]').val(), // data; input fra html siden, her putter du simply inn json strengen.
-        b: $('input[name="b"]').val()
+      $.getJSON($SCRIPT_ROOT + '/_AI_prediction', { // $.getJSON(url, data, func); url;  sender get request til url-en
+        a: 'jsonstrennnnnnn' // data; input fra html siden, her putter du simply inn json strengen, i steden for å hente input fra knappen.
+
       }, function(data) { // når dataen kommer frem kjøres denne funksjonen
         $('#result').text(data.result); // data.results er selve json strengen fått ifra heavyMaths, kan uthente info ved å indeksere listen data.results
         $('input[name=a]').focus().select();
@@ -49,8 +49,6 @@
 </script>
 <h1>jQuery Example</h1>
 <p>
-  <input type="text" size="5" name="a"> *
-  <input type="text" size="5" name="b"> =
   <span id="result">?</span>
 <p><a href=# id="calculate">calculate server side</a>
 {% endblock %}

@@ -60,7 +60,7 @@
 </head>
 <body>
 	<h1> Neural Network Tracker </h1>
-	<i id = "MODE"> Read-mode (labels: blue, AI-guess: red) </i>
+	<i id = "MODE"> Readmode (labels in blue, neuralnetwork prediction in red) </i>
 	<br/>
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<br/>
@@ -82,7 +82,7 @@
     	var obj_nr = 0; //changes the jsonfile used to display labels 
 
     	var json_labels = prompt("Enter the name of the labels jsonfile (correct answer)","labels0.json");
-    	var json_predict = prompt("Enter the name of the AI prediction jsonfile", "predictions.json");
+    	var json_predict = prompt("Enter the name of the AI prediction jsonfile", "predictions0.json");
 
     	var scale = 1; // har ingen funksjon, men må fjernes fra hele dokumentet for å fungere.
     	var current_mode = 1; // 0 - write, 1 - ai mode.
@@ -270,6 +270,7 @@
     			json_labels = 'labels' + obj_nr + '.json';
     			json_predict = 'predictions' + obj_nr + '.json';
     		}
+
     		else {
     			obj_nr = 0;
     			json_labels = 'labels0.json';
@@ -316,7 +317,8 @@
 
     	function jsonify() {
     		json_string = JSON.stringify(json_file);
-			console.log(json_string);
+
+			console.log(json_string); // skal fremtidig 
     	}
 
     	function changeMode() {
@@ -325,11 +327,12 @@
 			current_mode = (current_mode + 1) % 2;
 
 			if (current_mode == 0) {
-				document.getElementById("MODE").innerHTML = "Write-mode (mark the object to be tracked on each frame)"
+				document.getElementById("MODE").innerHTML = "Writemode (mark the object to be tracked)"
 			}
 			else if (current_mode == 1) {
-				document.getElementById("MODE").innerHTML = "Read-mode (labels: blue, AI-guess: red)"
+				document.getElementById("MODE").innerHTML = "Readmode (labels in blue, neuralnetwork prediction in red)"
 			}
+
 			onLoad();
     	}
 
@@ -339,29 +342,32 @@
 			getJsonData(json_predict, json_predict_data);
 			imagename = json_labels_data[4];
 
+			if (json_labels_data.length < 5) {
+				changeObject(-obj_nr);
+
+				onLoad();
+				return;
+			}
+
 			/*
 			if (imagename == undefined) {
 				imagename = "00000001.jpg"; // bør ideelt være første bildet i sekvensen
 			}
 			*/
-			
-			console.log(imagename)
 
     		var img = new Image();
-  			img.src = input_location + "/" + foldername + "/" + imagename;  // "/frame00000.jpg";
+  			img.src = input_location + "/" + foldername + "/" + imagename;
 
   			//alert('waiting...'); // neccesary so far...
 
-  			console.log(img.src)
-
   			setTimeout(function(){
 
-			c.height = original_height; // Denne er veldig asynkron (console.log(original_width) for å se)
+			c.height = original_height; // Denne er veldig asynkron (kjør console.log(original_width) for å se)
     		c.width = original_width;
 
     		ctx.drawImage(img, 0, 0, original_width*scale, original_height*scale); // drawImage(img, 0, 0, width, height) draws image onto canvas
 
-            if (current_mode == 0) {// WRITE MODE!
+            if (current_mode == 0) {// Write mode
             	click_coords = [];
             	document.addEventListener("mousedown", clickEvent);
 
@@ -375,7 +381,7 @@
 	            }
 	        }
 
-	        else if (current_mode == 1) { // READ MODE! (AI-mode)
+	        else if (current_mode == 1) { // Read mode (AI mode)
 		        document.removeEventListener("mousedown", clickEvent);
 
 		        drawSquare(json_labels_data[0], json_labels_data[1], json_labels_data[2], json_labels_data[3]);
@@ -391,8 +397,7 @@
 
 	    	document.getElementById("picNum").innerHTML = pic_num;
 
-
-	    	document.getElementById("imgAmount").innerHTML = img_amount;
+	    	document.getElementById("imgAmount").innerHTML = img_amount - 1;
 
 			}, 20);
     	}
@@ -436,29 +441,29 @@
 	<i> object nr</i>
 	<i id = "currentObject"> 0 </i> <br>
 
-	<b>Image number</b> <i id = "picNum"> 0 </i> <b>out of</b> <i id = "imgAmount"> many </i>
+	<b>Image</b> <i id = "picNum"> 0 </i> <b>out of</b> <i id = "imgAmount"> many </i>
 	<br>
 	<b> Input desired image number: </b> <input type="text" id = "inputPicNum">
 	
-	<!-- <button onclick = "inputPicnum()")> Submit </button> -->
-
 	<script>
 		document.getElementById("imgAmount").innerHTML = img_amount;
 
 		function inputPicnum() {
 			var new_picnum = document.getElementById("inputPicNum").value;
 
-			if (new_picnum >= 0 && new_picnum <= img_amount) {
+			if (new_picnum >= 0 && new_picnum <= img_amount - 1) {
 				pic_num =  Number(new_picnum);
 				onLoad();
 			}
 			else {
-				alert('You must enter a value between 0 and ' + (img_amount-1) + '!')
+				alert('You must enter a value between 0 and ' + (img_amount-1) + '!');
 			}
 		}
 
 	</script>
 	<br> <br>
+
+	<i id = "info" style = "font-size: 13px; color: #66b3ff"> <b> info: <b> </i>
 
 	<i id = "info" style = "font-size: 13px; color: #66b3ff"> Press up/down arrow keys to change folder, left/right arrow keys to change picture, <br> A/D to change object, enter to submit image number .</i> <br> <br>
 
