@@ -60,7 +60,7 @@
 </head>
 <body>
 	<h1> Neural Network Tracker </h1>
-	<i id = "MODE"> Readmode (labels in blue, neuralnetwork prediction in red) </i>
+	<i id = "MODE"> Readmode (labels in blue, neural network prediction in red) </i>
 	<br/>
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<br/>
@@ -68,7 +68,7 @@
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");
 
-    	var input_location = prompt("Enter the location of the folder which contains the image sequence","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser_bilder"); // before /home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser
+    	var input_location = prompt("Enter the location of the folder which contains the first image sequence","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser_bilder"); // before /home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser
 
     	var click_coords = [];
     	var json_file = []; // future to become json file
@@ -76,13 +76,13 @@
     	var json_predict_data = [];
     	var json_labels_data = [];
 
-    	var foldername = prompt("Enter the folder name", "seq00000"); // input må være på formen STRENG00000, der antall 0-er må være akkurat 5. STRENG er en streng med hvilken som helst lengde.
+    	var foldername = prompt("Enter the name of the folder that contains the first image sequence", "seq00000"); // input må være på formen STRENG00000, der antall 0-er må være akkurat 5. STRENG er en streng med hvilken som helst lengde.
     	var foldernum = 0;
     	var pic_num = 0;
     	var obj_nr = 0; //changes the jsonfile used to display labels 
 
-    	var json_labels = prompt("Enter the name of the labels jsonfile (correct answer)","labels0.json");
-    	var json_predict = prompt("Enter the name of the AI prediction jsonfile", "predictions0.json");
+    	var json_labels = prompt("Enter the name of the labels jsonfile","labels0.json");
+    	var json_predict = prompt("Enter the name of the neural network prediction jsonfile", "predictions0.json");
 
     	var scale = 1; // har ingen funksjon, men må fjernes fra hele dokumentet for å fungere.
     	var current_mode = 1; // 0 - write, 1 - ai mode.
@@ -92,7 +92,7 @@
   		var current_mode = 1; // 0 - write, 1 - ai mode.
   		var img_amount = 1000; // just a random high number, is changed in the code later to be the number of marked pictures of a spesific object.
 
-  		var json_string = '?'
+  		var json_string = '?';
 
   		function getFolderName() {
   			// finner filnavn, basert på hvilken verdi "foldernum" har. Hvis input filnavnet ikke er på formen STRENG00000 vil ikke foldernavnet endres.
@@ -210,16 +210,16 @@
 				changePic(-1);
 			}
 
-
-			else if (e.keyCode == 68) { // D
-				changeObject(+1);
-			}
-			else if (e.keyCode == 65) { // A
-				changeObject(-1);
-			}
-
-			else if (e.keyCode == 13) { // A
+			else if (e.keyCode == 13) { // Enter
 				inputPicnum();
+			}			
+			else if (current_mode == 1) { // only works in AI-mode
+				if (e.keyCode == 68) { // D
+					changeObject(+1);
+				}
+				else if (e.keyCode == 65) { // A
+					changeObject(-1);
+				}
 			}
 		});
 
@@ -306,14 +306,14 @@
 
     	function changeMode() {
     		// endrer mellom lese-modus(tegner firkanter for fasit og AIs gjettning) og skrive-modus(skriver json fil, ved å tegne firkanter)
-
+    		obj_nr  = '-'
 			current_mode = (current_mode + 1) % 2;
 
 			if (current_mode == 0) {
 				document.getElementById("MODE").innerHTML = "Writemode (mark the object to be tracked)"
 			}
 			else if (current_mode == 1) {
-				document.getElementById("MODE").innerHTML = "Readmode (labels in blue, neuralnetwork prediction in red)"
+				document.getElementById("MODE").innerHTML = "Readmode (labels in blue, neural network prediction in red)"
 			}
 
 			onLoad();
@@ -399,7 +399,7 @@
     	var img = new Image();
   		img.src = input_location + "/" + foldername + "/" + imagename;
 
-  		alert('waiting')
+  		//alert('waiting')
  
   		var original_height = img.height; // img height of first pic!
   		var original_width = img.width;
@@ -440,9 +440,9 @@
 	</script>
 	<br> <br>
 
-	<i id = "info" style = "font-size: 13px; color: #66b3ff"> <b> info: </b> </i>
+	<i id = "info" style = "font-size: 13px; color: #66b3ff"> <b> Info: </b> </i>
 
-	<i id = "info" style = "font-size: 13px; color: #66b3ff"> Press up/down arrow keys to change folder, left/right arrow keys to change picture, <br> A/D to change object, enter to submit image number .</i> <br> <br>
+	<i id = "info" style = "font-size: 13px; color: #66b3ff"> press up/down arrow keys to change image sequence, left/right arrow keys to change picture, <br> A/D to change object, enter to submit image number .</i> <br> <br>
 
 
 	<button class="button" onclick= "sendData(); jsonify();" > Submit data </button>
@@ -456,10 +456,10 @@
 	<br/>
 
 	<b>
-	<i">Mouseposition in pixels: </i>
+	<i">Mouseposition (pixel value): </i>
 	<i id = "MousePosPxl"></i> <br>
 
-	<i">Mouseposition coordinate-ver: </i>
+	<i">Mouseposition (coordinate system): </i>
 	<i id = "MousePosCoords"></i> <br>
 	</b>
 
