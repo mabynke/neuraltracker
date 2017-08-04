@@ -1,8 +1,6 @@
 #+TITLE: README neuralTrackerUI_bilder.html - forutsetninger for å kunne bruke programmet
 
 
-
-
 * MAPPENAVN
 navnet på mappen med bildesekvensene i må være på formen navn00000, der 'navn' er en streng av vilkårlig lengde bestående av kunn bokstaver. Hvis man har flere enn en mappe må de være på formen navn00001, navn00002 osv. Foreløbig fungerer blaing i mapper kunn hvis mappeantall er 5.
 
@@ -16,6 +14,7 @@ writemode er ikke ferdig, og kan foreløbig markere en firkant på bildet og lag
 
 
 * JSONFILER
+
 ** filplassering
 Json-filene skal være plassert i samme mappe som bildesekvensene.
 
@@ -34,7 +33,9 @@ Programmet fungerer kun i Firefox, dersom Firefox er den eneste nettleseren som 
 Bildene er foreløbig skalert til å alle ha samme størrelse, dette er størrelsen til det første bildet i den første bildesekvensen.
 
 ** jquery
-jquery filen "jquery-3.2.1.js" må ligge i samme mappe som programmet for å kunne kjøre jquery. Jquery gjør blant annet at programmet kan lese inn json filene, i tillegg til å gjøre så man kan bruke tastaturknappene til å utføre ulike handlinger.
+Jquery filen "jquery-3.2.1.js" må ligge i samme mappe som programmet for å kunne kjøre jquery. Jquery gjør blant annet at programmet kan lese inn json filene, i tillegg til å gjøre så man kan bruke tastaturknappene til å utføre ulike handlinger.
 
+** neuralTrackerUI_firkanter.html
+Dette er programmet som foreløbig fungerer best med 32x32px bildene av generete firkanter. neuralTrackerUI_bilder bør også fungere, men anbefaler å bruke neuralTrackerUI_firkanter for testing med selvgenerert data. Mye grunnet at json filene må være på et mye mer spesifikt format for å fungere med bilde versonen.
 
 
