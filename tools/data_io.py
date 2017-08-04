@@ -34,16 +34,18 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_
 
     print("Bildestørrelse: {0}*{0}".format(output_size))
 
-    for sequence_name in list_of_sequence_folders:  # Iterere gjennom sekvensene i mappen
-        sequence_dir = os.path.join(main_path, sequence_name)
+    for sequence_index in range(len(list_of_sequence_folders)):  # Iterere gjennom sekvensene i mappen
+        if not sequence_index % 5000:
+            print("Henter sekvens {0}/{1}...".format(sequence_index, max_count))
+        sequence_dir = os.path.join(main_path, list_of_sequence_folders[sequence_index])
 
         files_in_sequence_dir = os.listdir(sequence_dir)
         label_files_in_sequence_dir = [i for i in files_in_sequence_dir if (i[:6] == "labels" and i[-5:] == ".json")]
 
-        print("Fant {0} objektsekvenser i {1}.".format(len(label_files_in_sequence_dir), sequence_name))
+        # print("Fant {0} objektsekvenser i {1}.".format(len(label_files_in_sequence_dir), sequence_name))
 
         for object_sequence_index in range(len(label_files_in_sequence_dir)):
-            print("Laster inn fra", label_files_in_sequence_dir[object_sequence_index])
+            # print("Laster inn fra", label_files_in_sequence_dir[object_sequence_index])
 
             # Hente ut bildene som viser det gitte objektet, fra dets json-fil.
             image_names_in_object_sequence = []

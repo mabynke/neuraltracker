@@ -2,6 +2,8 @@ import os
 import sys
 import time
 import numpy
+import random
+import math
 
 # from tools import data_io  # For kjøring fra PyCharm
 import data_io  # For kjøring fra terminal
@@ -24,7 +26,9 @@ from keras.backend import get_value, set_value
 
 
 RUN_ID = 0
-USE_DENSENET = True
+USE_DENSENET = False
+import keras.backend as K
+from densenet121 import DenseNet
 
 
 def create_model(image_size, interface_vector_length, state_vector_length):
@@ -33,14 +37,30 @@ def create_model(image_size, interface_vector_length, state_vector_length):
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="same"), name="Konv1")(input_sequence)
-    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv2")(x)
-    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv3")(x)
-    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling3")(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv4")(x)
-    x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling4")(x)
+    if USE_DENSENET:
+        weights_path = 'imagenet_models/densenet121_weights_tf.h5'
+        dense_model = DenseNet(reduction=0.5, classes=1000, weights_path=weights_path)
+        for layer in dense_model.layers:
+            layer.trainable = False
+        x = TimeDistributed(dense_model)(input_sequence)
+
+    else:
+        for i in range(round(math.log(image_size, 2)-3)):  # Redusere til ca. 8*8
+            print("Lager konvolusjon- og maxpoolinglag nr.", i)
+            if i == 0:
+                kernel_size = (5, 5)  # Første laget har større kjerne
+                input = input_sequence
+            else:
+                kernel_size = (3, 3)
+                input = x
+            x = TimeDistributed(Conv2D(filters=32, kernel_size=kernel_size, activation="relu", padding="same"), name="Konv"+str(i+1))(input)
+            x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling"+str(i+1))(x)
+            # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv2")(x)
+            # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
+            # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv3")(x)
+            # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling3")(x)
+            # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv4")(x)
+            # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling4")(x)
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu"), name="Grensesnittvektorer")(x)
@@ -109,10 +129,23 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
         # Trene
         print("Trener ...")
         for j in range(len(train_seqs)):  # For hver objektsekvens i treningssettet
-            train_losses = model.train_on_batch(x=[numpy.array(train_seqs[j:j+1]),
+            print("Trener på sekvens", j)
+            seq = train_seqs[j]
+            labels_pos = train_labels_pos[j]
+            labels_size = train_labels_size[j]
+
+            max_length = 100
+
+            if len(seq) > max_length:
+                start_frame = random.randint(0, len(seq)-max_length)
+                seq = seq[start_frame:start_frame+10]
+                labels_pos = labels_pos[start_frame:start_frame + 10]
+                labels_size = labels_size[start_frame:start_frame + 10]
+
+            train_losses = model.train_on_batch(x=[numpy.array([seq]),
                                                    numpy.array(train_startcoords[j:j+1])],
-                                                y=[numpy.array(train_labels_pos[j:j+1]),
-                                                   numpy.array(train_labels_size[j:j+1])])
+                                                y=[numpy.array([labels_pos]),
+                                                   numpy.array([labels_size])])
             train_loss_history.append(train_losses)
 
         train_loss_history = numpy.array(train_loss_history)
@@ -124,10 +157,27 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
         # Teste
         print("Tester ...")
         for j in range(len(test_seqs)):  # For hver objektsekvens i testsettet
-            test_losses = model.test_on_batch(x=[numpy.array(test_seqs[j:j+1]),
-                                                 numpy.array(test_startcoords[j:j+1])],
-                                              y=[numpy.array(test_labels_pos[j:j+1]),
-                                                 numpy.array(test_labels_size[j:j+1])])
+            print("Tester på sekvens", j)
+            seq = test_seqs[j]
+            labels_pos = test_labels_pos[j]
+            labels_size = test_labels_size[j]
+
+            max_length = 200
+
+            if len(seq) > max_length:
+                start_frame = random.randint(0, len(seq) - max_length)
+                seq = seq[start_frame:start_frame + max_length]
+                labels_pos = labels_pos[start_frame:start_frame + max_length]
+                labels_size = labels_size[start_frame:start_frame + max_length]
+
+            test_losses = model.test_on_batch(x=[numpy.array([seq]),
+                                                   numpy.array(test_startcoords[j:j + 1])],
+                                                y=[numpy.array([labels_pos]),
+                                                   numpy.array([labels_size])])
+            # test_losses = model.test_on_batch(x=[numpy.array(test_seqs[j:j+1]),
+            #                                      numpy.array(test_startcoords[j:j+1])],
+            #                                   y=[numpy.array(test_labels_pos[j:j+1]),
+            #                                      numpy.array(test_labels_size[j:j+1])])
             test_loss_history.append(test_losses)
 
         test_loss_history = numpy.array(test_loss_history)
@@ -209,10 +259,10 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
     # default_test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
     # train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
     # test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
-    train_path = "../../Grafikk/urbantracker/train"
+    train_path = "../../Grafikk/tilfeldig_relativeKoordinater/train"
     print("Treningseksempler hentes fra ", train_path)
-    test_path = "../../Grafikk/urbantracker/test"
-    example_path = "../../Grafikk/urbantracker/all"
+    test_path = "../../Grafikk/tilfeldig_relativeKoordinater/test"
+    example_path = "../../Grafikk/tilfeldig_relativeKoordinater/test"
     print("Testeksempler hentes fra ", test_path)
     if load_weights:
         weights_path = os.path.join("saved_weights", input("Skriv filnavnet til vektene som skal lastes inn (ikke inkludert \".h5\"): ") + ".h5")
@@ -238,25 +288,12 @@ def make_example_jsons(example_examples, example_path, model, image_size):
         = data_io.fetch_seq_startcoords_labels(example_path, example_examples, output_size=image_size, frame_stride=1)
 
     for sequence_index in range(len(example_sequences)):
-
-        # if sequence_index == 20:
-        #     import pdb
-        #     pdb.set_trace()
-
-        print("sequence_index:", sequence_index)
-        # print("sekvens:", numpy.array(example_sequences[sequence_index:sequence_index+1]))
         predictions = model.predict([numpy.array(example_sequences[sequence_index:sequence_index+1]),
                                      numpy.array(example_startcoords[sequence_index:sequence_index+1])])
 
         json_label_path = json_paths[sequence_index]
         dir_path = os.path.split(json_label_path)[0]
         json_pred_name = "predictions" + os.path.split(json_label_path)[1][6:]
-
-        # print("Debug-info fra make_example_jsons():")
-        # print("len(predictions):", len(predictions))
-        # print("len(predictions[0]):", len(predictions[0]))
-        # print("len(predictions[0][0]):", len(predictions[0][0]))
-        # print("label path:", json_label_path)
 
         data_io.write_labels(file_names=data_io.get_image_file_names_in_json(json_label_path),
                              labels_pos=predictions[0][0],
@@ -277,14 +314,17 @@ def main():
     os.chdir(os.path.dirname(sys.argv[0]))  # set working directory to that of the script
     # Oppsett
     save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
-    load_saved_weights = True
-    do_training = False
+    load_saved_weights = False
+    do_training = True
     make_example_jsons = True
     training_examples = 0
     testing_examples = 0
-    example_examples = 0
+    example_examples = 100
     patience_before_lowering_lr = 8
-    image_size = 128
+    if USE_DENSENET:
+        image_size = 224
+    else:
+        image_size = 32
 
     for i in range(1):  # Kjøre de angitte eksperimentene
         global RUN_ID

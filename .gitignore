@@ -1,3 +1,4 @@
 .idea
-tools/links
+tools/saved_weights
+tools/__pycache__
 UI/eksempelsekvenser_bilder
