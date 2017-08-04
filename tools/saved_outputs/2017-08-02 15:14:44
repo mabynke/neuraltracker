@@ -1,0 +1,330 @@
+run_name:  2017-08-02 15:14:44
+Treningseksempler hentes fra  ../../Grafikk/urbantracker/train
+Testeksempler hentes fra  ../../Grafikk/urbantracker/test
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 224, 224 0                                            
+____________________________________________________________________________________________________
+time_distributed_1 (TimeDistribu (None, None, 7, 7, 10 7121152     Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 50176)   0           time_distributed_1[0][0]         
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     25690624    Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 34,390,788
+Trainable params: 34,307,140
+Non-trainable params: 83,648
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 1/5 sekvenser fra mappe: ../../Grafikk/urbantracker/train
+Bildestørrelse: 224*224
+Fant 17 objektsekvenser i seq00000.
+Laster inn fra labels5.json
+Laster inn fra labels1.json
+Laster inn fra labels16.json
+Laster inn fra labels12.json
+Laster inn fra labels10.json
+Laster inn fra labels2.json
+Laster inn fra labels18.json
+Laster inn fra labels7.json
+Laster inn fra labels11.json
+Laster inn fra labels4.json
+Laster inn fra labels8.json
+Laster inn fra labels9.json
+Laster inn fra labels17.json
+Laster inn fra labels19.json
+Laster inn fra labels14.json
+Laster inn fra labels3.json
+Laster inn fra labels0.json
+Henter 1/5 sekvenser fra mappe: ../../Grafikk/urbantracker/test
+Bildestørrelse: 224*224
+Fant 3 objektsekvenser i seq00000.
+Laster inn fra labels13.json
+Laster inn fra labels6.json
+Laster inn fra labels15.json
+Trener ...
+Treningsloss: (2.2146161, 2.1384356, 0.076180577)
+Tester ...
+Testloss: (0.41973534, 0.41458103, 0.0051542879)
+Fullført runde 1/1032 (1 epoker). Brukt 0.6 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 2.21462
+
+Trener ...
+Treningsloss: (0.8510018, 0.8356483, 0.015353429)
+Tester ...
+Testloss: (0.3423225, 0.33582315, 0.0064993375)
+Fullført runde 2/1032 (2 epoker). Brukt 0.8 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.851002
+
+Trener ...
+Treningsloss: (0.86210394, 0.85332066, 0.008783347)
+Tester ...
+Testloss: (0.57590681, 0.57005811, 0.0058487565)
+Fullført runde 3/1032 (3 epoker). Brukt 0.9 minutter.
+Runder uten forbedring: 1/8
+Beste treningsloss så langt: 0.851002
+
+Trener ...
+Treningsloss: (0.72847366, 0.71702343, 0.011450271)
+Tester ...
+Testloss: (0.27658716, 0.26973972, 0.0068474668)
+Fullført runde 4/1032 (4 epoker). Brukt 1.0 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.728474
+
+Trener ...
+Treningsloss: (0.54540598, 0.53813976, 0.0072662341)
+Tester ...
+Testloss: (0.28864846, 0.27892235, 0.0097260727)
+Fullført runde 5/1032 (5 epoker). Brukt 1.1 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.545406
+
+Trener ...
+Treningsloss: (0.53488642, 0.5280866, 0.0067997971)
+Tester ...
+Testloss: (0.23641717, 0.22801638, 0.0084007932)
+Fullført runde 6/1032 (6 epoker). Brukt 1.2 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.534886
+
+Trener ...
+Treningsloss: (0.53741628, 0.52728236, 0.010133899)
+Tester ...
+Testloss: (0.28332675, 0.26328549, 0.02004124)
+Fullført runde 7/1032 (7 epoker). Brukt 1.4 minutter.
+Runder uten forbedring: 1/8
+Beste treningsloss så langt: 0.534886
+
+Trener ...
+Treningsloss: (0.55599582, 0.5485152, 0.0074807177)
+Tester ...
+Testloss: (0.21367253, 0.20447306, 0.0091994749)
+Fullført runde 8/1032 (8 epoker). Brukt 1.5 minutter.
+Runder uten forbedring: 2/8
+Beste treningsloss så langt: 0.534886
+
+Trener ...
+Treningsloss: (0.57772082, 0.56974858, 0.0079722032)
+Tester ...
+Testloss: (0.53569394, 0.53117782, 0.0045161159)
+Fullført runde 9/1032 (9 epoker). Brukt 1.6 minutter.
+Runder uten forbedring: 3/8
+Beste treningsloss så langt: 0.534886
+
+Trener ...
+Treningsloss: (0.67077821, 0.66570652, 0.0050716898)
+Tester ...
+Testloss: (0.31462044, 0.30681738, 0.0078030634)
+Fullført runde 10/1032 (10 epoker). Brukt 1.7 minutter.
+Runder uten forbedring: 4/8
+Beste treningsloss så langt: 0.534886
+
+Trener ...
+Treningsloss: (0.61928004, 0.61350113, 0.0057788678)
+Tester ...
+Testloss: (0.67775458, 0.67075706, 0.0069974456)
+Fullført runde 11/1032 (11 epoker). Brukt 1.8 minutter.
+Runder uten forbedring: 5/8
+Beste treningsloss så langt: 0.534886
+
+Trener ...
+Treningsloss: (0.45002961, 0.44233996, 0.0076896688)
+Tester ...
+Testloss: (0.39416674, 0.38730884, 0.006857933)
+Fullført runde 12/1032 (12 epoker). Brukt 1.9 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.45003
+
+Trener ...
+Treningsloss: (0.51315045, 0.50769424, 0.005456212)
+Tester ...
+Testloss: (0.18396457, 0.17686515, 0.0070994296)
+Fullført runde 13/1032 (13 epoker). Brukt 2.1 minutter.
+Runder uten forbedring: 1/8
+Beste treningsloss så langt: 0.45003
+
+Trener ...
+Treningsloss: (0.47299945, 0.46756625, 0.0054331888)
+Tester ...
+Testloss: (0.088184975, 0.076211892, 0.011973088)
+Fullført runde 14/1032 (14 epoker). Brukt 2.2 minutter.
+Runder uten forbedring: 2/8
+Beste treningsloss så langt: 0.45003
+
+Trener ...
+Treningsloss: (0.51186174, 0.50408554, 0.0077762413)
+Tester ...
+Testloss: (0.079162978, 0.070484363, 0.008678617)
+Fullført runde 15/1032 (15 epoker). Brukt 2.3 minutter.
+Runder uten forbedring: 3/8
+Beste treningsloss så langt: 0.45003
+
+Trener ...
+Treningsloss: (0.37387818, 0.36932111, 0.0045570224)
+Tester ...
+Testloss: (0.53055066, 0.52404779, 0.0065028518)
+Fullført runde 16/1032 (16 epoker). Brukt 2.4 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.373878
+
+Trener ...
+Treningsloss: (0.39823461, 0.39305574, 0.0051788543)
+Tester ...
+Testloss: (0.17491446, 0.15702593, 0.017888524)
+Fullført runde 17/1032 (17 epoker). Brukt 2.5 minutter.
+Runder uten forbedring: 1/8
+Beste treningsloss så langt: 0.373878
+
+Trener ...
+Treningsloss: (0.46207854, 0.45597088, 0.0061076661)
+Tester ...
+Testloss: (0.27557957, 0.26769629, 0.0078832824)
+Fullført runde 18/1032 (18 epoker). Brukt 2.6 minutter.
+Runder uten forbedring: 2/8
+Beste treningsloss så langt: 0.373878
+
+Trener ...
+Treningsloss: (0.38330564, 0.37067753, 0.012628124)
+Tester ...
+Testloss: (0.45464638, 0.44074976, 0.01389663)
+Fullført runde 19/1032 (19 epoker). Brukt 2.7 minutter.
+Runder uten forbedring: 3/8
+Beste treningsloss så langt: 0.373878
+
+Trener ...
+Treningsloss: (0.41663596, 0.41049647, 0.0061395061)
+Tester ...
+Testloss: (0.37557861, 0.36355016, 0.012028445)
+Fullført runde 20/1032 (20 epoker). Brukt 2.9 minutter.
+Runder uten forbedring: 4/8
+Beste treningsloss så langt: 0.373878
+
+Trener ...
+Treningsloss: (0.3228704, 0.31410825, 0.0087621287)
+Tester ...
+Testloss: (0.55351627, 0.54989672, 0.0036195591)
+Fullført runde 21/1032 (21 epoker). Brukt 3.0 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.32287
+
+Trener ...
+Treningsloss: (0.22865988, 0.21727371, 0.011386177)
+Tester ...
+Testloss: (0.67003363, 0.66633528, 0.0036983052)
+Fullført runde 22/1032 (22 epoker). Brukt 3.1 minutter.
+Lagret vekter til  saved_weights/2017-08-02 15:14:44.h5
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.74699897, 0.74058104, 0.0064179213)
+Tester ...
+Testloss: (0.50696808, 0.50336623, 0.0036018759)
+Fullført runde 23/1032 (23 epoker). Brukt 3.2 minutter.
+Runder uten forbedring: 1/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.39535403, 0.38561437, 0.0097396811)
+Tester ...
+Testloss: (0.32215607, 0.31886765, 0.003288405)
+Fullført runde 24/1032 (24 epoker). Brukt 3.3 minutter.
+Runder uten forbedring: 2/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.27276561, 0.26564923, 0.0071164011)
+Tester ...
+Testloss: (0.43077675, 0.4233574, 0.0074193515)
+Fullført runde 25/1032 (25 epoker). Brukt 3.5 minutter.
+Runder uten forbedring: 3/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.38385317, 0.3776513, 0.0062018931)
+Tester ...
+Testloss: (0.39599609, 0.38028562, 0.015710449)
+Fullført runde 26/1032 (26 epoker). Brukt 3.6 minutter.
+Runder uten forbedring: 4/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.49044636, 0.48388505, 0.0065613235)
+Tester ...
+Testloss: (0.89272261, 0.87850094, 0.014221762)
+Fullført runde 27/1032 (27 epoker). Brukt 3.7 minutter.
+Runder uten forbedring: 5/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.29753923, 0.28858113, 0.0089580389)
+Tester ...
+Testloss: (0.31858778, 0.31454766, 0.0040401178)
+Fullført runde 28/1032 (28 epoker). Brukt 3.8 minutter.
+Runder uten forbedring: 6/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.35767895, 0.35281897, 0.0048599839)
+Tester ...
+Testloss: (0.26067576, 0.25599805, 0.0046777111)
+Fullført runde 29/1032 (29 epoker). Brukt 3.9 minutter.
+Runder uten forbedring: 7/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.3073419, 0.30074066, 0.0066012722)
+Tester ...
+Testloss: (0.17032184, 0.16028754, 0.010034294)
+Fullført runde 30/1032 (30 epoker). Brukt 4.0 minutter.
+Runder uten forbedring: 8/8
+Senket læringsrate til 0.0001
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.33942005, 0.33454102, 0.0048790155)
+Tester ...
+Testloss: (0.076376706, 0.071084701, 0.00529201)
+Fullført runde 31/1032 (31 epoker). Brukt 4.2 minutter.
+Runder uten forbedring: 9/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.26455668, 0.25718266, 0.0073740561)
+Tester ...
+Testloss: (0.22147626, 0.21715398, 0.0043222769)
+Fullført runde 32/1032 (32 epoker). Brukt 4.3 minutter.
+Runder uten forbedring: 10/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.3478663, 0.34392565, 0.0039406312)
+Tester ...
+Testloss: (0.031436563, 0.023443334, 0.0079932297)
+Fullført runde 33/1032 (33 epoker). Brukt 4.4 minutter.
+Runder uten forbedring: 11/8
+Beste treningsloss så langt: 0.22866
+
+Trener ...
+Treningsloss: (0.27427229, 0.26809555, 0.006176759)
+Tester ...
+Testloss: (0.04725207, 0.034232058, 0.013020009)
+Fullført runde 34/1032 (34 epoker). Brukt 4.5 minutter.
+Runder uten forbedring: 12/8
+Laster inn vekter fra  saved_weights/2017-08-02 15:14:44.h5

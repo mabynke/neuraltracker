@@ -7,17 +7,17 @@
 	<script src="jquery-3.2.1.js"></script>
 	<style>
 		body {
-	  		margin: 30px;
+	  		margin: 20px;
 	  		padding: 0px;
 			}
 
 		i {
 			color: #008CBA;
-			font-size: 15px; /* text-align: center; */
+			font-size: 15px;
 		}
 
 		br {
-			line-height: 15px;
+			line-height: 10px;
 		}
 
 		b {
@@ -28,14 +28,14 @@
 		    background-color: white;
 		    border: none;
 		    color: black;
-		    border: 2px solid #008CBA; /*blue*/
+		    border: 2px solid #008CBA;
 		    padding: 10px 25px;
 		    text-align: center;
 		    text-decoration: none;
 		    display: inline-block;
 		    border-radius: 8px;
 		    font-size: 12px;
-		    -webkit-transition-duration: 0.4s; /* Safari */
+		    -webkit-transition-duration: 0.4s;
 	    	transition-duration: 0.4s;
 		}
 
@@ -45,12 +45,12 @@
 		}
 
 		input[type=text] {
-		    width: 100px;
+		    width: 70px;
 		    height: 30px;
 		    padding: 3px 6px;
 		    margin: 4px 0;
 		    box-sizing: border-box;
-		    border: 2px solid #008CBA;
+		    border: 2px solid #66b3ff;
 		    font-size: 14px;
 		    border-radius: 8px;
 		}
@@ -60,7 +60,7 @@
 </head>
 <body>
 	<h1> Neural Network Tracker </h1>
-	<i id = "MODE"> Readmode (labels in blue, neural network prediction in red) </i>
+	<b> <i id = "MODE">Readmode (labels in blue, neural network prediction in red) </i> </b>
 	<br/>
 	<canvas id="myCanvas" height = "" width=""> </canvas>
 	<br/>
@@ -68,7 +68,7 @@
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");
 
-    	var input_location = prompt("Enter the location of the folder which contains the first image sequence","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser_bilder"); // before /home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser
+    	var input_location = prompt("Enter the location of the folder which contains the first image sequence","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser_bilder");
 
     	var click_coords = [];
     	var json_file = []; // future to become json file
@@ -76,7 +76,7 @@
     	var json_predict_data = [];
     	var json_labels_data = [];
 
-    	var foldername = prompt("Enter the name of the folder that contains the first image sequence", "seq00000"); // input må være på formen STRENG00000, der antall 0-er må være akkurat 5. STRENG er en streng med hvilken som helst lengde.
+    	var foldername = prompt("Enter the name of the folder that contains the first image sequence", "seq00000");
     	var foldernum = 0;
     	var pic_num = 0;
     	var obj_nr = 0; //changes the jsonfile used to display labels 
@@ -84,12 +84,9 @@
     	var json_labels = prompt("Enter the name of the labels jsonfile","labels0.json");
     	var json_predict = prompt("Enter the name of the neural network prediction jsonfile", "predictions0.json");
 
-    	var scale = 1; // har ingen funksjon, men må fjernes fra hele dokumentet for å fungere.
     	var current_mode = 1; // 0 - write, 1 - ai mode.
 
-
     	var clear_image = false;
-  		var current_mode = 1; // 0 - write, 1 - ai mode.
   		var img_amount = 1000; // just a random high number, is changed in the code later to be the number of marked pictures of a spesific object.
 
   		var json_string = '?';
@@ -113,9 +110,9 @@
   		}
 
 
-		function getJsonData(jsonfile, datalist) { // NB! bør kanskje endre picnum, til å matche filnavnet.
+		function getJsonData(jsonfile, datalist) {
 
-            while(datalist.length > 0) { // emptys both 'datalist' and the array 'datalist' corresponds to (e.g json_labels_data). Which datalist = [] doesn't do
+            while(datalist.length > 0) {
     			datalist.pop();
 			}
 
@@ -125,7 +122,7 @@
                 w = data[pic_num].w;
                 h = data[pic_num].h;
                 filename = data[pic_num].filename;
-                img_amount = data[data.length-1].img_amount; // GLOBAL VARIABLE, number of pictures with desired object on
+                img_amount = data[data.length-1].img_amount; // img_amount er en global variabel 
 
 				x1 = (x + 1 - w) * original_width / 2; // upper corner
 				y1 = (y + 1 - h) * original_height / 2;
@@ -169,8 +166,8 @@
 			getCoordinates(event);
 
 			if (click_coords.length == 4) {
-				var img = new Image();
-  				img.src = input_location + "/" + foldername + "/" + imagename;
+				var img = new Image(); // bør kunne fjernes?
+  				img.src = input_location + "/" + foldername + "/" + imagename; // fjern
 
 				drawSquare(click_coords[0],click_coords[1],click_coords[2],click_coords[3], "#4CAF50");
 			}
@@ -180,16 +177,16 @@
 			// tegner selve firkanten
 			
 			ctx.globalAlpha = 0.6; // opacity
-			ctx.lineWidth = 3; // potentially 1*scale
+			ctx.lineWidth = 3;
 			ctx.strokeStyle = colour;
 
 			ctx.beginPath();
-			ctx.moveTo(x_A*scale, y_A*scale);
-			ctx.lineTo(x_C*scale, y_A*scale);
-			ctx.lineTo(x_C*scale,y_C*scale);
-			ctx.lineTo(x_A*scale,y_C*scale);
-			ctx.lineTo(x_A*scale,y_A*scale);
-			ctx.lineTo(x_C*scale, y_A*scale); // for å få vekk venstre hjørne hull
+			ctx.moveTo(x_A, y_A);
+			ctx.lineTo(x_C, y_A);
+			ctx.lineTo(x_C,y_C);
+			ctx.lineTo(x_A,y_C);
+			ctx.lineTo(x_A,y_A);
+			ctx.lineTo(x_C, y_A); // uten denne får firkanten et hull i venstre hjørne.
 
 			ctx.stroke();
 		}
@@ -210,7 +207,7 @@
 				changePic(-1);
 			}
 
-			else if (e.keyCode == 13) { // Enter
+			else if (e.keyCode == 13) { // enter
 				inputPicnum();
 			}			
 			else if (current_mode == 1) { // only works in AI-mode
@@ -239,7 +236,7 @@
     		json_labels = 'labels0.json';
     		json_predict = 'predictions0.json';
 
-    		foldernum = (foldernum + i + 5) % 5 ; // NB, only works with 5 folders
+    		foldernum = (foldernum + i + 100) % 100 ; // NB, only works with 5 folders
     		foldername = getFolderName();
 
 			onLoad();
@@ -271,10 +268,10 @@
     			var dict_file = {};
     			var dict_draw = {};
 
-    			var x1 = (click_coords[0] / scale);
-    			var y1 = (click_coords[1] / scale);
-    			var x2 = (click_coords[2] / scale);
-    			var y2 = (click_coords[3] / scale);
+    			var x1 = (click_coords[0]);
+    			var y1 = (click_coords[1]);
+    			var x2 = (click_coords[2]);
+    			var y2 = (click_coords[3]);
     			var filename = json_predict_data[4];
 
     			var w = (x2-x1)/original_width;
@@ -288,7 +285,7 @@
     			dict_draw['y2'] = y2;
     			dict_draw['filename'] = filename;
 
-    			dict_file['w'] = w; // info som sendes til json fil
+    			dict_file['w'] = w; // info som sendes til future to become json fil
 				dict_file['h'] = h;
 				dict_file['x'] = x;
 				dict_file['y'] = y;
@@ -301,19 +298,22 @@
 
     	function jsonify() {
     		json_string = JSON.stringify(json_file);
-			alert(json_string); // skal fremtidig bli sent 
+			alert(json_string); // skal fremtidig bli sent til server + nevralt nettverk som input 
     	}
 
     	function changeMode() {
-    		// endrer mellom lese-modus(tegner firkanter for fasit og AIs gjettning) og skrive-modus(skriver json fil, ved å tegne firkanter)
-    		obj_nr  = '-'
+    		// endrer mellom lese-modus (som tegner firkanter for fasit og AI  prediksjon) og skrive-modus( som brukes til å markere ønsket objekt + sende input til nevralt nettverk)
+    		
 			current_mode = (current_mode + 1) % 2;
 
 			if (current_mode == 0) {
 				document.getElementById("MODE").innerHTML = "Writemode (mark the object to be tracked)"
+				old_obj_nr = obj_nr;
+				obj_nr = 0;
 			}
 			else if (current_mode == 1) {
 				document.getElementById("MODE").innerHTML = "Readmode (labels in blue, neural network prediction in red)"
+				obj_nr = old_obj_nr;
 			}
 
 			onLoad();
@@ -326,7 +326,7 @@
     		imagename = json_labels_data[4];
 
 			if (json_labels_data.length < 5) {
-				changeObject(-obj_nr);
+				changeObject(-obj_nr); // resets obj_nr to 0 and pic_num to 0, changes predictions + labels files to labels0.json.
 
 				onLoad();
 				return;
@@ -335,14 +335,12 @@
     		var img = new Image();
   			img.src = input_location + "/" + foldername + "/" + imagename;
 
-  			//alert('waiting...'); // neccesary so far...
-
   			setTimeout(function(){
 
 			c.height = original_height; // Denne er veldig asynkron (kjør console.log(original_width) for å se)
     		c.width = original_width;
 
-    		ctx.drawImage(img, 0, 0, original_width*scale, original_height*scale); // drawImage(img, 0, 0, width, height) draws image onto canvas
+    		ctx.drawImage(img, 0, 0, original_width, original_height); // drawImage(img, 0, 0, width, height)
 
             if (current_mode == 0) {// Write mode
             	click_coords = [];
@@ -367,13 +365,9 @@
 		        }
 
 	    	document.getElementById("imageTitle").innerHTML = imagename;
-
 	    	document.getElementById("folderTitle").innerHTML = foldername;
-
 	    	document.getElementById("currentObject").innerHTML = obj_nr;
-
 	    	document.getElementById("picNum").innerHTML = pic_num;
-
 	    	document.getElementById("imgAmount").innerHTML = img_amount - 1;
 
 			}, 20);
@@ -389,8 +383,8 @@
     		// viser museposisjon når man 'hoverer' over bildet
 
         	var mousePos = getMousePos(c, event);
-        	var message_pxl = 'x: ' + (mousePos.x/scale).toFixed(1) + 'px, y: ' + (mousePos.y/scale).toFixed(1) + 'px';
-        	var message_coords = 'x: ' + (((mousePos.x/scale)*2)/original_width + w -1).toFixed(3) + ', y: ' + (((mousePos.y/scale)*2)/original_height + h -1).toFixed(3); // don't ask me how this algorithm works :3 
+        	var message_pxl = 'x: ' + (mousePos.x).toFixed(1) + 'px, y: ' + (mousePos.y).toFixed(1) + 'px';
+        	var message_coords = 'x: ' + (((mousePos.x)*2)/original_width + w -1).toFixed(3) + ', y: ' + (((mousePos.y)*2)/original_height + h -1).toFixed(3);
 
         	document.getElementById("MousePosPxl").innerHTML = message_pxl;
         	document.getElementById("MousePosCoords").innerHTML = message_coords;
@@ -401,7 +395,7 @@
 
   		alert('waiting');
  
-  		var original_height = img.height; // img height of first pic!
+  		var original_height = img.height; // putt inn ønsket bilde størrelse. 
   		var original_width = img.width;
 
 		window.onload = onLoad();
@@ -422,6 +416,16 @@
 	<br>
 	<b> Input desired image number: </b> <input type="text" id = "inputPicNum">
 	
+	<br>
+	<br>
+	<b>
+	<i">Mouseposition (pixel value): </i>
+	<i id = "MousePosPxl"></i> <br>
+
+	<i">Mouseposition (coordinate system): </i>
+	<i id = "MousePosCoords"></i> <br>
+	</b>
+
 	<script>
 		document.getElementById("imgAmount").innerHTML = img_amount;
 
@@ -440,28 +444,19 @@
 	</script>
 	<br> <br>
 
-	<i id = "info" style = "font-size: 13px; color: #66b3ff"> <b> Info: </b> </i>
-
-	<i id = "info" style = "font-size: 13px; color: #66b3ff"> press up/down arrow keys to change image sequence, left/right arrow keys to change picture, <br> A/D to change object, enter to submit image number .</i> <br> <br>
-
-
 	<button class="button" onclick= "sendData(); jsonify();" > Submit data </button>
 	<button class="button" onclick= "clear_image = true; onLoad();" > Clear image </button>
 	<button class="button" onclick= "changeMode();" >Change mode</button>
-
 	<button class="button" onclick= "changeObject(-1)" > Prev object </button>
 	<button class="button" onclick= "changeObject(+1)" > Next object </button>
 
 	<br/>
-	<br/>
 
-	<b>
-	<i">Mouseposition (pixel value): </i>
-	<i id = "MousePosPxl"></i> <br>
+	<i id = "info" style = "font-size: 13px; color: #66b3ff"> <b> Info: </b> </i>
 
-	<i">Mouseposition (coordinate system): </i>
-	<i id = "MousePosCoords"></i> <br>
-	</b>
+	<i id = "info" style = "font-size: 13px; color: #66b3ff"> Press 'Change mode' to change between readmode and writemode. <br> Press up/down arrow key to change image sequence, left/right arrow key to change picture. <br>
+	While in readmode press A/D arrow key to change object. <br>
+	While in writemode press clear image to remove newly drawn square, press submit data to pretend you're submitting data. </i>
 
 	<div style = "font-size: 13px"; id="content"> </div>
 </body>

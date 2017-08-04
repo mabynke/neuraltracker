@@ -1,0 +1,40 @@
+#+TITLE: README neuralTrackerUI_bilder.html - forutsetninger for å kunne bruke programmet
+
+
+
+
+* MAPPENAVN
+navnet på mappen med bildesekvensene i må være på formen navn00000, der 'navn' er en streng av vilkårlig lengde bestående av kunn bokstaver. Hvis man har flere enn en mappe må de være på formen navn00001, navn00002 osv. Foreløbig fungerer blaing i mapper kunn hvis mappeantall er 5.
+
+
+* BILDENAVN
+kan være på hvilken som helst form, men må være oppgitt i alle labels filene, på formen gi.
+
+
+* WRITEMODE
+writemode er ikke ferdig, og kan foreløbig markere en firkant på bildet og lagre koordinatene. Denne modulen kan bygges videre på til å feks markere treningsdata til det nevrale nettverket eller la brukeren markere et objekt på en bildesekvens som det nevrale nettverket kan tracke.
+
+
+* JSONFILER
+** filplassering
+Json-filene skal være plassert i samme mappe som bildesekvensene.
+
+** filinnhold
+Json-filene må være på formen [{"w": 0.0525, "x": -0.8200000000000001, "y": 0.7516666666666667, "h": 0.13166666666666665, "filename": "00002754.jpg"}, {...}... {"img_amount": 2], der "img_amount" er antall bilder i en bildesekvens med et spesifikkt objekt. 
+
+** filnavn
+Json filene må ha filnavn på formen labels0.json, labels12.json predictions1.json, predictions162.json osv. 
+
+
+* ANNET
+** nettleser
+Programmet fungerer kun i Firefox, dersom Firefox er den eneste nettleseren som tillater lesing av json filer by default (så vidt jeg vet). 
+
+** skalering
+Bildene er foreløbig skalert til å alle ha samme størrelse, dette er størrelsen til det første bildet i den første bildesekvensen.
+
+** jquery
+jquery filen "jquery-3.2.1.js" må ligge i samme mappe som programmet for å kunne kjøre jquery. Jquery gjør blant annet at programmet kan lese inn json filene, i tillegg til å gjøre så man kan bruke tastaturknappene til å utføre ulike handlinger.
+
+
+
