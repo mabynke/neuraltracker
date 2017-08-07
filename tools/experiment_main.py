@@ -294,7 +294,7 @@ def evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, tes
 def main():
     os.chdir(os.path.dirname(sys.argv[0]))  # set working directory to that of the script
     # Oppsett
-    save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
+    save_results = True  # Husk denne! Lagrer vekter, plott og stdout.
     load_saved_weights = False
     do_training = True
     make_example_jsons = True

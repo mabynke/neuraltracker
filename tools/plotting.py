@@ -14,9 +14,9 @@ def plot_loss_history(loss_history, run_name):
         # for j in range(3):  # loss, loss_pos, loss_str
         plt.plot(array[:, i, 0], colors[i][0])
 
-    plt.xlabel("Runder")
+    plt.xlabel("Epoker")
     plt.ylabel("mean_squared_error")
-    plt.title("Loss for trening (blå) og test (rød)")
+    plt.title("Tap for trening (blå) og test (rød)")
     plt.grid(True)
     plt.savefig(os.path.join("saved_plots", run_name + ".png"))
 
