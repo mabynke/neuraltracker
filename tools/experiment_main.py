@@ -12,7 +12,11 @@ import plotting
 
 # Tar GPU-enhet som første argument
 os.environ["CUDA_DEVICE_ORDER"] = "PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"] = sys.argv[1]
+try:
+    os.environ["CUDA_VISIBLE_DEVICES"] = sys.argv[1]
+except IndexError:
+    print("Trenger et argument: GPU-enhet (0-3)")
+    exit()
 
 # from keras.callbacks import TerminateOnNaN, TensorBoard
 from keras.layers import Input
@@ -27,8 +31,10 @@ from keras.backend import get_value, set_value
 
 RUN_ID = 0
 USE_DENSENET = False
-import keras.backend as K
-from densenet121 import DenseNet
+
+if USE_DENSENET:
+    from densenet121 import DenseNet
+# import keras.backend as K
 
 
 def create_model(image_size, interface_vector_length, state_vector_length):
@@ -55,12 +61,6 @@ def create_model(image_size, interface_vector_length, state_vector_length):
                 input = x
             x = TimeDistributed(Conv2D(filters=32, kernel_size=kernel_size, activation="relu", padding="same"), name="Konv"+str(i+1))(input)
             x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling"+str(i+1))(x)
-            # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv2")(x)
-            # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
-            # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv3")(x)
-            # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling3")(x)
-            # x = TimeDistributed(Conv2D(filters=32, kernel_size=(3, 3), activation="relu", padding="same"), name="Konv4")(x)
-            # x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling4")(x)
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
     x = TimeDistributed(Dense(interface_vector_length, activation="relu"), name="Grensesnittvektorer")(x)
@@ -84,7 +84,7 @@ def create_model(image_size, interface_vector_length, state_vector_length):
 
 def build_and_train_model(state_vector_length, image_size, interface_vector_length, tensorboard_log_dir,
                           training_examples, training_path, test_path, testing_examples, weights_path, run_name,
-                          round_patience, load_prevous_weigths, do_training, save_results):
+                          round_patience, load_prevous_weigths, do_training, save_results, batch_size):
     # Bygge modellen
     # model = create_model(image_size, interface_vector_length, state_vector_length)
     model = create_model(image_size, interface_vector_length, state_vector_length)
@@ -101,15 +101,15 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     if do_training:
         print("Begynner trening.")
         train_model(model, round_patience, weights_path, tensorboard_log_dir, test_path, testing_examples,
-                    training_examples, training_path, run_name, save_results=save_results, image_size=image_size)
+                    training_examples, training_path, run_name, save_results=save_results, image_size=image_size,
+                    batch_size=batch_size)
     else:
         print("Hopper over trening.")
     return model
 
 
 def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, test_path, testing_examples,
-                training_examples, training_path, run_name, save_results, image_size):
-    epoches_per_round = 1
+                training_examples, training_path, run_name, save_results, image_size, batch_size):
 
     train_seqs, train_startcoords, train_labels_pos, train_labels_size, _ =\
         data_io.fetch_seq_startcoords_labels(training_path, training_examples, output_size=image_size)
@@ -118,34 +118,29 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
+    max_num_of_epoches = 10000
     best_loss = 10000  # Kan like gjerne være uendelig, bare den er høyere enn alle loss-verdier
     num_of_rounds_without_improvement = 0
-    max_num_of_rounds = int(1032 / epoches_per_round)
     time_at_start = os.times().elapsed
-    for round_index in range(max_num_of_rounds):
+    for epoch_index in range(max_num_of_epoches):
         train_loss_history = []
         test_loss_history = []
 
         # Trene
         print("Trener ...")
-        for j in range(len(train_seqs)):  # For hver objektsekvens i treningssettet
-            print("Trener på sekvens", j)
-            seq = train_seqs[j]
-            labels_pos = train_labels_pos[j]
-            labels_size = train_labels_size[j]
+        for batch_start in range(0, len(train_seqs), batch_size):  # For hver objektsekvens i treningssettet
+            batch_end = min(batch_start+batch_size, len(train_seqs) - 1)
+            # print("Trener på sekvens {0}-{1} …".format(batch_start, batch_end))
 
-            max_length = 100
+            batch_sequences = train_seqs[batch_start:batch_end+1]
+            batch_startcoords = train_startcoords[batch_start:batch_end+1]
+            batch_labels_pos = train_labels_pos[batch_start:batch_end+1]
+            batch_labels_size = train_labels_size[batch_start:batch_end+1]
 
-            if len(seq) > max_length:
-                start_frame = random.randint(0, len(seq)-max_length)
-                seq = seq[start_frame:start_frame+10]
-                labels_pos = labels_pos[start_frame:start_frame + 10]
-                labels_size = labels_size[start_frame:start_frame + 10]
-
-            train_losses = model.train_on_batch(x=[numpy.array([seq]),
-                                                   numpy.array(train_startcoords[j:j+1])],
-                                                y=[numpy.array([labels_pos]),
-                                                   numpy.array([labels_size])])
+            train_losses = model.train_on_batch(x=[numpy.array(batch_sequences),
+                                                   numpy.array(batch_startcoords)],
+                                                y=[numpy.array(batch_labels_pos),
+                                                   numpy.array(batch_labels_size)])
             train_loss_history.append(train_losses)
 
         train_loss_history = numpy.array(train_loss_history)
@@ -156,34 +151,25 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
 
         # Teste
         print("Tester ...")
-        for j in range(len(test_seqs)):  # For hver objektsekvens i testsettet
-            print("Tester på sekvens", j)
-            seq = test_seqs[j]
-            labels_pos = test_labels_pos[j]
-            labels_size = test_labels_size[j]
+        for batch_start in range(0, len(test_seqs), batch_size):  # For hver objektsekvens i treningssettet
+            batch_end = min(batch_start+batch_size, len(test_seqs) - 1)
+            # print("Tester på sekvens {0}-{1} …".format(batch_start, batch_end))
 
-            max_length = 200
+            batch_sequences = test_seqs[batch_start:batch_end+1]
+            batch_startcoords = test_startcoords[batch_start:batch_end+1]
+            batch_labels_pos = test_labels_pos[batch_start:batch_end+1]
+            batch_labels_size = test_labels_size[batch_start:batch_end+1]
 
-            if len(seq) > max_length:
-                start_frame = random.randint(0, len(seq) - max_length)
-                seq = seq[start_frame:start_frame + max_length]
-                labels_pos = labels_pos[start_frame:start_frame + max_length]
-                labels_size = labels_size[start_frame:start_frame + max_length]
-
-            test_losses = model.test_on_batch(x=[numpy.array([seq]),
-                                                   numpy.array(test_startcoords[j:j + 1])],
-                                                y=[numpy.array([labels_pos]),
-                                                   numpy.array([labels_size])])
-            # test_losses = model.test_on_batch(x=[numpy.array(test_seqs[j:j+1]),
-            #                                      numpy.array(test_startcoords[j:j+1])],
-            #                                   y=[numpy.array(test_labels_pos[j:j+1]),
-            #                                      numpy.array(test_labels_size[j:j+1])])
+            test_losses = model.test_on_batch(x=[numpy.array(batch_sequences),
+                                                   numpy.array(batch_startcoords)],
+                                                y=[numpy.array(batch_labels_pos),
+                                                   numpy.array(batch_labels_size)])
             test_loss_history.append(test_losses)
 
         test_loss_history = numpy.array(test_loss_history)
         test_loss = (numpy.mean(test_loss_history[:, 0]),
-                     numpy.mean(test_loss_history[:, 1]),
-                     numpy.mean(test_loss_history[:, 2]))
+                      numpy.mean(test_loss_history[:, 1]),
+                      numpy.mean(test_loss_history[:, 2]))
         print("Testloss:", test_loss)
 
         if save_results:
@@ -191,10 +177,9 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
             loss_history.append((train_loss, test_loss))
             plotting.plot_loss_history(loss_history, run_name)
 
-        print("Fullført runde {0}/{1} ({2} epoker). Brukt {3} minutter."
-              .format(round_index + 1,
-                      max_num_of_rounds,
-                      (round_index + 1) * epoches_per_round,
+        print("Fullført epoke {0}/{1}. Brukt {2} minutter."
+              .format(epoch_index + 1,
+                      max_num_of_epoches,
                       round((os.times().elapsed - time_at_start) / 60, 1)))
 
         if train_loss[0] >= best_loss:
@@ -243,7 +228,7 @@ def print_results(example_labels, example_sequences, prediction, sequence_length
 
 def do_run(example_examples=100, testing_examples=0, training_examples=0, load_weights=False, do_training=True,
            make_predictions=True, round_patience=8, interface_vector_length=512, state_vector_length=512,
-           save_results=True, image_size=32):
+           save_results=True, image_size=32, batch_size=16):
 
     timestamp = time.localtime()
     run_name = "{0}-{1:02}-{2:02} {3:02}:{4:02}:{5:02}".format(timestamp[0], timestamp[1], timestamp[2], timestamp[3],
@@ -255,10 +240,6 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
         sys.stdout = open(os.path.join(print_path, run_name), 'w', buffering=1)
 
     print("run_name: ", run_name)
-    # default_train_path = "../Grafikk/tilfeldig_relativeKoordinater/train"
-    # default_test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
-    # train_path = data_io.get_path_from_user(default_train_path, "mappen med treningssekvenser")
-    # test_path = data_io.get_path_from_user(default_test_path, "mappen med testsekvenser")
     train_path = "../../Grafikk/tilfeldig_relativeKoordinater/train"
     print("Treningseksempler hentes fra ", train_path)
     test_path = "../../Grafikk/tilfeldig_relativeKoordinater/test"
@@ -273,7 +254,7 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, tensorboard_log_dir,
                                   training_examples, train_path, test_path, testing_examples, weights_path, run_name,
                                   round_patience=round_patience, load_prevous_weigths=load_weights,
-                                  do_training=do_training, save_results=save_results)
+                                  do_training=do_training, save_results=save_results, batch_size=batch_size)
     # TODO: Lagre modellens konfigurasjon som json
     if make_predictions:
         make_example_jsons(example_examples, example_path, model, image_size=image_size)
@@ -319,8 +300,10 @@ def main():
     make_example_jsons = True
     training_examples = 0
     testing_examples = 0
-    example_examples = 100
+    sequences_to_predict = 100  # Antall sekvenser det skal lages prediksjons-json-filer til.
     patience_before_lowering_lr = 8
+    batch_size = 16  # Antall sekvenser som skal inkluderes per parti (trening og testing)
+
     if USE_DENSENET:
         image_size = 224
     else:
@@ -331,9 +314,9 @@ def main():
         RUN_ID = i
         try:
             # with tf.device("/gpu:0"):
-            do_run(example_examples, testing_examples, training_examples, load_saved_weights, do_training,
+            do_run(sequences_to_predict, testing_examples, training_examples, load_saved_weights, do_training,
                    make_example_jsons, round_patience=patience_before_lowering_lr, save_results=save_results,
-                   image_size=image_size)
+                   image_size=image_size, batch_size=batch_size)
         except IOError as e:
             print("Det skjedde en feil med kjøring nr.", RUN_ID)
             print(e)
