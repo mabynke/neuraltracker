@@ -118,7 +118,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
-    max_num_of_epoches = 10000
+    max_num_of_epoches = 1000
     best_loss = 10000  # Kan like gjerne være uendelig, bare den er høyere enn alle loss-verdier
     num_of_rounds_without_improvement = 0
     time_at_start = os.times().elapsed
@@ -184,7 +184,7 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
 
         if train_loss[0] >= best_loss:
             num_of_rounds_without_improvement += 1
-            print("Runder uten forbedring: {0}/{1}".format(num_of_rounds_without_improvement, round_patience))
+            print("Epoker uten forbedring: {0}/{1}".format(num_of_rounds_without_improvement, round_patience))
             if num_of_rounds_without_improvement == round_patience:  # Senke læringsrate
                 set_value(model.optimizer.lr, get_value(model.optimizer.lr) / 10)
                 print("Senket læringsrate til", get_value(model.optimizer.lr))

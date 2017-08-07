@@ -1,0 +1,468 @@
+run_name:  2017-08-07 10:46:34
+Treningseksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/train
+Testeksempler hentes fra  ../../Grafikk/tilfeldig_relativeKoordinater/test
+Lager konvolusjon- og maxpoolinglag nr. 0
+Lager konvolusjon- og maxpoolinglag nr. 1
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 32, 32,  0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, None, 32, 32,  2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, None, 16, 16,  0           Konv1[0][0]                      
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, None, 16, 16,  9248        maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, None, 8, 8, 32 0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 2048)    0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     1049088     Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 2,639,780
+Trainable params: 2,639,780
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 100000/100000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/train
+Bildestørrelse: 32*32
+Henter sekvens 0/100000...
+Henter sekvens 5000/100000...
+Henter sekvens 10000/100000...
+Henter sekvens 15000/100000...
+Henter sekvens 20000/100000...
+Henter sekvens 25000/100000...
+Henter sekvens 30000/100000...
+Henter sekvens 35000/100000...
+Henter sekvens 40000/100000...
+Henter sekvens 45000/100000...
+Henter sekvens 50000/100000...
+Henter sekvens 55000/100000...
+Henter sekvens 60000/100000...
+Henter sekvens 65000/100000...
+Henter sekvens 70000/100000...
+Henter sekvens 75000/100000...
+Henter sekvens 80000/100000...
+Henter sekvens 85000/100000...
+Henter sekvens 90000/100000...
+Henter sekvens 95000/100000...
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/tilfeldig_relativeKoordinater/test
+Bildestørrelse: 32*32
+Henter sekvens 0/10000...
+Henter sekvens 5000/10000...
+Trener ...
+Treningsloss: (0.17090736, 0.16938907, 0.0015183068)
+Tester ...
+Testloss: (0.080450706, 0.080316074, 0.00013463706)
+Fullført epoke 1/10000. Brukt 2.5 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.170907
+
+Trener ...
+Treningsloss: (0.059919443, 0.059852999, 6.6443165e-05)
+Tester ...
+Testloss: (0.045433413, 0.045404334, 2.908104e-05)
+Fullført epoke 2/10000. Brukt 5.0 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0599194
+
+Trener ...
+Treningsloss: (0.042455968, 0.042432696, 2.3267547e-05)
+Tester ...
+Testloss: (0.034990191, 0.034980353, 9.8355931e-06)
+Fullført epoke 3/10000. Brukt 7.5 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.042456
+
+Trener ...
+Treningsloss: (0.037474461, 0.03745731, 1.7148866e-05)
+Tester ...
+Testloss: (0.032659303, 0.03264834, 1.0966416e-05)
+Fullført epoke 4/10000. Brukt 10.0 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0374745
+
+Trener ...
+Treningsloss: (0.034830414, 0.034813747, 1.6668222e-05)
+Tester ...
+Testloss: (0.02829079, 0.028278833, 1.1957313e-05)
+Fullført epoke 5/10000. Brukt 12.5 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0348304
+
+Trener ...
+Treningsloss: (0.036095705, 0.036080163, 1.5536545e-05)
+Tester ...
+Testloss: (0.035772394, 0.03575363, 1.8759092e-05)
+Fullført epoke 6/10000. Brukt 15.0 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.0348304
+
+Trener ...
+Treningsloss: (0.033076197, 0.033061482, 1.4710655e-05)
+Tester ...
+Testloss: (0.025163285, 0.025154004, 9.28195e-06)
+Fullført epoke 7/10000. Brukt 17.5 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0330762
+
+Trener ...
+Treningsloss: (0.032031517, 0.032017112, 1.4406453e-05)
+Tester ...
+Testloss: (0.025914997, 0.025904877, 1.0120237e-05)
+Fullført epoke 8/10000. Brukt 20.0 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0320315
+
+Trener ...
+Treningsloss: (0.030619394, 0.030605074, 1.4319944e-05)
+Tester ...
+Testloss: (0.029659783, 0.029629862, 2.9925555e-05)
+Fullført epoke 9/10000. Brukt 22.5 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0306194
+
+Trener ...
+Treningsloss: (0.030341983, 0.030326998, 1.4984945e-05)
+Tester ...
+Testloss: (0.028012812, 0.027981788, 3.1025957e-05)
+Fullført epoke 10/10000. Brukt 25.0 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.030342
+
+Trener ...
+Treningsloss: (0.032140441, 0.032122217, 1.8223893e-05)
+Tester ...
+Testloss: (0.026046418, 0.026033271, 1.3148597e-05)
+Fullført epoke 11/10000. Brukt 27.5 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.030342
+
+Trener ...
+Treningsloss: (0.030757187, 0.030741196, 1.5992267e-05)
+Tester ...
+Testloss: (0.025779527, 0.025771732, 7.7948125e-06)
+Fullført epoke 12/10000. Brukt 29.9 minutter.
+Epoker uten forbedring: 2/8
+Beste treningsloss så langt: 0.030342
+
+Trener ...
+Treningsloss: (0.02911753, 0.029102026, 1.5504129e-05)
+Tester ...
+Testloss: (0.02586231, 0.025847986, 1.4324401e-05)
+Fullført epoke 13/10000. Brukt 32.4 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0291175
+
+Trener ...
+Treningsloss: (0.027877413, 0.027863428, 1.398611e-05)
+Tester ...
+Testloss: (0.025054837, 0.025039176, 1.5662361e-05)
+Fullført epoke 14/10000. Brukt 34.9 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0278774
+
+Trener ...
+Treningsloss: (0.028596804, 0.028577529, 1.9274054e-05)
+Tester ...
+Testloss: (0.025826251, 0.025805753, 2.0496014e-05)
+Fullført epoke 15/10000. Brukt 37.4 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.0278774
+
+Trener ...
+Treningsloss: (0.029807266, 0.029790517, 1.6747385e-05)
+Tester ...
+Testloss: (0.023281699, 0.023269763, 1.1935796e-05)
+Fullført epoke 16/10000. Brukt 39.9 minutter.
+Epoker uten forbedring: 2/8
+Beste treningsloss så langt: 0.0278774
+
+Trener ...
+Treningsloss: (0.026993599, 0.026982192, 1.1405752e-05)
+Tester ...
+Testloss: (0.023927329, 0.023923473, 3.8578423e-06)
+Fullført epoke 17/10000. Brukt 42.4 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0269936
+
+Trener ...
+Treningsloss: (0.027199939, 0.027189199, 1.073839e-05)
+Tester ...
+Testloss: (0.022784993, 0.02277106, 1.3934486e-05)
+Fullført epoke 18/10000. Brukt 44.9 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.0269936
+
+Trener ...
+Treningsloss: (0.026052495, 0.026042102, 1.039052e-05)
+Tester ...
+Testloss: (0.024406476, 0.02440083, 5.6444283e-06)
+Fullført epoke 19/10000. Brukt 47.4 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0260525
+
+Trener ...
+Treningsloss: (0.025631111, 0.025620928, 1.0185262e-05)
+Tester ...
+Testloss: (0.021223282, 0.021218259, 5.0244453e-06)
+Fullført epoke 20/10000. Brukt 49.9 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0256311
+
+Trener ...
+Treningsloss: (0.025955342, 0.025945829, 9.512647e-06)
+Tester ...
+Testloss: (0.025946295, 0.025939515, 6.7818469e-06)
+Fullført epoke 21/10000. Brukt 52.4 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.0256311
+
+Trener ...
+Treningsloss: (0.025021728, 0.025012046, 9.6844587e-06)
+Tester ...
+Testloss: (0.027663238, 0.027651453, 1.1789327e-05)
+Fullført epoke 22/10000. Brukt 54.9 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.027195344, 0.027184552, 1.0794783e-05)
+Tester ...
+Testloss: (0.022295553, 0.022289481, 6.0717425e-06)
+Fullført epoke 23/10000. Brukt 57.4 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.027008159, 0.02699841, 9.7468728e-06)
+Tester ...
+Testloss: (0.024934318, 0.024927516, 6.8007262e-06)
+Fullført epoke 24/10000. Brukt 59.9 minutter.
+Epoker uten forbedring: 2/8
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.026977587, 0.026968883, 8.7033595e-06)
+Tester ...
+Testloss: (0.022249362, 0.022231946, 1.7416525e-05)
+Fullført epoke 25/10000. Brukt 62.4 minutter.
+Epoker uten forbedring: 3/8
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.026656343, 0.026647089, 9.2561249e-06)
+Tester ...
+Testloss: (0.023982536, 0.023973148, 9.3894623e-06)
+Fullført epoke 26/10000. Brukt 64.9 minutter.
+Epoker uten forbedring: 4/8
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.026080301, 0.026070489, 9.8124174e-06)
+Tester ...
+Testloss: (0.022314547, 0.022306509, 8.0375967e-06)
+Fullført epoke 27/10000. Brukt 67.3 minutter.
+Epoker uten forbedring: 5/8
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.025950834, 0.0259408, 1.0033752e-05)
+Tester ...
+Testloss: (0.028293116, 0.028278915, 1.420054e-05)
+Fullført epoke 28/10000. Brukt 69.8 minutter.
+Epoker uten forbedring: 6/8
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.026807165, 0.026795259, 1.1907608e-05)
+Tester ...
+Testloss: (0.023236727, 0.023224184, 1.2542859e-05)
+Fullført epoke 29/10000. Brukt 72.3 minutter.
+Epoker uten forbedring: 7/8
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.02554618, 0.025536379, 9.8005794e-06)
+Tester ...
+Testloss: (0.023989767, 0.023979595, 1.01752e-05)
+Fullført epoke 30/10000. Brukt 74.8 minutter.
+Epoker uten forbedring: 8/8
+Senket læringsrate til 0.0001
+Beste treningsloss så langt: 0.0250217
+
+Trener ...
+Treningsloss: (0.020736607, 0.020734243, 2.3624614e-06)
+Tester ...
+Testloss: (0.016887868, 0.016885959, 1.9086756e-06)
+Fullført epoke 31/10000. Brukt 77.3 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0207366
+
+Trener ...
+Treningsloss: (0.018060366, 0.018058518, 1.8494565e-06)
+Tester ...
+Testloss: (0.015777998, 0.01577642, 1.5773842e-06)
+Fullført epoke 32/10000. Brukt 79.8 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0180604
+
+Trener ...
+Treningsloss: (0.016875174, 0.016873583, 1.5915224e-06)
+Tester ...
+Testloss: (0.014765408, 0.014763959, 1.4493226e-06)
+Fullført epoke 33/10000. Brukt 82.3 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0168752
+
+Trener ...
+Treningsloss: (0.015865356, 0.015863674, 1.681093e-06)
+Tester ...
+Testloss: (0.014730587, 0.014729012, 1.575011e-06)
+Fullført epoke 34/10000. Brukt 84.8 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0158654
+
+Trener ...
+Treningsloss: (0.0155671, 0.015565496, 1.6040344e-06)
+Tester ...
+Testloss: (0.014351903, 0.014350564, 1.3391195e-06)
+Fullført epoke 35/10000. Brukt 87.2 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0155671
+
+Trener ...
+Treningsloss: (0.015462666, 0.015461109, 1.5577727e-06)
+Tester ...
+Testloss: (0.014510013, 0.01450873, 1.2835477e-06)
+Fullført epoke 36/10000. Brukt 89.7 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0154627
+
+Trener ...
+Treningsloss: (0.014925308, 0.014923576, 1.7310265e-06)
+Tester ...
+Testloss: (0.013742014, 0.013740143, 1.869876e-06)
+Fullført epoke 37/10000. Brukt 92.2 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0149253
+
+Trener ...
+Treningsloss: (0.014567493, 0.014565798, 1.6966146e-06)
+Tester ...
+Testloss: (0.013999356, 0.01399792, 1.4367625e-06)
+Fullført epoke 38/10000. Brukt 94.6 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0145675
+
+Trener ...
+Treningsloss: (0.014234695, 0.014233096, 1.6007056e-06)
+Tester ...
+Testloss: (0.013784093, 0.013782779, 1.3135597e-06)
+Fullført epoke 39/10000. Brukt 97.1 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0142347
+
+Trener ...
+Treningsloss: (0.013987485, 0.013985933, 1.55327e-06)
+Tester ...
+Testloss: (0.013421066, 0.013419892, 1.1731163e-06)
+Fullført epoke 40/10000. Brukt 99.5 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0139875
+
+Trener ...
+Treningsloss: (0.013253377, 0.013251914, 1.4627007e-06)
+Tester ...
+Testloss: (0.013278686, 0.01327714, 1.5470686e-06)
+Fullført epoke 41/10000. Brukt 102.0 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0132534
+
+Trener ...
+Treningsloss: (0.013600417, 0.013598894, 1.5235403e-06)
+Tester ...
+Testloss: (0.012983953, 0.012982232, 1.719187e-06)
+Fullført epoke 42/10000. Brukt 104.4 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.0132534
+
+Trener ...
+Treningsloss: (0.013103101, 0.013101136, 1.9648671e-06)
+Tester ...
+Testloss: (0.013133139, 0.013131103, 2.0360392e-06)
+Fullført epoke 43/10000. Brukt 106.8 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0131031
+
+Trener ...
+Treningsloss: (0.012961378, 0.012959422, 1.9567563e-06)
+Tester ...
+Testloss: (0.013328521, 0.0133268, 1.719222e-06)
+Fullført epoke 44/10000. Brukt 109.3 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0129614
+
+Trener ...
+Treningsloss: (0.012876101, 0.012874131, 1.9691231e-06)
+Tester ...
+Testloss: (0.013256527, 0.013254859, 1.6683106e-06)
+Fullført epoke 45/10000. Brukt 111.7 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0128761
+
+Trener ...
+Treningsloss: (0.012790925, 0.012788876, 2.0488876e-06)
+Tester ...
+Testloss: (0.01266805, 0.012666219, 1.8307976e-06)
+Fullført epoke 46/10000. Brukt 114.1 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0127909
+
+Trener ...
+Treningsloss: (0.012455913, 0.012453903, 2.0083189e-06)
+Tester ...
+Testloss: (0.012899396, 0.012897678, 1.7189557e-06)
+Fullført epoke 47/10000. Brukt 116.6 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0124559
+
+Trener ...
+Treningsloss: (0.012213181, 0.012211299, 1.8811933e-06)
+Tester ...
+Testloss: (0.012501175, 0.012499436, 1.7379882e-06)
+Fullført epoke 48/10000. Brukt 119.0 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0122132
+
+Trener ...
+Treningsloss: (0.012014368, 0.01201224, 2.128465e-06)
+Tester ...
+Testloss: (0.012608577, 0.012606618, 1.9594047e-06)
+Fullført epoke 49/10000. Brukt 121.5 minutter.
+Lagret vekter til  saved_weights/2017-08-07 10:46:34.h5
+Beste treningsloss så langt: 0.0120144
+
+Trener ...
+Treningsloss: (0.012019454, 0.012017428, 2.0230909e-06)
+Tester ...
+Testloss: (0.012608119, 0.012606336, 1.783268e-06)
+Fullført epoke 50/10000. Brukt 123.9 minutter.
+Epoker uten forbedring: 1/8
+Beste treningsloss så langt: 0.0120144
+
+Trener ...

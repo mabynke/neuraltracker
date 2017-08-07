@@ -140,3 +140,11 @@ Resultat: Uregelmessig testloss. På det beste (37 epoker) testloss 0.206, treni
 Forsøk 2017-08-01 15:22:27:
 128*128-bilder fra urbantracker. Økt konvolusjon.
 Resultat: Testloss holdt seg lav på omtrent samme nivå helt fra start selv om treningsloss startet mye høyere og brukte tid på å komme seg ned. Treningsloss 0.209, testloss 0.205
+
+2017-08-07 09:43:19:
+Gjenopprettet firkantinndatahåndtering og innført flere sekvenser per parti. Skal finne ut om den er like effektiv som før. Bruker partistørrelse 16. frame_stride var fortsatt 2 for test- og treningssett (uhell).
+Resultat:
+
+2017-08-07 10:31:58:
+Redusert frame_stride til 1.
+Resultat: 

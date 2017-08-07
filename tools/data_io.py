@@ -5,7 +5,7 @@ import json
 from PIL import Image
 
 
-def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_stride=2):
+def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_stride=1):
     """
     Leser inn sekvensmapper og genererer to sequences- og labels_pos-arrayer som kan brukes til trening.
     labels_pos hentes fra en fil ved navn "label.json" i sekvensmappen.
