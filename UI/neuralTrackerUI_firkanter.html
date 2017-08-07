@@ -59,7 +59,7 @@
 	    var c = document.getElementById("myCanvas");
     	var ctx = c.getContext("2d");
 
-    	var input_location = prompt("Please enter folder location","/home/nadiaw/prosjekter/neuraltracker/UI/eksempelsekvenser_firkanter");
+    	var input_location = prompt("Please enter folder location","test");
 
     	var click_coords = [];
     	var json_file = [];
@@ -113,7 +113,7 @@
                 w = data[pic_num].w;
                 h = data[pic_num].h;
                 filename = data[pic_num].filename;
-
+                img_amount = data.length; // img_amount er en global variabel
 
 				x1 = (x + 1 - w) * img_width / 2; // upper corner
 				y1 = (y + 1 - h) * img_height / 2;
@@ -236,7 +236,7 @@
     		// sender data før bildet er sent, endrer bilde, og henter ny json_data. 
     		sendData();
 
-			pic_num = (pic_num + i + 12) % 12;
+			pic_num = (pic_num + i + img_amount) % img_amount;
 			getJsonData(json_labels, json_labels_coords);
 			getJsonData(json_predict, json_predict_coords);
 
@@ -334,6 +334,10 @@
 
 			c.height = img.height;
     		c.width = img.width;
+
+			//ctx.imageSmoothingEnabled = false; // Ikke nødvendig
+			//ctx.webkitImageSmoothingEnabled = false;  // Ikke nødvendig
+			ctx.mozImageSmoothingEnabled = false;
 
     		ctx.drawImage(img, 0, 0, img_width*scale, img_height*scale); // drawImage(img, 0, 0, width, height) draws image onto canvas
 

@@ -9,42 +9,43 @@ import scipy.misc
 from data_io import write_labels
 
 
-def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, size_x=32, size_y=32, channels=3):
-    square_size = 1
-
-    sequence = np.zeros((frames, size_x, size_y, channels), dtype=np.int)
-
-    if binary_type == "horizontal-vertical":
-        speedX = (category - 1) * random.random() * size_x / 2 / frames
-        speedY = category       * random.random() * size_y / 2 / frames
-        posX = size_x / 2
-        posY = size_y / 2
-    elif binary_type == "fast-slow_right":
-        speedX = (size_x / frames) * (1 + random.random() + category)
-        speedY = 0
-        posX = random.randint(0, size_x - 1)
-        posY = size_y / 2
-
-    else:
-        print("FEIL i sekvensgenerator.generate_binary_linear_movement: Ukjent binary_type: ", binary_type)
-        return None
-
-    for frame in range(frames):
-        # TODO: Bruke draw_rectangle her dersom vi beholder denne funksjonen
-        for widthIndex in range(square_size):
-            for heightIndex in range(square_size):
-                for channel in range(channels):
-                    sequence[frame,
-                             round(posY + heightIndex - square_size / 2) % size_y,
-                             round(posX  + widthIndex - square_size / 2) % size_x,
-                             channel] = 255
-        posX += speedX
-        posY += speedY
-
-    return sequence
+# def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, size_x=32, size_y=32, channels=3):
+#     square_size = 1
+#
+#     sequence = np.zeros((frames, size_x, size_y, channels), dtype=np.int)
+#
+#     if binary_type == "horizontal-vertical":
+#         speedX = (category - 1) * random.random() * size_x / 2 / frames
+#         speedY = category       * random.random() * size_y / 2 / frames
+#         posX = size_x / 2
+#         posY = size_y / 2
+#     elif binary_type == "fast-slow_right":
+#         speedX = (size_x / frames) * (1 + random.random() + category)
+#         speedY = 0
+#         posX = random.randint(0, size_x - 1)
+#         posY = size_y / 2
+#
+#     else:
+#         print("FEIL i sekvensgenerator.generate_binary_linear_movement: Ukjent binary_type: ", binary_type)
+#         return None
+#
+#     for frame in range(frames):
+#         # TODO: Bruke draw_rectangle her dersom vi beholder denne funksjonen
+#         for widthIndex in range(square_size):
+#             for heightIndex in range(square_size):
+#                 for channel in range(channels):
+#                     sequence[frame,
+#                              round(posY + heightIndex - square_size / 2) % size_y,
+#                              round(posX  + widthIndex - square_size / 2) % size_x,
+#                              channel] = 255
+#         posX += speedX
+#         posY += speedY
+#
+#     return sequence
 
 
 def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=32, size_y=32, channels=3):
+
     labels_pos = []
     labels_size = []
 
@@ -52,12 +53,9 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
     if type == "random":
         pos_x = random.randint(0, size_x - 1)
         pos_y = random.randint(0, size_y - 1)
-        # pos_x = round(size_x / 2)
-        # pos_y = round(size_y / 2)
         speed_x = random.gauss(0, 0.05 * size_x)
         speed_y = random.gauss(0, 0.05 * size_y)
         square_size = random.randint(3, int(size_x / 3))
-        # square_size = 4
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
@@ -66,20 +64,25 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=color)  # Tegne inn firkant i bildet
 
         # Lagre merkelapp for dette bildet
-        x = pos_x / size_x * 2 - 1
-        y = pos_y / size_y * 2 - 1
-        w = square_size / size_x
-        h = square_size / size_y
+        x_min = max(0, pos_x - square_size / 2)  # Venstre kant av rektangelet
+        y_min = max(0, pos_y - square_size / 2)  # Øvre kant av rektangelet
+        x_max = min(size_x, pos_x + square_size / 2)  # Høyre kant av rektangelet
+        y_max = min(size_y, pos_y + square_size / 2)  # Nedre kant av rektangelet
+        # Konvertere til relativt koordinatsystem
+        x = (x_max + x_min) / size_x - 1
+        y = (y_max + y_min) / size_y - 1
+        w = (x_max - x_min) / size_x
+        h = (y_max - y_min) / size_y
         labels_pos.append((x, y))
         labels_size.append((w, h))
 
         # Oppdatere posisjon og fart til neste bilde/tidssteg
         pos_x += speed_x
         pos_y += speed_y
-        # TODO: burde vi ha en deskaleringsfaktor her? unngå ukontrollert økning
-        # i fart for lange sekvenser?
         speed_x += random.gauss(0, 0.03 * size_x)
         speed_y += random.gauss(0, 0.03 * size_y)
+        speed_x += 0.05 * (size_x/2 - pos_x)
+        speed_y += 0.05 * (size_y/2 - pos_y)
 
         # Sørge for at firkanten holder seg innenfor bildet
         if pos_x < 0:
@@ -168,7 +171,7 @@ def save_sequence_labelfile(sequence, labels_pos, labels_size, parent_path, seq_
 
 
 def create_train_test_examples(path, counts, figures=1):
-    frames = 12
+    frames = 24
     image_size = 32
     channels = 3
 
@@ -203,9 +206,9 @@ def create_train_test_examples(path, counts, figures=1):
 
 def main():
     os.chdir(os.path.dirname(sys.argv[0]))
-    test_examples = 10000
+    test_examples = 100
     train_examples = 0
-    default_path = "../Grafikk/tilfeldig_relativeKoordinater"
+    default_path = "../../Grafikk/tilfeldig_varStr"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":
