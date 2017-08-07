@@ -55,19 +55,20 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         pos_y = random.randint(0, size_y - 1)
         speed_x = random.gauss(0, 0.05 * size_x)
         speed_y = random.gauss(0, 0.05 * size_y)
-        square_size = random.randint(3, int(size_x / 3))
+        rect_size_x = random.randint(3, int(size_x / 3))
+        rect_size_y = random.randint(3, int(size_x / 3))
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
     color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
     for frame in range(frames):  # For hvert bilde i sekvensen
-        draw_rectangle(sequence, frame, pos_x, pos_y, square_size, channels, color=color)  # Tegne inn firkant i bildet
+        draw_rectangle(sequence, frame, pos_x, pos_y, rect_size_x, rect_size_y, channels, color=color)  # Tegne inn firkant i bildet
 
         # Lagre merkelapp for dette bildet
-        x_min = max(0, pos_x - square_size / 2)  # Venstre kant av rektangelet
-        y_min = max(0, pos_y - square_size / 2)  # Øvre kant av rektangelet
-        x_max = min(size_x, pos_x + square_size / 2)  # Høyre kant av rektangelet
-        y_max = min(size_y, pos_y + square_size / 2)  # Nedre kant av rektangelet
+        x_min = max(0.0, pos_x - rect_size_x / 2)  # Venstre kant av rektangelet
+        y_min = max(0.0, pos_y - rect_size_y / 2)  # Øvre kant av rektangelet
+        x_max = min(size_x, pos_x + rect_size_x / 2)  # Høyre kant av rektangelet
+        y_max = min(size_y, pos_y + rect_size_y / 2)  # Nedre kant av rektangelet
         # Konvertere til relativt koordinatsystem
         x = (x_max + x_min) / size_x - 1
         y = (y_max + y_min) / size_y - 1
@@ -83,6 +84,14 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         speed_y += random.gauss(0, 0.03 * size_y)
         speed_x += 0.05 * (size_x/2 - pos_x)
         speed_y += 0.05 * (size_y/2 - pos_y)
+
+        # Oppdatere størrelse til neste bilde/tidssteg
+        rect_size_x += random.gauss(0, 0.1 * rect_size_x)
+        rect_size_x = min(rect_size_x, 12)
+        rect_size_x = max(rect_size_x, 2)
+        rect_size_y += random.gauss(0, 0.1 * rect_size_y)
+        rect_size_y = min(rect_size_y, 12)
+        rect_size_y = max(rect_size_y, 2)
 
         # Sørge for at firkanten holder seg innenfor bildet
         if pos_x < 0:
@@ -101,7 +110,7 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
     return labels_pos, labels_size
 
 
-def draw_rectangle(sequence, frame, pos_x, pos_y, square_size=4, channels=3, color=(255, 255, 255)):
+def draw_rectangle(sequence, frame, pos_x, pos_y, rect_size_x=4, rect_size_y=4, channels=3, color=(255, 255, 255)):
     """
     Tegner et kvadrat i en numpy-array sequence på den gitte posisjonen.
 
@@ -117,13 +126,13 @@ def draw_rectangle(sequence, frame, pos_x, pos_y, square_size=4, channels=3, col
 
     assert len(color) == channels
 
-    orig_x = round(pos_x - square_size / 2)      # Venstre kant av rektangelet
-    orig_y = round(pos_y - square_size / 2)      # Øvre kant av rektangelet
-    for widthIndex in range(square_size):           # Iterere over bredden til firkanten
+    orig_x = round(pos_x - rect_size_x / 2)      # Venstre kant av rektangelet
+    orig_y = round(pos_y - rect_size_y / 2)      # Øvre kant av rektangelet
+    for widthIndex in range(round(rect_size_x)):           # Iterere over bredden til firkanten
         current_pos_x = orig_x + widthIndex
         if current_pos_x < 0 or current_pos_x > len(sequence[0][0]):    # Utenfor bildet
             continue
-        for heightIndex in range(square_size):      # Iterere over høyden til firkanten
+        for heightIndex in range(round(rect_size_y)):      # Iterere over høyden til firkanten
             current_pos_y = orig_y + heightIndex
             if current_pos_y < 0 or current_pos_y > len(sequence[0]):  # Utenfor bildet
                 continue
@@ -208,7 +217,7 @@ def main():
     os.chdir(os.path.dirname(sys.argv[0]))
     test_examples = 100
     train_examples = 0
-    default_path = "../../Grafikk/tilfeldig_varStr"
+    default_path = "../../Grafikk/tilfeldig_varStr2"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":
