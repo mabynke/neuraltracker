@@ -240,10 +240,10 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
         sys.stdout = open(os.path.join(print_path, run_name), 'w', buffering=1)
 
     print("run_name: ", run_name)
-    train_path = "../../Grafikk/tilfeldig_varStr/train"
+    train_path = "../../Grafikk/tilfeldig_varStr2/train"
     print("Treningseksempler hentes fra ", train_path)
-    test_path = "../../Grafikk/tilfeldig_varStr/test"
-    example_path = "../../Grafikk/tilfeldig_varStr/test"
+    test_path = "../../Grafikk/tilfeldig_varStr2/test"
+    example_path = "../../Grafikk/tilfeldig_varStr2/test"
     print("Testeksempler hentes fra ", test_path)
     if load_weights:
         weights_path = os.path.join("saved_weights", input("Skriv filnavnet til vektene som skal lastes inn (ikke inkludert \".h5\"): ") + ".h5")

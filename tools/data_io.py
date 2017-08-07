@@ -11,6 +11,8 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_
     labels_pos hentes fra en fil ved navn "label.json" i sekvensmappen.
     :param main_path: Full bane til mappen som inneholder sekvensmappene (og bare det)
     :param max_count: Maksimalt antall sekvenser som skal lastes inn. 0 betyr ingen begrensning.
+    :param output_size: Størrelsen som bildene skal skaleres til (heltall). Alle bilder blir skalert til kvadrater.
+    :param frame_stride: Kan brukes til å ikke laste inn alle bilder, men bare f.eks. hvert andre (ved å sette til 2).
     :return: sequences, startcoords, labels_pos, labels_size, json_paths
     """
 
@@ -97,8 +99,9 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_
     return sequences, startcoords, labels_pos, labels_size, json_paths
 
 
-def write_labels(path, json_file_name, labels_pos, labels_size, file_names):
-    # Skrive merkelapper til fil
+def write_labels(dir_path, json_file_name, labels_pos, labels_size, file_names):
+    """Skrive merkelapper til json-fil."""
+
     formatted_labels = []
     for i in range(len(labels_pos)):
         formatted_labels.append({"filename": file_names[i],
@@ -106,11 +109,13 @@ def write_labels(path, json_file_name, labels_pos, labels_size, file_names):
                                  "y": float(labels_pos[i][1]),
                                  "w": float(labels_size[i][0]),
                                  "h": float(labels_size[i][1])})
-    with open(os.path.join(path, json_file_name), "w") as label_file:
+    with open(os.path.join(dir_path, json_file_name), "w") as label_file:
         json.dump(formatted_labels, label_file)
 
 
 def get_image_file_names_in_json(json_path):
+    """Henter ut en liste over filnavnene til alle bilder i en merkelapp-json-fil i riktig rekkefølge."""
+
     with open(json_path, "r") as json_file:
         json_content = json.load(json_file)
     image_file_names = []

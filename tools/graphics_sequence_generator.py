@@ -215,8 +215,8 @@ def create_train_test_examples(path, counts, figures=1):
 
 def main():
     os.chdir(os.path.dirname(sys.argv[0]))
-    test_examples = 100
-    train_examples = 0
+    train_examples = 100000
+    test_examples = 10000
     default_path = "../../Grafikk/tilfeldig_varStr2"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
