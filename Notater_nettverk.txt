@@ -143,16 +143,22 @@ Resultat: Testloss holdt seg lav på omtrent samme nivå helt fra start selv om 
 
 2017-08-07 09:43:19:
 Gjenopprettet firkantinndatahåndtering og innført flere sekvenser per parti. Skal finne ut om den er like effektiv som før. Bruker partistørrelse 16. frame_stride var fortsatt 2 for test- og treningssett (uhell).
-Resultat:
+Resultat: Testloss 0.0105 (0.0105+0.0000002), treningsloss 0.0055 (0.0055 + 0.0000002). 328 epoker (559 min).
 
 2017-08-07 10:31:58:
 Redusert frame_stride til 1.
-Resultat: Læringen gikk raskere.
+Resultat: Læringen gikk raskere. Testloss 0.00798 (0.00798+0.000001), treningsloss 0.0056 (0.0056+0.000001). 203 epoker (517 min).
 
 2017-08-07 13:55:08:
 Nye genererte bilder. Håndterer nå kanter av bildet riktig i label-filene slik at markeringen holder seg innenfor bildet. Farten på firkantene får en vekting innover mot midten. Dobbelt så lange sekvenser (24 bilder) (tilfeldig_varStr).
-Resultat:
+Resultat: Tok betydelig lengre tid å trene (antakelig pga. doblingen av antall bilder per sekvens). Testloss 0.00785 (0.00750+0.00035), treningsloss 0.0058 (0.0054+0.0004). Som forventet en økning i tap for størrelsen, men fortsatt veldig god ytelse på posisjon. 219 epoker (985 min).
 
 2017-08-07 14:30:43
 Firkantene er ikke lenger bare kvadrater. Varierer i høyde og bredde underveis. (tilfeldig_varStr2)
-Resultat: 
+Resultat: Testtap 0.0170 (0.0151+0.0019), treningstap 0.0096 (0.0075+0.0020). Betydelig høyere tap for både posisjon og størrelse. Visuell vurdering: Veldig god til å følge firkantene, men bare litt god til å finne størrelsen. Kan være lurt å øke vekten til størrelsestapet.
+
+2017-08-09 09:47:30:
+Endret tapvekting til 1, 2 og redusert til 10000 treningseksempler for å trene fortere.
+Resultat: Svært stort gap mellom trenings- og testtap. Avbryter.
+
+Henter bare de 12 første bildene i hver sekvens under innlasting av trenings- og testsettet.

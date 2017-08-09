@@ -57,10 +57,11 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         speed_y = random.gauss(0, 0.05 * size_y)
         rect_size_x = random.randint(3, int(size_x / 3))
         rect_size_y = random.randint(3, int(size_x / 3))
+        color = [random.randint(1, 255) for i in range(3)]
+        color_speed = [random.gauss(0, 10) for i in range(3)]
     else:
         raise ValueError("Ukjent verdi av 'type': {0}".format(type))
 
-    color = (random.randint(1, 255), random.randint(1, 255), random.randint(1, 255))
     for frame in range(frames):  # For hvert bilde i sekvensen
         draw_rectangle(sequence, frame, pos_x, pos_y, rect_size_x, rect_size_y, channels, color=color)  # Tegne inn firkant i bildet
 
@@ -84,15 +85,6 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         speed_y += random.gauss(0, 0.03 * size_y)
         speed_x += 0.05 * (size_x/2 - pos_x)
         speed_y += 0.05 * (size_y/2 - pos_y)
-
-        # Oppdatere størrelse til neste bilde/tidssteg
-        rect_size_x += random.gauss(0, 0.1 * rect_size_x)
-        rect_size_x = min(rect_size_x, 12)
-        rect_size_x = max(rect_size_x, 2)
-        rect_size_y += random.gauss(0, 0.1 * rect_size_y)
-        rect_size_y = min(rect_size_y, 12)
-        rect_size_y = max(rect_size_y, 2)
-
         # Sørge for at firkanten holder seg innenfor bildet
         if pos_x < 0:
             pos_x = 0
@@ -106,6 +98,25 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
         elif pos_y >= size_y:
             pos_y = size_y - 1
             speed_y = 0
+
+        # Oppdatere størrelse til neste bilde/tidssteg
+        rect_size_x += random.gauss(0, 0.1 * rect_size_x)
+        rect_size_x = min(rect_size_x, 12)
+        rect_size_x = max(rect_size_x, 2)
+        rect_size_y += random.gauss(0, 0.1 * rect_size_y)
+        rect_size_y = min(rect_size_y, 12)
+        rect_size_y = max(rect_size_y, 2)
+
+        # Oppdatere farge til neste bilde/tidssteg
+        for channel in range(3):
+            color[channel] = color[channel] + color_speed[channel]
+            if color[channel] < 0:
+                color[channel] = 0
+                color_speed[channel] = 0
+            elif color[channel] > 255:
+                color[channel] = 255
+                color_speed[channel] = 0
+            color_speed[channel] += random.gauss(0, 6)
 
     return labels_pos, labels_size
 
@@ -143,24 +154,24 @@ def draw_rectangle(sequence, frame, pos_x, pos_y, rect_size_x=4, rect_size_y=4, 
                     pass
 
 
-def save_sequence_binarylabel(sequence, parent_path, type):
-    seq_number = 0
-    while True:
-        path_base = os.path.join(parent_path, "seq{0:05d}".format(seq_number))
-        for i in range(2):
-            if os.access(path_base + " " + str(i), os.F_OK):
-                seq_number += 1
-                break
-        else:   # Dersom det ikke ble funnet en eksisterende mappe
-            break
-        continue   # Dersom det ble funnet en eksisterende mappe
-
-    path = os.path.join(path_base + " " + type)
-    os.mkdir(path)
-
-    for frame in range(len(sequence)):
-        image_array = sequence[frame]
-        scipy.misc.imsave(os.path.join(path, "frame{0:05d}.jpg".format(frame)), image_array)
+# def save_sequence_binarylabel(sequence, parent_path, type):
+#     seq_number = 0
+#     while True:
+#         path_base = os.path.join(parent_path, "seq{0:05d}".format(seq_number))
+#         for i in range(2):
+#             if os.access(path_base + " " + str(i), os.F_OK):
+#                 seq_number += 1
+#                 break
+#         else:   # Dersom det ikke ble funnet en eksisterende mappe
+#             break
+#         continue   # Dersom det ble funnet en eksisterende mappe
+#
+#     path = os.path.join(path_base + " " + type)
+#     os.mkdir(path)
+#
+#     for frame in range(len(sequence)):
+#         image_array = sequence[frame]
+#         scipy.misc.imsave(os.path.join(path, "frame{0:05d}.jpg".format(frame)), image_array)
 
 
 def save_sequence_labelfile(sequence, labels_pos, labels_size, parent_path, seq_number):
@@ -175,7 +186,7 @@ def save_sequence_labelfile(sequence, labels_pos, labels_size, parent_path, seq_
         image_array = sequence[frame]
         scipy.misc.imsave(os.path.join(path, file_name), image_array)
 
-    write_labels(file_names=file_names, labels_pos=labels_pos, labels_size=labels_size, path=path,
+    write_labels(file_names=file_names, labels_pos=labels_pos, labels_size=labels_size, dir_path=path,
                  json_file_name="labels.json")
 
 
@@ -217,7 +228,7 @@ def main():
     os.chdir(os.path.dirname(sys.argv[0]))
     train_examples = 100000
     test_examples = 10000
-    default_path = "../../Grafikk/tilfeldig_varStr2"
+    default_path = "../../Grafikk/skiftendeFarger"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":

@@ -5,11 +5,12 @@ import json
 from PIL import Image
 
 
-def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_stride=1):
+def fetch_seq_startcoords_labels(main_path, max_count=0, max_length=0, output_size=224, frame_stride=1):
     """
     Leser inn sekvensmapper og genererer to sequences- og labels_pos-arrayer som kan brukes til trening.
     labels_pos hentes fra en fil ved navn "label.json" i sekvensmappen.
     :param main_path: Full bane til mappen som inneholder sekvensmappene (og bare det)
+    :param max_length: Det maksimale antall bilder som skal hentes per sekvens. Kutter fra slutten. 0 betyr ingen begrensning.
     :param max_count: Maksimalt antall sekvenser som skal lastes inn. 0 betyr ingen begrensning.
     :param output_size: Størrelsen som bildene skal skaleres til (heltall). Alle bilder blir skalert til kvadrater.
     :param frame_stride: Kan brukes til å ikke laste inn alle bilder, men bare f.eks. hvert andre (ved å sette til 2).
@@ -62,6 +63,9 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, output_size=224, frame_
                     image_names_in_object_sequence.append(image_label["filename"])
                 except KeyError:  # Denne oppføringen er ikke et bilde, men sannsynligvis en som inneholder "img_amount".
                     labels.remove(image_label)  # Fjerner denne oppføringen fordi den skaper problemer senere.
+
+            if max_length > 0 and max_length < len(image_names_in_object_sequence):
+                image_names_in_object_sequence = image_names_in_object_sequence[:max_length]
 
             sequence = []  # Bildene i denne objektsekvensen
             for image_name in image_names_in_object_sequence:  # Iterere gjennom bildene i objektsekvensen og legge dem til i sequence

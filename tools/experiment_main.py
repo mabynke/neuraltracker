@@ -88,7 +88,7 @@ def build_and_train_model(state_vector_length, image_size, interface_vector_leng
     # Bygge modellen
     # model = create_model(image_size, interface_vector_length, state_vector_length)
     model = create_model(image_size, interface_vector_length, state_vector_length)
-    model.compile(optimizer=Adam(), loss=["mean_squared_error", "mean_squared_error"], loss_weights=[1, 1])
+    model.compile(optimizer=Adam(), loss=["mean_squared_error", "mean_squared_error"], loss_weights=[1, 2])
 
     print("Oppsummering av nettet:")
     model.summary()  # Skrive ut en oversikt over modellen
@@ -112,9 +112,9 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                 training_examples, training_path, run_name, save_results, image_size, batch_size):
 
     train_seqs, train_startcoords, train_labels_pos, train_labels_size, _ =\
-        data_io.fetch_seq_startcoords_labels(training_path, training_examples, output_size=image_size)
+        data_io.fetch_seq_startcoords_labels(training_path, training_examples, output_size=image_size, max_length=0)
     test_seqs, test_startcoords, test_labels_pos, test_labels_size, _ = \
-        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size)
+        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size, max_length=0)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
@@ -279,7 +279,7 @@ def make_example_jsons(example_examples, example_path, model, image_size):
         data_io.write_labels(file_names=data_io.get_image_file_names_in_json(json_label_path),
                              labels_pos=predictions[0][0],
                              labels_size=predictions[1][0],
-                             path=dir_path, json_file_name=json_pred_name)
+                             dir_path=dir_path, json_file_name=json_pred_name)
         # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
 
@@ -298,7 +298,7 @@ def main():
     load_saved_weights = False
     do_training = True
     make_example_jsons = True
-    training_examples = 0
+    training_examples = 10000
     testing_examples = 0
     sequences_to_predict = 100  # Antall sekvenser det skal lages prediksjons-json-filer til.
     patience_before_lowering_lr = 8
