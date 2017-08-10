@@ -161,4 +161,21 @@ Resultat: Testtap 0.0170 (0.0151+0.0019), treningstap 0.0096 (0.0075+0.0020). Be
 Endret tapvekting til 1, 2 og redusert til 10000 treningseksempler for å trene fortere.
 Resultat: Svært stort gap mellom trenings- og testtap. Avbryter.
 
-Henter bare de 12 første bildene i hver sekvens under innlasting av trenings- og testsettet.
+2017-08-09 11:26:45:
+Firkantene skifter farge. Økt til 100000 treningssekvenser igjen for å kunne sammenligne med resultatene fra tidligere. Fortsatt 24 bilder/sekvens.
+Resultat:
+Visuell vurdering: Svært god til å ikke miste firkanten sin. Klarer å følge riktig firkant selv når de krysser hverandre og ser veldig like ut (se f.eks. sekvensen skiftendeFarger/test/seq00052). Også når den aktuelle firkanten er gjemt bak den andre i et bilde. Tar tilsynelatende feil bare når firkantene starter oppå hverandre og det er mer eller mindre umulig å vite hvilken firkant som skulle følges. Ikke like god til å finne størrelsen, men klarer det rimelig godt.
+
+2017-08-09 11:27:51:
+Ganget størrelsen på grensesnittvektoren med 2. Ganget antall filtre med 2. (1024, 64)
+Resultat: Dårlig. Tap på rundt 0.20-0.21.
+Visuell vurdering: Klarer i korte øyeblikk å følge firkanten, men ligner for det meste på kvalifisert gjetting.
+
+2017-08-09 12:27:46:
+Redusert grensesnittvektorens lengde tilbake til 512. Fortsatt 64 filtre.
+Resultat: 
+
+2017-08-09 16:21:23:
+Endret bakgrunn fra svart til tilfeldig støy (men ikke animert). Skrudd av skiftende farger på firkantene.
+Resultat: Tap på 0.33.
+Visuell vurdering: Prediksjonen står helt stille i midten av bildet og har ca. samme størrelse som målfirkanten har i første bilde. Det er tydelig på grafikken at det er en veldig vanskelig oppgave for konvolusjonsdelen og grensesnittlaget.

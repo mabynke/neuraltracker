@@ -2,10 +2,9 @@ import os
 import sys
 import time
 import numpy
-import random
 import math
 
-# from tools import data_io  # For kjøring fra PyCharm
+# from tools import data_io  # PyCharm krever dette formatet
 import data_io  # For kjøring fra terminal
 import plotting
 # import tf_tracker
@@ -18,7 +17,6 @@ except IndexError:
     print("Trenger et argument: GPU-enhet (0-3)")
     exit()
 
-# from keras.callbacks import TerminateOnNaN, TensorBoard
 from keras.layers import Input
 from keras.layers.convolutional import Conv2D, MaxPooling2D
 from keras.layers.core import Dense, Flatten
@@ -119,8 +117,10 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 
     max_num_of_epoches = 1000
-    best_loss = 10000  # Kan like gjerne være uendelig, bare den er høyere enn alle loss-verdier
-    num_of_rounds_without_improvement = 0
+    best_train_loss = 10000  # Kan like gjerne være uendelig, bare den er høyere enn alle loss-verdier
+    best_test_loss = 10000
+    num_of_rounds_without_train_improvement = 0
+    num_of_rounds_without_test_improvement = 0
     time_at_start = os.times().elapsed
     for epoch_index in range(max_num_of_epoches):
         train_loss_history = []
@@ -182,48 +182,40 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                       max_num_of_epoches,
                       round((os.times().elapsed - time_at_start) / 60, 1)))
 
-        if train_loss[0] >= best_loss:
-            num_of_rounds_without_improvement += 1
-            print("Epoker uten forbedring: {0}/{1}".format(num_of_rounds_without_improvement, round_patience))
-            if num_of_rounds_without_improvement == round_patience:  # Senke læringsrate
+        if train_loss[0] >= best_train_loss:
+            num_of_rounds_without_train_improvement += 1
+            print("Epoker uten forbedring i treningstap: {0}/{1} ({2})".format(num_of_rounds_without_train_improvement,
+                                                                               round_patience, round_patience+4))
+            if num_of_rounds_without_train_improvement == round_patience:  # Senke læringsrate
                 set_value(model.optimizer.lr, get_value(model.optimizer.lr) / 10)
                 print("Senket læringsrate til", get_value(model.optimizer.lr))
-            if num_of_rounds_without_improvement >= round_patience + 4:  # Avslutte treningen
+            if num_of_rounds_without_train_improvement >= round_patience + 4:  # Avslutte treningen
+                print("Ingen forbedring i treningstap. Avslutter ...")
                 if save_results:
                     print("Laster inn vekter fra ", save_weights_path)
                     model.load_weights(save_weights_path)
                 break
         else:
-            num_of_rounds_without_improvement = 0
-            best_loss = train_loss[0]
+            num_of_rounds_without_train_improvement = 0
+            best_train_loss = train_loss[0]
+        if test_loss[0] >= best_test_loss:
+            num_of_rounds_without_test_improvement += 1
+            print("Epoker uten forbedring i testtap: {0}/{1}".format(num_of_rounds_without_test_improvement, 36))
+            if num_of_rounds_without_test_improvement == 36:  # Avslutte
+                print("Ingen forbedring i testtap. Avslutter ...")
+                if save_results:
+                    print("Laster inn vekter fra ", save_weights_path)
+                    model.load_weights(save_weights_path)
+                break
+        else:
+            num_of_rounds_without_test_improvement = 0
+            best_test_loss = test_loss[0]
             if save_results:
                 model.save_weights(save_weights_path, overwrite=True)
                 print("Lagret vekter til ", save_weights_path)
-        print("Beste treningsloss så langt:", best_loss)
+        print("Beste treningstap så langt:", best_train_loss)
+        print("Beste testtap så langt:", best_test_loss)
         print()
-
-
-def print_results(example_labels, example_sequences, prediction, sequence_length, max_count):
-    for i in range(len(example_sequences)):
-        if i >= max_count:
-            break
-
-        print("Eksempelsekvens:")
-        for frame in range(sequence_length):
-            print("Bilde:")
-            correct_coords = example_labels[i][frame]
-            calculated_coords = prediction[i][frame]
-
-            squared_error = 0
-            for coordinate in range(len(correct_coords)):
-                squared_error += (correct_coords[coordinate] - calculated_coords[coordinate]) ** 2
-            mean_squared_error = squared_error / len(correct_coords)
-
-            print("{0:4.0f}, {1:4.0f} \t{2:4.0f}, {3:4.0f}".format(correct_coords[0], correct_coords[1],
-                                                                   correct_coords[2], correct_coords[3]))
-            print("{0:4.0f}, {1:4.0f} \t{2:4.0f}, {3:4.0f}".format(calculated_coords[0], calculated_coords[1],
-                                                                   calculated_coords[2], calculated_coords[3]), end="")
-            print("\tLoss: {0:5.2f}".format(mean_squared_error))
 
 
 def do_run(example_examples=100, testing_examples=0, training_examples=0, load_weights=False, do_training=True,
@@ -240,10 +232,10 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
         sys.stdout = open(os.path.join(print_path, run_name), 'w', buffering=1)
 
     print("run_name: ", run_name)
-    train_path = "../../Grafikk/tilfeldig_varStr2/train"
+    train_path = "../../Grafikk/skiftendeFarger/train"
     print("Treningseksempler hentes fra ", train_path)
-    test_path = "../../Grafikk/tilfeldig_varStr2/test"
-    example_path = "../../Grafikk/tilfeldig_varStr2/test"
+    test_path = "../../Grafikk/skiftendeFarger/test"
+    example_path = "../../Grafikk/skiftendeFarger/test"
     print("Testeksempler hentes fra ", test_path)
     if load_weights:
         weights_path = os.path.join("saved_weights", input("Skriv filnavnet til vektene som skal lastes inn (ikke inkludert \".h5\"): ") + ".h5")
@@ -280,7 +272,6 @@ def make_example_jsons(example_examples, example_path, model, image_size):
                              labels_pos=predictions[0][0],
                              labels_size=predictions[1][0],
                              dir_path=dir_path, json_file_name=json_pred_name)
-        # print_results(example_labels, example_sequences, predictions, sequence_length, 4)
 
 
 def evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, test_labels_size):
@@ -292,13 +283,12 @@ def evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, tes
 
 
 def main():
-    os.chdir(os.path.dirname(sys.argv[0]))  # set working directory to that of the script
     # Oppsett
-    save_results = True  # Husk denne! Lagrer vekter, plott og stdout.
-    load_saved_weights = False
-    do_training = True
+    save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
+    load_saved_weights = True
+    do_training = False
     make_example_jsons = True
-    training_examples = 10000
+    training_examples = 0
     testing_examples = 0
     sequences_to_predict = 100  # Antall sekvenser det skal lages prediksjons-json-filer til.
     patience_before_lowering_lr = 8
@@ -309,17 +299,23 @@ def main():
     else:
         image_size = 32
 
-    for i in range(1):  # Kjøre de angitte eksperimentene
+    os.chdir(os.path.dirname(sys.argv[0]))  # set working directory to that of the script
+
+    experiment_count = 1
+    for i in range(experiment_count):  # Kjøre de angitte eksperimentene
         global RUN_ID
         RUN_ID = i
         try:
             # with tf.device("/gpu:0"):
             do_run(sequences_to_predict, testing_examples, training_examples, load_saved_weights, do_training,
                    make_example_jsons, round_patience=patience_before_lowering_lr, save_results=save_results,
-                   image_size=image_size, batch_size=batch_size)
+                   image_size=image_size, batch_size=batch_size, interface_vector_length=512)
         except IOError as e:
             print("Det skjedde en feil med kjøring nr.", RUN_ID)
-            print(e)
+            if i == experiment_count - 1:
+                raise e
+            else:
+                print(e)
 
 
 if __name__ == "__main__":

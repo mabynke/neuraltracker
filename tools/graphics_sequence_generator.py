@@ -45,6 +45,8 @@ from data_io import write_labels
 
 
 def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=32, size_y=32, channels=3):
+    changing_color = False
+    changing_size = True
 
     labels_pos = []
     labels_size = []
@@ -100,23 +102,25 @@ def generate_movement_positionlabel(sequence, type="random", frames=12, size_x=3
             speed_y = 0
 
         # Oppdatere størrelse til neste bilde/tidssteg
-        rect_size_x += random.gauss(0, 0.1 * rect_size_x)
-        rect_size_x = min(rect_size_x, 12)
-        rect_size_x = max(rect_size_x, 2)
-        rect_size_y += random.gauss(0, 0.1 * rect_size_y)
-        rect_size_y = min(rect_size_y, 12)
-        rect_size_y = max(rect_size_y, 2)
+        if changing_size:
+            rect_size_x += random.gauss(0, 0.1 * rect_size_x)
+            rect_size_x = min(rect_size_x, 12)
+            rect_size_x = max(rect_size_x, 2)
+            rect_size_y += random.gauss(0, 0.1 * rect_size_y)
+            rect_size_y = min(rect_size_y, 12)
+            rect_size_y = max(rect_size_y, 2)
 
         # Oppdatere farge til neste bilde/tidssteg
-        for channel in range(3):
-            color[channel] = color[channel] + color_speed[channel]
-            if color[channel] < 0:
-                color[channel] = 0
-                color_speed[channel] = 0
-            elif color[channel] > 255:
-                color[channel] = 255
-                color_speed[channel] = 0
-            color_speed[channel] += random.gauss(0, 6)
+        if changing_color:
+            for ch in range(3):
+                color[ch] = color[ch] + color_speed[ch]
+                if color[ch] < 0:
+                    color[ch] = 0
+                    color_speed[ch] = 0
+                elif color[ch] > 255:
+                    color[ch] = 255
+                    color_speed[ch] = 0
+                color_speed[ch] += random.gauss(0, 6)
 
     return labels_pos, labels_size
 
@@ -129,7 +133,8 @@ def draw_rectangle(sequence, frame, pos_x, pos_y, rect_size_x=4, rect_size_y=4, 
     :param frame: Indeksen til bildet i sekvensen som skal endres
     :param pos_x: x-koordinaten til midten av rektangelet
     :param pos_y: y-koordinaten til midten av rektangelet
-    :param square_size: sidelengden til kvadratet
+    :param rect_size_x: bredden til rektangelet
+    :param rect_size_y: høyden til rektangelet
     :param channels: antallet fargekanaler
     :param color: fargen til rektangelet, som tuppel med oppføring for hver fargekanal
     :return:
@@ -152,6 +157,18 @@ def draw_rectangle(sequence, frame, pos_x, pos_y, rect_size_x=4, rect_size_y=4, 
                     sequence[frame, current_pos_y, current_pos_x, channel] = color[channel]
                 except IndexError:
                     pass
+
+
+def make_background(sequence, pattern="random_noise_constant"):
+    if pattern == "random_noise_constant":
+        for x in range(len(sequence[0])):
+            for y in range(len(sequence[0][0])):
+                for ch in range(3):
+                    value = random.randint(0, 255)
+                    for frame in range(len(sequence)):
+                        sequence[frame][x][y][ch] = value
+    else:
+        raise ValueError("Kjenner ikke mønsteret " + pattern)
 
 
 # def save_sequence_binarylabel(sequence, parent_path, type):
@@ -210,17 +227,18 @@ def create_train_test_examples(path, counts, figures=1):
 
         count = counts[name_index]
         for sequence_index in range(count):
-            if not sequence_index % 1000:
+            if not sequence_index % 2000:
                 print("Skrevet {0}/{1} sekvenser til {2}".format(sequence_index, count, name))
             sequence = np.zeros((frames, image_size, image_size, channels), dtype=np.int)
+            make_background(sequence)
             for figure in range(figures):
                 # Kun den siste versjonen av labels blir beholdt og skrevet til fil
                 labels_pos, labels_size = generate_movement_positionlabel(sequence,
-                                                         type="random",
-                                                         frames=frames,
-                                                         size_x=image_size,
-                                                         size_y=image_size,
-                                                         channels=channels)
+                                                                          type="random",
+                                                                          frames=frames,
+                                                                          size_x=image_size,
+                                                                          size_y=image_size,
+                                                                          channels=channels)
             save_sequence_labelfile(sequence, labels_pos, labels_size, os.path.join(path, name), seq_number=sequence_index)
 
 
@@ -228,7 +246,7 @@ def main():
     os.chdir(os.path.dirname(sys.argv[0]))
     train_examples = 100000
     test_examples = 10000
-    default_path = "../../Grafikk/skiftendeFarger"
+    default_path = "../../Grafikk/stoybakgrunn"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":

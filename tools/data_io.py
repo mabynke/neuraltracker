@@ -10,8 +10,8 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, max_length=0, output_si
     Leser inn sekvensmapper og genererer to sequences- og labels_pos-arrayer som kan brukes til trening.
     labels_pos hentes fra en fil ved navn "label.json" i sekvensmappen.
     :param main_path: Full bane til mappen som inneholder sekvensmappene (og bare det)
-    :param max_length: Det maksimale antall bilder som skal hentes per sekvens. Kutter fra slutten. 0 betyr ingen begrensning.
     :param max_count: Maksimalt antall sekvenser som skal lastes inn. 0 betyr ingen begrensning.
+    :param max_length: Det maksimale antall bilder som skal hentes per sekvens. Kutter fra slutten. 0 betyr ingen begrensning.
     :param output_size: Størrelsen som bildene skal skaleres til (heltall). Alle bilder blir skalert til kvadrater.
     :param frame_stride: Kan brukes til å ikke laste inn alle bilder, men bare f.eks. hvert andre (ved å sette til 2).
     :return: sequences, startcoords, labels_pos, labels_size, json_paths
@@ -21,10 +21,10 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, max_length=0, output_si
     startcoords = []  # Startkoordinatene for hver sekvens
     labels_pos = []  # x og y for hvert bilde i hver sekvens
     labels_size = []  # w og h for hvert bilde i hver sekvens
-    json_paths = []
+    json_paths = []  # Liste over stiene til json-filene som hver sekvens er hentet fra
 
     list_of_sequence_folders = os.listdir(main_path)  # os.listdir sorterer ikke alfabetisk.
-    list_of_sequence_folders.sort()  # For å være konsekvent og for å lagre eksemplene i riktige mapper
+    list_of_sequence_folders.sort()  # Kanskje ikke nødvendig etter at vi lagrer json_paths og prediksjonene derfor uansett havner i riktig mappe?
 
     # Kontrollere antall sekvenser som skal lastes inn
     if max_count <= 0:
@@ -39,13 +39,11 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, max_length=0, output_si
 
     for sequence_index in range(len(list_of_sequence_folders)):  # Iterere gjennom sekvensene i mappen
         if not sequence_index % 5000:
-            print("Henter sekvens {0}/{1}...".format(sequence_index, max_count))
+            print("Henter sekvens {0}/{1} ...".format(sequence_index, max_count))
         sequence_dir = os.path.join(main_path, list_of_sequence_folders[sequence_index])
 
         files_in_sequence_dir = os.listdir(sequence_dir)
         label_files_in_sequence_dir = [i for i in files_in_sequence_dir if (i[:6] == "labels" and i[-5:] == ".json")]
-
-        # print("Fant {0} objektsekvenser i {1}.".format(len(label_files_in_sequence_dir), sequence_name))
 
         for object_sequence_index in range(len(label_files_in_sequence_dir)):
             # print("Laster inn fra", label_files_in_sequence_dir[object_sequence_index])
