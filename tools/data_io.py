@@ -168,6 +168,8 @@ def get_image_file_names_in_json(json_path):
 
 
 def get_path_from_user(default_path, description):
+    # Jeg tror ikke at denne funksjonen brukes lenger.
+
     path = None
     while path is None:
         path = input("Skriv inn banen til {1} (trykk enter for \"{0}\"): >".format(default_path, description))
@@ -179,6 +181,8 @@ def get_path_from_user(default_path, description):
 
 
 def main():
+
+    # Dette er kode for å lage utsnitt av INRIA Holidays-bildene til bruk i fotobakgrunn-sekvensene.
     dir = "../../INRIAHolidays/jpg"
     out_dir = "../../INRIAHolidays/utsnitt"
     file_list = os.listdir(dir)

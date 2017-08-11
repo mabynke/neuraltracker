@@ -1,2 +1,3 @@
 Få bakgrunnen til å bevege seg.
-Lage en tapsfunksjon som også tar hensyn til farten til firkanten (for å unngå det lokale minimumet «stå stille i midten»).
+Lage en tapsfunksjon som også tar hensyn til fartsvektoren til firkanten (for å unngå det lokale minimumet «stå stille i midten»).
+Evt. gjøre noe annet for å gi et sterkt insentiv til å forlate dette lokale minimumet.
