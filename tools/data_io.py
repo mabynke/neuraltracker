@@ -1,6 +1,7 @@
 import os
 import numpy
 import json
+import random
 
 from PIL import Image
 
@@ -64,6 +65,7 @@ def fetch_seq_startcoords_labels(main_path, max_count=0, max_length=0, output_si
 
             if max_length > 0 and max_length < len(image_names_in_object_sequence):
                 image_names_in_object_sequence = image_names_in_object_sequence[:max_length]
+                labels = labels[:max_length]
 
             sequence = []  # Bildene i denne objektsekvensen
             for image_name in image_names_in_object_sequence:  # Iterere gjennom bildene i objektsekvensen og legge dem til i sequence
@@ -115,6 +117,41 @@ def write_labels(dir_path, json_file_name, labels_pos, labels_size, file_names):
         json.dump(formatted_labels, label_file)
 
 
+def load_image_section(size_x, size_y, image_path=None, pos_x=None, pos_y=None, scale=1, numpy_array=True):
+    if image_path is None:
+        dir = "../../INRIAHolidays/jpg"
+        file = random.choice(os.listdir(dir))
+        image_path = os.path.join(dir, file)
+
+    im = Image.open(image_path)
+    orig_size_x, orig_size_y = im.size
+
+    section_size_x = min(round(size_x / scale), orig_size_x)
+    section_size_y = min(round(size_y / scale), orig_size_y)
+
+    if pos_x is None:
+        pos_x = random.randint(0, orig_size_x - section_size_x)
+    if pos_y is None:
+        pos_y = random.randint(0, orig_size_y - section_size_y)
+
+    im = im.crop((pos_x, pos_y, pos_x + section_size_x, pos_y + section_size_y))
+    im = im.resize((size_x, size_y), Image.BILINEAR)
+
+    if numpy_array:
+        im = numpy.array(im)
+    return im
+
+
+def get_existing_image_section(dir="../../INRIAHolidays/utsnitt"):
+    """ Returnerer ferdiggenererte små bakgrunner i mappen dir. """
+
+    file = random.choice(os.listdir(dir))
+    image_path = os.path.join(dir, file)
+    im = Image.open(image_path)
+
+    return im
+
+
 def get_image_file_names_in_json(json_path):
     """Henter ut en liste over filnavnene til alle bilder i en merkelapp-json-fil i riktig rekkefølge."""
 
@@ -139,3 +176,18 @@ def get_path_from_user(default_path, description):
         if not os.access(path, os.F_OK):
             print("%s er ikke en mappe eller fil." % path)
     return path
+
+
+def main():
+    dir = "../../INRIAHolidays/jpg"
+    out_dir = "../../INRIAHolidays/utsnitt"
+    file_list = os.listdir(dir)
+    for i in range(100000):
+        if not i % 1000:
+            print("Framgang: {0}/{1}".format(i, 100000))
+        image = load_image_section(size_x=32, size_y=32, scale=0.01, image_path=os.path.join(dir, random.choice(file_list)), numpy_array=False)
+        image.save(os.path.join(out_dir, str(i)+".bmp"))
+
+
+if __name__ == "__main__":
+    main()

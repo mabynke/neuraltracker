@@ -1,5 +1,2 @@
-- Støy på innkoordinatene
-- To LSTM-lag
-
-
-- Spesialiserte innsekvenser
+Få bakgrunnen til å bevege seg.
+Lage en tapsfunksjon som også tar hensyn til farten til firkanten (for å unngå det lokale minimumet «stå stille i midten»).

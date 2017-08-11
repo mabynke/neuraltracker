@@ -1,0 +1,912 @@
+run_name:  2017-08-10 15:27:24
+Treningseksempler hentes fra  ../../Grafikk/fotobakgrunn/train
+Testeksempler hentes fra  ../../Grafikk/fotobakgrunn/test
+Lager konvolusjon- og maxpoolinglag nr. 0
+Lager konvolusjon- og maxpoolinglag nr. 1
+Oppsummering av nettet:
+____________________________________________________________________________________________________
+Layer (type)                     Output Shape          Param #     Connected to                     
+====================================================================================================
+Innsekvens (InputLayer)          (None, None, 32, 32,  0                                            
+____________________________________________________________________________________________________
+Konv1 (TimeDistributed)          (None, None, 32, 32,  2432        Innsekvens[0][0]                 
+____________________________________________________________________________________________________
+maxpooling1 (TimeDistributed)    (None, None, 16, 16,  0           Konv1[0][0]                      
+____________________________________________________________________________________________________
+Konv2 (TimeDistributed)          (None, None, 16, 16,  9248        maxpooling1[0][0]                
+____________________________________________________________________________________________________
+maxpooling2 (TimeDistributed)    (None, None, 8, 8, 32 0           Konv2[0][0]                      
+____________________________________________________________________________________________________
+Bildeutflating (TimeDistributed) (None, None, 2048)    0           maxpooling2[0][0]                
+____________________________________________________________________________________________________
+Innkoordinater (InputLayer)      (None, 4)             0                                            
+____________________________________________________________________________________________________
+Grensesnittvektorer (TimeDistrib (None, None, 512)     1049088     Bildeutflating[0][0]             
+____________________________________________________________________________________________________
+Kodede_koordinater (Dense)       (None, 512)           2560        Innkoordinater[0][0]             
+____________________________________________________________________________________________________
+GRU-lag1 (GRU)                   (None, None, 512)     1574400     Grensesnittvektorer[0][0]        
+                                                                   Kodede_koordinater[0][0]         
+____________________________________________________________________________________________________
+Posisjon_ut (TimeDistributed)    (None, None, 2)       1026        GRU-lag1[0][0]                   
+____________________________________________________________________________________________________
+Stoerrelse_ut (TimeDistributed)  (None, None, 2)       1026        GRU-lag1[0][0]                   
+====================================================================================================
+Total params: 2,639,780
+Trainable params: 2,639,780
+Non-trainable params: 0
+____________________________________________________________________________________________________
+
+Begynner trening.
+Henter 100000/100000 sekvenser fra mappe: ../../Grafikk/fotobakgrunn/train
+Bildestørrelse: 32*32
+Henter sekvens 0/100000 ...
+Henter sekvens 5000/100000 ...
+Henter sekvens 10000/100000 ...
+Henter sekvens 15000/100000 ...
+Henter sekvens 20000/100000 ...
+Henter sekvens 25000/100000 ...
+Henter sekvens 30000/100000 ...
+Henter sekvens 35000/100000 ...
+Henter sekvens 40000/100000 ...
+Henter sekvens 45000/100000 ...
+Henter sekvens 50000/100000 ...
+Henter sekvens 55000/100000 ...
+Henter sekvens 60000/100000 ...
+Henter sekvens 65000/100000 ...
+Henter sekvens 70000/100000 ...
+Henter sekvens 75000/100000 ...
+Henter sekvens 80000/100000 ...
+Henter sekvens 85000/100000 ...
+Henter sekvens 90000/100000 ...
+Henter sekvens 95000/100000 ...
+Henter 10000/10000 sekvenser fra mappe: ../../Grafikk/fotobakgrunn/test
+Bildestørrelse: 32*32
+Henter sekvens 0/10000 ...
+Henter sekvens 5000/10000 ...
+Trener ...
+Treningsloss: (0.34320241, 0.3331646, 0.0050189286)
+Tester ...
+Testloss: (0.32135558, 0.31473953, 0.0033080284)
+Fullført epoke 1/1000. Brukt 3.1 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.343202
+Beste testtap så langt: 0.321356
+
+Trener ...
+Treningsloss: (0.32607234, 0.31882662, 0.0036228539)
+Tester ...
+Testloss: (0.319098, 0.31214947, 0.0034742584)
+Fullført epoke 2/1000. Brukt 6.1 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.326072
+Beste testtap så langt: 0.319098
+
+Trener ...
+Treningsloss: (0.32560593, 0.31865677, 0.0034745862)
+Tester ...
+Testloss: (0.32048145, 0.31377149, 0.0033549834)
+Fullført epoke 3/1000. Brukt 9.1 minutter.
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.325606
+Beste testtap så langt: 0.319098
+
+Trener ...
+Treningsloss: (0.32509053, 0.31809956, 0.0034954767)
+Tester ...
+Testloss: (0.32028264, 0.31373018, 0.0032762268)
+Fullført epoke 4/1000. Brukt 12.2 minutter.
+Epoker uten forbedring i testtap: 2/36
+Beste treningstap så langt: 0.325091
+Beste testtap så langt: 0.319098
+
+Trener ...
+Treningsloss: (0.32446164, 0.31761461, 0.0034235003)
+Tester ...
+Testloss: (0.31809679, 0.31169659, 0.0032000854)
+Fullført epoke 5/1000. Brukt 15.2 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.324462
+Beste testtap så langt: 0.318097
+
+Trener ...
+Treningsloss: (0.3243525, 0.31759554, 0.0033784765)
+Tester ...
+Testloss: (0.31807411, 0.31158945, 0.0032423181)
+Fullført epoke 6/1000. Brukt 18.3 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.324353
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32441184, 0.31766248, 0.0033746751)
+Tester ...
+Testloss: (0.32077274, 0.31443727, 0.003167728)
+Fullført epoke 7/1000. Brukt 21.3 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.324353
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32423607, 0.31757745, 0.0033293061)
+Tester ...
+Testloss: (0.31910372, 0.3127518, 0.0031759441)
+Fullført epoke 8/1000. Brukt 24.4 minutter.
+Epoker uten forbedring i testtap: 2/36
+Beste treningstap så langt: 0.324236
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32412714, 0.31749707, 0.0033150269)
+Tester ...
+Testloss: (0.31875926, 0.31242716, 0.0031660642)
+Fullført epoke 9/1000. Brukt 27.4 minutter.
+Epoker uten forbedring i testtap: 3/36
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32421365, 0.31757611, 0.0033187659)
+Tester ...
+Testloss: (0.32038331, 0.31401405, 0.0031846324)
+Fullført epoke 10/1000. Brukt 30.5 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 4/36
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32434747, 0.31773165, 0.0033079123)
+Tester ...
+Testloss: (0.31875888, 0.3123793, 0.0031898017)
+Fullført epoke 11/1000. Brukt 33.5 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Epoker uten forbedring i testtap: 5/36
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32455131, 0.31791687, 0.0033172253)
+Tester ...
+Testloss: (0.31868926, 0.31239507, 0.0031470973)
+Fullført epoke 12/1000. Brukt 36.6 minutter.
+Epoker uten forbedring i treningstap: 3/8 (12)
+Epoker uten forbedring i testtap: 6/36
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32443562, 0.31779441, 0.0033206006)
+Tester ...
+Testloss: (0.31847152, 0.31213379, 0.0031688542)
+Fullført epoke 13/1000. Brukt 39.6 minutter.
+Epoker uten forbedring i treningstap: 4/8 (12)
+Epoker uten forbedring i testtap: 7/36
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32453564, 0.31790796, 0.0033138318)
+Tester ...
+Testloss: (0.32125664, 0.31486139, 0.003197636)
+Fullført epoke 14/1000. Brukt 42.7 minutter.
+Epoker uten forbedring i treningstap: 5/8 (12)
+Epoker uten forbedring i testtap: 8/36
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318074
+
+Trener ...
+Treningsloss: (0.32444423, 0.31779915, 0.0033225433)
+Tester ...
+Testloss: (0.3180711, 0.31163177, 0.0032196608)
+Fullført epoke 15/1000. Brukt 45.7 minutter.
+Epoker uten forbedring i treningstap: 6/8 (12)
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318071
+
+Trener ...
+Treningsloss: (0.32449234, 0.31787068, 0.0033108338)
+Tester ...
+Testloss: (0.31916925, 0.31286499, 0.0031521241)
+Fullført epoke 16/1000. Brukt 48.8 minutter.
+Epoker uten forbedring i treningstap: 7/8 (12)
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.318071
+
+Trener ...
+Treningsloss: (0.32459453, 0.31793675, 0.0033288968)
+Tester ...
+Testloss: (0.31750473, 0.31119245, 0.0031561353)
+Fullført epoke 17/1000. Brukt 51.9 minutter.
+Epoker uten forbedring i treningstap: 8/8 (12)
+Senket læringsrate til 0.0001
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.324127
+Beste testtap så langt: 0.317505
+
+Trener ...
+Treningsloss: (0.31723469, 0.31084737, 0.0031936634)
+Tester ...
+Testloss: (0.31749013, 0.31114778, 0.0031711827)
+Fullført epoke 18/1000. Brukt 55.0 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.317235
+Beste testtap så langt: 0.31749
+
+Trener ...
+Treningsloss: (0.3170715, 0.3107039, 0.0031838086)
+Tester ...
+Testloss: (0.31741744, 0.3110919, 0.0031627954)
+Fullført epoke 19/1000. Brukt 58.0 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.317071
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31700778, 0.31063315, 0.0031873125)
+Tester ...
+Testloss: (0.31743312, 0.31110567, 0.0031637286)
+Fullført epoke 20/1000. Brukt 61.1 minutter.
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.317008
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31695682, 0.31062546, 0.0031656721)
+Tester ...
+Testloss: (0.31775215, 0.31143314, 0.003159513)
+Fullført epoke 21/1000. Brukt 64.2 minutter.
+Epoker uten forbedring i testtap: 2/36
+Beste treningstap så langt: 0.316957
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31692198, 0.31059262, 0.0031646942)
+Tester ...
+Testloss: (0.31801572, 0.3116881, 0.0031638236)
+Fullført epoke 22/1000. Brukt 67.3 minutter.
+Epoker uten forbedring i testtap: 3/36
+Beste treningstap så langt: 0.316922
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31690791, 0.31056911, 0.0031693974)
+Tester ...
+Testloss: (0.31789345, 0.31155086, 0.0031712968)
+Fullført epoke 23/1000. Brukt 70.3 minutter.
+Epoker uten forbedring i testtap: 4/36
+Beste treningstap så langt: 0.316908
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31688324, 0.3105514, 0.0031659089)
+Tester ...
+Testloss: (0.31758732, 0.31125626, 0.0031655375)
+Fullført epoke 24/1000. Brukt 73.4 minutter.
+Epoker uten forbedring i testtap: 5/36
+Beste treningstap så langt: 0.316883
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31690186, 0.31055456, 0.0031736603)
+Tester ...
+Testloss: (0.3175748, 0.31124815, 0.0031633207)
+Fullført epoke 25/1000. Brukt 76.5 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 6/36
+Beste treningstap så langt: 0.316883
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31691915, 0.31056377, 0.0031776922)
+Tester ...
+Testloss: (0.3175714, 0.31122616, 0.0031726169)
+Fullført epoke 26/1000. Brukt 79.6 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Epoker uten forbedring i testtap: 7/36
+Beste treningstap så langt: 0.316883
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31687456, 0.31053555, 0.0031695161)
+Tester ...
+Testloss: (0.31787455, 0.31154841, 0.0031630492)
+Fullført epoke 27/1000. Brukt 82.6 minutter.
+Epoker uten forbedring i testtap: 8/36
+Beste treningstap så langt: 0.316875
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31688139, 0.31052777, 0.0031768011)
+Tester ...
+Testloss: (0.31788224, 0.3115651, 0.0031585805)
+Fullført epoke 28/1000. Brukt 85.7 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 9/36
+Beste treningstap så langt: 0.316875
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31689578, 0.31055796, 0.0031689191)
+Tester ...
+Testloss: (0.31782424, 0.31149933, 0.0031624648)
+Fullført epoke 29/1000. Brukt 88.8 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Epoker uten forbedring i testtap: 10/36
+Beste treningstap så langt: 0.316875
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31689262, 0.31056613, 0.0031632476)
+Tester ...
+Testloss: (0.31749982, 0.31119049, 0.0031546538)
+Fullført epoke 30/1000. Brukt 91.8 minutter.
+Epoker uten forbedring i treningstap: 3/8 (12)
+Epoker uten forbedring i testtap: 11/36
+Beste treningstap så langt: 0.316875
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31689328, 0.31055266, 0.003170307)
+Tester ...
+Testloss: (0.31764409, 0.31135088, 0.0031466188)
+Fullført epoke 31/1000. Brukt 94.9 minutter.
+Epoker uten forbedring i treningstap: 4/8 (12)
+Epoker uten forbedring i testtap: 12/36
+Beste treningstap så langt: 0.316875
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31683841, 0.31052294, 0.0031577391)
+Tester ...
+Testloss: (0.31741947, 0.31110671, 0.0031563779)
+Fullført epoke 32/1000. Brukt 98.0 minutter.
+Epoker uten forbedring i testtap: 13/36
+Beste treningstap så langt: 0.316838
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31685868, 0.31054622, 0.0031562315)
+Tester ...
+Testloss: (0.31794029, 0.31162506, 0.0031576168)
+Fullført epoke 33/1000. Brukt 101.0 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 14/36
+Beste treningstap så langt: 0.316838
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31683114, 0.31051296, 0.0031590885)
+Tester ...
+Testloss: (0.31779805, 0.3114838, 0.0031571151)
+Fullført epoke 34/1000. Brukt 104.1 minutter.
+Epoker uten forbedring i testtap: 15/36
+Beste treningstap så langt: 0.316831
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.3168298, 0.31050402, 0.0031628832)
+Tester ...
+Testloss: (0.31798577, 0.31166708, 0.0031593349)
+Fullført epoke 35/1000. Brukt 107.2 minutter.
+Epoker uten forbedring i testtap: 16/36
+Beste treningstap så langt: 0.31683
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31682685, 0.31051853, 0.0031541598)
+Tester ...
+Testloss: (0.31831256, 0.31199437, 0.0031591009)
+Fullført epoke 36/1000. Brukt 110.2 minutter.
+Epoker uten forbedring i testtap: 17/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31686047, 0.31053382, 0.003163327)
+Tester ...
+Testloss: (0.31744462, 0.31111577, 0.0031644197)
+Fullført epoke 37/1000. Brukt 113.3 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 18/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31685883, 0.31051907, 0.0031698877)
+Tester ...
+Testloss: (0.3176187, 0.3112753, 0.0031716907)
+Fullført epoke 38/1000. Brukt 116.4 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Epoker uten forbedring i testtap: 19/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31684446, 0.31052205, 0.0031612096)
+Tester ...
+Testloss: (0.31825268, 0.31192321, 0.0031647561)
+Fullført epoke 39/1000. Brukt 119.4 minutter.
+Epoker uten forbedring i treningstap: 3/8 (12)
+Epoker uten forbedring i testtap: 20/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31684926, 0.31052798, 0.0031606327)
+Tester ...
+Testloss: (0.31817004, 0.31184119, 0.0031644234)
+Fullført epoke 40/1000. Brukt 122.5 minutter.
+Epoker uten forbedring i treningstap: 4/8 (12)
+Epoker uten forbedring i testtap: 21/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.3168503, 0.3105303, 0.003160005)
+Tester ...
+Testloss: (0.31759307, 0.31126061, 0.0031662171)
+Fullført epoke 41/1000. Brukt 125.5 minutter.
+Epoker uten forbedring i treningstap: 5/8 (12)
+Epoker uten forbedring i testtap: 22/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31685591, 0.31052324, 0.0031663398)
+Tester ...
+Testloss: (0.31759441, 0.31127298, 0.0031607086)
+Fullført epoke 42/1000. Brukt 128.6 minutter.
+Epoker uten forbedring i treningstap: 6/8 (12)
+Epoker uten forbedring i testtap: 23/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31683466, 0.31051433, 0.0031601626)
+Tester ...
+Testloss: (0.31779879, 0.31146544, 0.0031666595)
+Fullført epoke 43/1000. Brukt 131.7 minutter.
+Epoker uten forbedring i treningstap: 7/8 (12)
+Epoker uten forbedring i testtap: 24/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31685024, 0.31053215, 0.003159032)
+Tester ...
+Testloss: (0.31798932, 0.31164685, 0.0031712356)
+Fullført epoke 44/1000. Brukt 134.7 minutter.
+Epoker uten forbedring i treningstap: 8/8 (12)
+Senket læringsrate til 1e-05
+Epoker uten forbedring i testtap: 25/36
+Beste treningstap så langt: 0.316827
+Beste testtap så langt: 0.317417
+
+Trener ...
+Treningsloss: (0.31595457, 0.30964759, 0.0031534899)
+Tester ...
+Testloss: (0.31726041, 0.31104982, 0.0031053119)
+Fullført epoke 45/1000. Brukt 137.8 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315955
+Beste testtap så langt: 0.31726
+
+Trener ...
+Treningsloss: (0.31594604, 0.30964088, 0.0031525739)
+Tester ...
+Testloss: (0.31722543, 0.31101701, 0.0031042302)
+Fullført epoke 46/1000. Brukt 140.8 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315946
+Beste testtap så langt: 0.317225
+
+Trener ...
+Treningsloss: (0.31596112, 0.30966514, 0.0031479937)
+Tester ...
+Testloss: (0.317083, 0.31087464, 0.0031041862)
+Fullført epoke 47/1000. Brukt 143.8 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315946
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31593081, 0.3096334, 0.0031487017)
+Tester ...
+Testloss: (0.31718007, 0.31097004, 0.0031049915)
+Fullført epoke 48/1000. Brukt 146.8 minutter.
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.315931
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31590328, 0.3096275, 0.0031378889)
+Tester ...
+Testloss: (0.31717387, 0.31096244, 0.0031057263)
+Fullført epoke 49/1000. Brukt 149.9 minutter.
+Epoker uten forbedring i testtap: 2/36
+Beste treningstap så langt: 0.315903
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.3158865, 0.30961418, 0.0031361512)
+Tester ...
+Testloss: (0.31717759, 0.31096771, 0.0031049398)
+Fullført epoke 50/1000. Brukt 152.9 minutter.
+Epoker uten forbedring i testtap: 3/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31589514, 0.3096059, 0.00314461)
+Tester ...
+Testloss: (0.31716478, 0.31095478, 0.0031050011)
+Fullført epoke 51/1000. Brukt 155.9 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 4/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31589654, 0.30961934, 0.0031385992)
+Tester ...
+Testloss: (0.31716076, 0.31095055, 0.0031051103)
+Fullført epoke 52/1000. Brukt 159.0 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Epoker uten forbedring i testtap: 5/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31592548, 0.30961666, 0.0031543944)
+Tester ...
+Testloss: (0.31716612, 0.31095284, 0.0031066337)
+Fullført epoke 53/1000. Brukt 162.0 minutter.
+Epoker uten forbedring i treningstap: 3/8 (12)
+Epoker uten forbedring i testtap: 6/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31590712, 0.30960798, 0.003149569)
+Tester ...
+Testloss: (0.31722695, 0.31101552, 0.003105717)
+Fullført epoke 54/1000. Brukt 165.0 minutter.
+Epoker uten forbedring i treningstap: 4/8 (12)
+Epoker uten forbedring i testtap: 7/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31591675, 0.30963472, 0.0031410183)
+Tester ...
+Testloss: (0.31714717, 0.3109363, 0.0031054236)
+Fullført epoke 55/1000. Brukt 168.0 minutter.
+Epoker uten forbedring i treningstap: 5/8 (12)
+Epoker uten forbedring i testtap: 8/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31591293, 0.30960783, 0.0031525481)
+Tester ...
+Testloss: (0.31712613, 0.31091666, 0.0031047296)
+Fullført epoke 56/1000. Brukt 171.1 minutter.
+Epoker uten forbedring i treningstap: 6/8 (12)
+Epoker uten forbedring i testtap: 9/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31590992, 0.30960718, 0.0031513767)
+Tester ...
+Testloss: (0.31716099, 0.31095147, 0.0031047664)
+Fullført epoke 57/1000. Brukt 174.1 minutter.
+Epoker uten forbedring i treningstap: 7/8 (12)
+Epoker uten forbedring i testtap: 10/36
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317083
+
+Trener ...
+Treningsloss: (0.31590411, 0.30960718, 0.0031484652)
+Tester ...
+Testloss: (0.31706226, 0.31085131, 0.0031054683)
+Fullført epoke 58/1000. Brukt 177.1 minutter.
+Epoker uten forbedring i treningstap: 8/8 (12)
+Senket læringsrate til 1e-06
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315886
+Beste testtap så langt: 0.317062
+
+Trener ...
+Treningsloss: (0.31579104, 0.30951685, 0.00313711)
+Tester ...
+Testloss: (0.31687179, 0.31066611, 0.0031028402)
+Fullført epoke 59/1000. Brukt 180.1 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315791
+Beste testtap så langt: 0.316872
+
+Trener ...
+Treningsloss: (0.31578898, 0.30951807, 0.0031354541)
+Tester ...
+Testloss: (0.31687212, 0.31066632, 0.0031029042)
+Fullført epoke 60/1000. Brukt 183.1 minutter.
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.316872
+
+Trener ...
+Treningsloss: (0.31580102, 0.30951899, 0.003141012)
+Tester ...
+Testloss: (0.31687137, 0.31066579, 0.0031027969)
+Fullført epoke 61/1000. Brukt 186.2 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.316871
+
+Trener ...
+Treningsloss: (0.31579429, 0.30950734, 0.0031434894)
+Tester ...
+Testloss: (0.31687075, 0.3106651, 0.0031028159)
+Fullført epoke 62/1000. Brukt 189.2 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.316871
+
+Trener ...
+Treningsloss: (0.31579825, 0.30951497, 0.0031416486)
+Tester ...
+Testloss: (0.31687033, 0.31066489, 0.0031027233)
+Fullført epoke 63/1000. Brukt 192.2 minutter.
+Epoker uten forbedring i treningstap: 3/8 (12)
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.31687
+
+Trener ...
+Treningsloss: (0.31581098, 0.30951992, 0.0031455401)
+Tester ...
+Testloss: (0.31687149, 0.31066579, 0.0031028457)
+Fullført epoke 64/1000. Brukt 195.2 minutter.
+Epoker uten forbedring i treningstap: 4/8 (12)
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.31687
+
+Trener ...
+Treningsloss: (0.31579855, 0.30950165, 0.0031484466)
+Tester ...
+Testloss: (0.31687036, 0.31066483, 0.0031027533)
+Fullført epoke 65/1000. Brukt 198.3 minutter.
+Epoker uten forbedring i treningstap: 5/8 (12)
+Epoker uten forbedring i testtap: 2/36
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.31687
+
+Trener ...
+Treningsloss: (0.31581196, 0.3095212, 0.0031453846)
+Tester ...
+Testloss: (0.31687075, 0.31066534, 0.0031027154)
+Fullført epoke 66/1000. Brukt 201.3 minutter.
+Epoker uten forbedring i treningstap: 6/8 (12)
+Epoker uten forbedring i testtap: 3/36
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.31687
+
+Trener ...
+Treningsloss: (0.31580019, 0.30951375, 0.0031432293)
+Tester ...
+Testloss: (0.31687075, 0.31066528, 0.0031027268)
+Fullført epoke 67/1000. Brukt 204.3 minutter.
+Epoker uten forbedring i treningstap: 7/8 (12)
+Epoker uten forbedring i testtap: 4/36
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.31687
+
+Trener ...
+Treningsloss: (0.31579554, 0.30949956, 0.003147979)
+Tester ...
+Testloss: (0.31687045, 0.31066468, 0.0031028946)
+Fullført epoke 68/1000. Brukt 207.4 minutter.
+Epoker uten forbedring i treningstap: 8/8 (12)
+Senket læringsrate til 1e-07
+Epoker uten forbedring i testtap: 5/36
+Beste treningstap så langt: 0.315789
+Beste testtap så langt: 0.31687
+
+Trener ...
+Treningsloss: (0.31578517, 0.30949628, 0.0031444449)
+Tester ...
+Testloss: (0.31686446, 0.31065956, 0.0031024488)
+Fullført epoke 69/1000. Brukt 210.4 minutter.
+Lagret vekter til  saved_weights/2017-08-10 15:27:24.h5
+Beste treningstap så langt: 0.315785
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31580731, 0.30951628, 0.0031455138)
+Tester ...
+Testloss: (0.31686509, 0.31066021, 0.0031024315)
+Fullført epoke 70/1000. Brukt 213.4 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 1/36
+Beste treningstap så langt: 0.315785
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31576699, 0.30949056, 0.0031382092)
+Tester ...
+Testloss: (0.31686524, 0.31066036, 0.0031024299)
+Fullført epoke 71/1000. Brukt 216.4 minutter.
+Epoker uten forbedring i testtap: 2/36
+Beste treningstap så langt: 0.315767
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31579408, 0.30951074, 0.0031416663)
+Tester ...
+Testloss: (0.31686547, 0.31066063, 0.0031024213)
+Fullført epoke 72/1000. Brukt 219.5 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 3/36
+Beste treningstap så langt: 0.315767
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31577641, 0.30949038, 0.0031430083)
+Tester ...
+Testloss: (0.3168653, 0.31066048, 0.003102419)
+Fullført epoke 73/1000. Brukt 222.5 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Epoker uten forbedring i testtap: 4/36
+Beste treningstap så langt: 0.315767
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31580135, 0.30949855, 0.0031513995)
+Tester ...
+Testloss: (0.31686524, 0.31066039, 0.0031024213)
+Fullført epoke 74/1000. Brukt 225.5 minutter.
+Epoker uten forbedring i treningstap: 3/8 (12)
+Epoker uten forbedring i testtap: 5/36
+Beste treningstap så langt: 0.315767
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31576514, 0.30948132, 0.0031419049)
+Tester ...
+Testloss: (0.3168653, 0.31066045, 0.0031024234)
+Fullført epoke 75/1000. Brukt 228.5 minutter.
+Epoker uten forbedring i testtap: 6/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31578895, 0.30951539, 0.0031367808)
+Tester ...
+Testloss: (0.3168653, 0.31066045, 0.0031024243)
+Fullført epoke 76/1000. Brukt 231.6 minutter.
+Epoker uten forbedring i treningstap: 1/8 (12)
+Epoker uten forbedring i testtap: 7/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31580004, 0.30951238, 0.0031438367)
+Tester ...
+Testloss: (0.31686527, 0.31066039, 0.0031024222)
+Fullført epoke 77/1000. Brukt 234.6 minutter.
+Epoker uten forbedring i treningstap: 2/8 (12)
+Epoker uten forbedring i testtap: 8/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31577405, 0.30949384, 0.0031401031)
+Tester ...
+Testloss: (0.31686521, 0.31066036, 0.003102425)
+Fullført epoke 78/1000. Brukt 237.6 minutter.
+Epoker uten forbedring i treningstap: 3/8 (12)
+Epoker uten forbedring i testtap: 9/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31578186, 0.30950025, 0.0031408221)
+Tester ...
+Testloss: (0.31686538, 0.31066051, 0.003102422)
+Fullført epoke 79/1000. Brukt 240.6 minutter.
+Epoker uten forbedring i treningstap: 4/8 (12)
+Epoker uten forbedring i testtap: 10/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31576613, 0.30949575, 0.003135199)
+Tester ...
+Testloss: (0.31686524, 0.31066039, 0.0031024171)
+Fullført epoke 80/1000. Brukt 243.7 minutter.
+Epoker uten forbedring i treningstap: 5/8 (12)
+Epoker uten forbedring i testtap: 11/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.3157801, 0.30949509, 0.0031425171)
+Tester ...
+Testloss: (0.31686506, 0.31066021, 0.0031024234)
+Fullført epoke 81/1000. Brukt 246.7 minutter.
+Epoker uten forbedring i treningstap: 6/8 (12)
+Epoker uten forbedring i testtap: 12/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31578535, 0.30949426, 0.003145539)
+Tester ...
+Testloss: (0.31686506, 0.31066024, 0.0031024192)
+Fullført epoke 82/1000. Brukt 249.7 minutter.
+Epoker uten forbedring i treningstap: 7/8 (12)
+Epoker uten forbedring i testtap: 13/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31578782, 0.30951995, 0.0031339338)
+Tester ...
+Testloss: (0.31686488, 0.31066003, 0.0031024264)
+Fullført epoke 83/1000. Brukt 252.8 minutter.
+Epoker uten forbedring i treningstap: 8/8 (12)
+Senket læringsrate til 1e-08
+Epoker uten forbedring i testtap: 14/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31578922, 0.30950636, 0.0031414202)
+Tester ...
+Testloss: (0.31686494, 0.31066006, 0.0031024315)
+Fullført epoke 84/1000. Brukt 255.8 minutter.
+Epoker uten forbedring i treningstap: 9/8 (12)
+Epoker uten forbedring i testtap: 15/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31578383, 0.30950245, 0.0031406977)
+Tester ...
+Testloss: (0.316865, 0.31066009, 0.003102435)
+Fullført epoke 85/1000. Brukt 258.8 minutter.
+Epoker uten forbedring i treningstap: 10/8 (12)
+Epoker uten forbedring i testtap: 16/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31577909, 0.30950245, 0.0031383182)
+Tester ...
+Testloss: (0.31686503, 0.31066015, 0.0031024364)
+Fullført epoke 86/1000. Brukt 261.8 minutter.
+Epoker uten forbedring i treningstap: 11/8 (12)
+Epoker uten forbedring i testtap: 17/36
+Beste treningstap så langt: 0.315765
+Beste testtap så langt: 0.316864
+
+Trener ...
+Treningsloss: (0.31579763, 0.30951071, 0.0031434423)
+Tester ...
+Testloss: (0.31686506, 0.31066018, 0.0031024388)
+Fullført epoke 87/1000. Brukt 264.9 minutter.
+Epoker uten forbedring i treningstap: 12/8 (12)
+Ingen forbedring i treningstap. Avslutter ...
+Laster inn vekter fra  saved_weights/2017-08-10 15:27:24.h5
+Henter 100/10000 sekvenser fra mappe: ../../Grafikk/fotobakgrunn/test
+Bildestørrelse: 32*32
+Henter sekvens 0/100 ...

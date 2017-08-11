@@ -12,7 +12,7 @@ def plot_loss_history(loss_history, run_name):
               ["#ff0000", "#e06060", "#c06060"]]
 
     plt.clf()
-    plt.ylim(0, 0.06)
+    # plt.ylim(0, 0.06)
     for i in range(2):  # Trening og test
         # for j in range(3):  # loss, loss_pos, loss_str
         plt.plot(array[:, i, 0], colors[i][0])

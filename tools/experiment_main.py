@@ -110,9 +110,9 @@ def train_model(model, round_patience, save_weights_path, tensorboard_log_dir, t
                 training_examples, training_path, run_name, save_results, image_size, batch_size):
 
     train_seqs, train_startcoords, train_labels_pos, train_labels_size, _ =\
-        data_io.fetch_seq_startcoords_labels(training_path, training_examples, output_size=image_size, max_length=0)
+        data_io.fetch_seq_startcoords_labels(training_path, training_examples, output_size=image_size, max_length=16)
     test_seqs, test_startcoords, test_labels_pos, test_labels_size, _ = \
-        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size, max_length=0)
+        data_io.fetch_seq_startcoords_labels(test_path, testing_examples, output_size=image_size, max_length=16)
 
     loss_history = []  # Format: ((treningsloss, tr.loss_pos, tr.loss_str), (testloss, testloss_pos, testloss_str))
 

@@ -1,4 +1,4 @@
-De følgende forsøkene er kjørt med trening som automatisk slutter å trene når 5 epoker har gått uten forbedring i loss.
+De første forsøkene er kjørt med trening som automatisk slutter å trene når 5 epoker har gått uten forbedring i loss.
 
 2017-07-12 - Forsøk:
 Beskrivelse: Forsøk med data (1000 trening, 1000 test) med 1 4*4-kvadrat i tilfeldig bevegelse med tilfeldig startpunkt (32*32 piksler, hvit figur på svart bakgrunn). Grensesnittvektorstørrelse 512. Tilstandsvektorstørrelse 256. Ingen konvolusjonale lag. Optimeringsalgoritme: rmsprop
@@ -163,7 +163,7 @@ Resultat: Svært stort gap mellom trenings- og testtap. Avbryter.
 
 2017-08-09 11:26:45:
 Firkantene skifter farge. Økt til 100000 treningssekvenser igjen for å kunne sammenligne med resultatene fra tidligere. Fortsatt 24 bilder/sekvens.
-Resultat:
+Resultat: Beste treningstap: 0.00998 (0.00682+2*0.00158). Beste testtap: 0.0176 (0.0146+2*0.0015).
 Visuell vurdering: Svært god til å ikke miste firkanten sin. Klarer å følge riktig firkant selv når de krysser hverandre og ser veldig like ut (se f.eks. sekvensen skiftendeFarger/test/seq00052). Også når den aktuelle firkanten er gjemt bak den andre i et bilde. Tar tilsynelatende feil bare når firkantene starter oppå hverandre og det er mer eller mindre umulig å vite hvilken firkant som skulle følges. Ikke like god til å finne størrelsen, men klarer det rimelig godt.
 
 2017-08-09 11:27:51:
@@ -173,9 +173,23 @@ Visuell vurdering: Klarer i korte øyeblikk å følge firkanten, men ligner for 
 
 2017-08-09 12:27:46:
 Redusert grensesnittvektorens lengde tilbake til 512. Fortsatt 64 filtre.
-Resultat: 
+Resultat: Ligner veldig på resultatene med 32 filtre (muligens enda litt bedre til å skjønne hvilken firkant den skal følge). Beste treningstap: 0.0126 (0.00903+2*0.00180). Beste testtap: 0.0204 (0.0171+2*0.0016).
 
 2017-08-09 16:21:23:
-Endret bakgrunn fra svart til tilfeldig støy (men ikke animert). Skrudd av skiftende farger på firkantene.
+Endret bakgrunn fra svart til tilfeldig støy (men ikke animert). Skrudd av skiftende farger på firkantene. Redusert til 32 filtre i konvolusjonslagene.
 Resultat: Tap på 0.33.
 Visuell vurdering: Prediksjonen står helt stille i midten av bildet og har ca. samme størrelse som målfirkanten har i første bilde. Det er tydelig på grafikken at det er en veldig vanskelig oppgave for konvolusjonsdelen og grensesnittlaget.
+
+2017-08-10 12:27:57:
+Byttet tapsfunksjonen for posisjon fra mean_squared_error til mean_absolute_error. Begrenset sekvenslengden til 16 bilder.
+2017-08-10 13:33:01:
+Fortsettelse av samme forsøk.
+Resultat: Samme som forrige gang, men prediksjonen er ikke alltid helt i midten. Men den står fortsatt stille.
+
+2017-08-10 14:41:00:
+Hentet bilder fra http://lear.inrialpes.fr/people/jegou/data.php og brukt utsnitt av dem som bakgrunn istedenfor støy eller svart. Bruker fortsatt mean_absolute_error som tap for posisjon.
+Resultat: Ligner veldig på resultatet med støybakgrunn. Beste treningstap: 0.479607 (0.473+0.003), beste testtap: 0.480488 (0.474+0.003). (husk annen tapsfunksjon).
+
+2017-08-10 15:27:24:
+Samme som sist, men med mean_squared_error som tap for posisjon.
+Resultat: Ligner veldig på forrige. Beste treningstap: 0.318 (0.309+0.003), beste testtap: 0.317 (0.311+0.003)

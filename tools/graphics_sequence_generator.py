@@ -6,7 +6,7 @@ import numpy as np
 import scipy.misc
 
 # from tools.data_io import write_labels
-from data_io import write_labels
+from data_io import write_labels, get_existing_image_section
 
 
 # def generate_movement_binarylabel(category, binary_type="horizontal-vertical", frames=12, size_x=32, size_y=32, channels=3):
@@ -167,6 +167,14 @@ def make_background(sequence, pattern="random_noise_constant"):
                     value = random.randint(0, 255)
                     for frame in range(len(sequence)):
                         sequence[frame][x][y][ch] = value
+
+    elif pattern == "random_photograph_section_constant":
+        size_x = len(sequence[0])
+        size_y = len(sequence[0][0])
+        photo = get_existing_image_section()
+        for frame in range(len(sequence)):
+            sequence[frame] = photo
+
     else:
         raise ValueError("Kjenner ikke mønsteret " + pattern)
 
@@ -198,7 +206,7 @@ def save_sequence_labelfile(sequence, labels_pos, labels_size, parent_path, seq_
     # Iterere gjennom bildene i sekvensen
     file_names = []
     for frame in range(len(sequence)):
-        file_name = "frame{0:05d}.jpg".format(frame)
+        file_name = "frame{0:05d}.bmp".format(frame)
         file_names.append(file_name)
         image_array = sequence[frame]
         scipy.misc.imsave(os.path.join(path, file_name), image_array)
@@ -208,7 +216,7 @@ def save_sequence_labelfile(sequence, labels_pos, labels_size, parent_path, seq_
 
 
 def create_train_test_examples(path, counts, figures=1):
-    frames = 24
+    frames = 12
     image_size = 32
     channels = 3
 
@@ -230,7 +238,7 @@ def create_train_test_examples(path, counts, figures=1):
             if not sequence_index % 2000:
                 print("Skrevet {0}/{1} sekvenser til {2}".format(sequence_index, count, name))
             sequence = np.zeros((frames, image_size, image_size, channels), dtype=np.int)
-            make_background(sequence)
+            make_background(sequence, pattern="random_photograph_section_constant")
             for figure in range(figures):
                 # Kun den siste versjonen av labels blir beholdt og skrevet til fil
                 labels_pos, labels_size = generate_movement_positionlabel(sequence,
@@ -246,7 +254,7 @@ def main():
     os.chdir(os.path.dirname(sys.argv[0]))
     train_examples = 100000
     test_examples = 10000
-    default_path = "../../Grafikk/stoybakgrunn"
+    default_path = "../../Grafikk/fotobakgrunn_bmp"
 
     path = input("Mappe det skal skrives til (trykk enter for \"{0}\"): >".format(default_path))
     if path == "":

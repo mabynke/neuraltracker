@@ -1,0 +1,7 @@
+Hvordan kjøre prediksjon med ferdigtrente vekter
+
+
+1: Pass på at nettverket har samme oppbygning (like lag) som det hadde når treningen ble utført.
+2: I main() i experiment_main.py: Sett save_results = False, load_saved_weights = True, do_training = False og make_example_jsons = True.
+3: Sett example_path i do_run() til mappen med sekvensene som nettverket skal kjøres på.
+4: Kjør experiment_main.py og skriv inn navnet kjøringen du vil hente de ferdigtrente vektene fra, når du blir spurt om det.
