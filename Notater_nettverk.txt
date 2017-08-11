@@ -198,3 +198,4 @@ Resultat: Ligner veldig på forrige. Beste treningstap: 0.318 (0.309+0.003), bes
 2017-08-11 11:14:30:
 Lagd nye sekvenssett lik de forrige, men i bmp-format og dermed helt uten støy på firkantene. Trener videre på vektene fra kjøring 2017-08-09 11:26:45.
 Visuell vurdering: Mer interessant oppførsel. Klarer å følge riktig firkant til en viss grad, men bommer mye oftere enn med svart bakgrunn. Det er tydelig at jpg-komprimeringen gjør oppgaven betydelig vanskeligere, men uten støy er det enda mer begrenset hvor realistisk oppgaven er, fordi firkantene er fullstendig rene i fargen. Dette tyder imidlertid på at det er bildebehandlingsdelen av nettverket som nå er flaskehalsen.
+Resultat: Loss rundt 0.06 (ikke ferdig kjørt)
