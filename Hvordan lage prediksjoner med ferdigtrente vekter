@@ -1,0 +1,11 @@
+Hvordan kjøre prediksjon med ferdigtrente vekter
+
+1: Pass på at nettverket har samme oppbygning (like lag) som det hadde når treningen ble utført.
+2: I main() i experiment_main.py: Sett save_results = False, load_saved_weights = True, do_training = False og make_predictions = True.
+3: Sett example_path i do_run() til mappen med sekvensene som du vil ha prediksjoner for.
+4: Dersom du vil teste med andre vekter, endre dette i "do_run" funksjonen i "experiment_main.py"
+
+
+Hvordan visualisere prediksjonene med nettgrensesnittet
+
+Kjør html-filen "UI/neuralTrackerUI.html". Det er viktig at  "jquery-3.2.1.js" ligger i denne mappen. Sifiser hvilken mappe du vil lese sekvenser fra (f.eks. test eller train). Relative baner fungerer også, så dersom filene ligger i mappen du vil teste gjør du det veldig enkelt for deg selv. De andre spørsmålene har fornuftige standardverdier.

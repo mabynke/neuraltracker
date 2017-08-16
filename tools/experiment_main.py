@@ -28,10 +28,10 @@ def create_model(image_size, interface_vector_length, state_vector_length):
     input_coordinates = Input(shape=(4,), name="Innkoordinater")
 
     # Behandle bildesekvensen
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv1")(input_sequence)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv2")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="same"), name="Konv1")(input_sequence)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="same"), name="Konv2")(x)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling1")(x)
-    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu"), name="Konv3")(x)
+    x = TimeDistributed(Conv2D(filters=32, kernel_size=(5, 5), activation="relu", padding="same"), name="Konv3")(x)
     x = TimeDistributed(MaxPooling2D((2, 2)), name="maxpooling2")(x)
 
     x = TimeDistributed(Flatten(), name="Bildeutflating")(x)
@@ -182,7 +182,7 @@ def do_run(example_examples=100, testing_examples=0, training_examples=0, load_w
     test_path = "../Grafikk/tilfeldig_relativeKoordinater/test"
     example_path = test_path
     print("Testeksempler hentes fra ", test_path)
-    weights_path = os.path.join("saved_weights", run_name + ".h5")
+    weights_path = os.path.join("./saved_weights", "basic" + ".h5")
     tensorboard_log_dir = "tensorboard_logs"
 
     model = build_and_train_model(state_vector_length, image_size, interface_vector_length, tensorboard_log_dir,
@@ -229,13 +229,13 @@ def evaluate_model(model, test_sequences, test_startcoords, test_labels_pos, tes
 def main():
     os.chdir(os.path.dirname(sys.argv[0])) # set working directory to that of the script
     # Oppsett
-    save_results = True  # Husk denne! Lagrer vekter, plott og stdout.
-    load_saved_weights = False
-    do_training = True
+    save_results = False  # Husk denne! Lagrer vekter, plott og stdout.
+    load_saved_weights = True
+    do_training = False
     make_predictions = True
     training_examples = 100000
     testing_examples = 10000
-    example_examples = 100
+    example_examples = testing_examples
     patience_before_lowering_lr = 8
     image_size = 32
 
