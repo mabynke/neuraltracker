@@ -8,4 +8,6 @@ Hvordan kjøre prediksjon med ferdigtrente vekter
 
 Hvordan visualisere prediksjonene med nettgrensesnittet
 
-Legg en kopi av neuralTrackerUI_firkanter.html og jquery-3.2.1.js i mappen sammen med en eller flere mapper med sekvenser. Kjør html-filen og spesifiser hvilken mappe du vil lese sekvenser fra (f.eks. test eller train). De andre spørsmålene har fornuftige standardverdier.
+Se "README_UI.org" for info her. Merk at du kan måtte bruke Firefox som nettleser.
+Åpne "neuralTrackerUI_bilder.html" eller "neuralTrackerUI_firkanter.html" i *Firefox*
+(ikke garantert å virke i andre nettlesere).
